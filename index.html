@@ -457,7 +457,7 @@
       }
     }
 
-    async function loadHomeTasks() {
+       async function loadHomeTasks() {
       try {
         const response = await fetch(TASKS_URL);
         const csv = await response.text();
@@ -465,24 +465,39 @@
         const list = document.getElementById('home-tasks');
         list.innerHTML = '';
 
-        const pendingTasks = rows.filter(row => {
+        const pendingTasks = rows.map((row, index) => {
           const cols = row.split(',');
-          return cols.length >= 4 && cols[3].trim() !== 'Done' && cols[0].trim() !== '';
-        });
+          return {
+            task: cols[0] ? cols[0].trim() : '',
+            dueDate: cols[1] ? cols[1].trim() : '',
+            priority: cols[2] ? cols[2].trim() : '',
+            status: cols[3] ? cols[3].trim() : '',
+            rowIndex: index
+          };
+        }).filter(item => item.status !== 'Done' && item.task !== '');
 
         if (pendingTasks.length === 0) {
           list.innerHTML = '<p class="empty">No pending tasks. You\'re all clear!</p>';
           return;
         }
 
-        pendingTasks.slice(0, 5).forEach(row => {
-          const cols = row.split(',');
+        pendingTasks.slice(0, 5).forEach(item => {
           const div = document.createElement('div');
-          div.style.cssText = 'padding: 10px 12px; background: rgba(255,255,255,0.05); border-radius: 10px; font-size: 14px;';
-          div.textContent = `${cols[0].trim()}`;
-          if (cols[1] && cols[1].trim() !== '') {
-            div.textContent += ` — Due: ${cols[1].trim()}`;
+          div.style.cssText = 'display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; background: rgba(255,255,255,0.05); border-radius: 10px; margin-bottom: 6px; font-size: 14px;';
+          
+          const info = document.createElement('span');
+          info.textContent = `${item.task}`;
+          if (item.dueDate !== '') {
+            info.textContent += ` — Due: ${item.dueDate}`;
           }
+          
+          const doneBtn = document.createElement('button');
+          doneBtn.textContent = '✓';
+          doneBtn.style.cssText = 'background: rgba(139, 92, 246, 0.2); border: 1px solid rgba(139, 92, 246, 0.4); color: #A78BFA; font-size: 16px; width: 28px; height: 28px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center;';
+          doneBtn.onclick = () => completeTask(item.rowIndex);
+          
+          div.appendChild(info);
+          div.appendChild(doneBtn);
           list.appendChild(div);
         });
       } catch (error) {
@@ -539,7 +554,22 @@
         list.appendChild(row);
       });
     }
-
+    async function completeTask(rowIndex) {
+      try {
+        await fetch(SCRIPT_URL, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'text/plain' },
+          body: JSON.stringify({
+            action: 'complete_task',
+            row: rowIndex
+          })
+        });
+        loadHomeTasks(); // Reload the task list
+      } catch (error) {
+        alert('Unable to mark task as done.');
+      }
+    }
     async function deleteScore(rowIndex) {
       try {
         await fetch(SCRIPT_URL, {
