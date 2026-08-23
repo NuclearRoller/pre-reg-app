@@ -36,7 +36,6 @@
       user-select: none;
     }
 
-    /* Soft ambient background */
     .orb {
       position: fixed;
       border-radius: 50%;
@@ -55,7 +54,6 @@
       50% { transform: translate(15px, 25px); }
     }
 
-    /* Splash Screen */
     #splash {
       position: fixed;
       inset: 0;
@@ -91,7 +89,6 @@
       50% { opacity: 1; }
     }
 
-    /* Main App */
     #app {
       position: relative;
       z-index: 1;
@@ -107,7 +104,6 @@
       to { opacity: 1; }
     }
 
-    /* Greeting */
     .greeting {
       margin-top: 30px;
       animation: slideIn 1s cubic-bezier(0.16, 1, 0.3, 1) 0.8s both;
@@ -131,7 +127,6 @@
       to { opacity: 1; transform: translateX(0); }
     }
 
-    /* Cards */
     .card {
       background: var(--card);
       border: 1px solid var(--card-border);
@@ -162,7 +157,6 @@
       font-style: italic;
     }
 
-    /* Tab Views */
     .tab-view {
       display: none;
       animation: viewFade 0.4s ease;
@@ -175,7 +169,6 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
-    /* Calendar */
     .calendar-wrap {
       margin-top: 14px;
       border-radius: 18px;
@@ -191,7 +184,6 @@
       filter: invert(0.85) hue-rotate(180deg) brightness(0.9) contrast(0.9);
     }
 
-    /* Chat / Arlo */
     .chat-wrap {
       margin-top: 14px;
       border-radius: 18px;
@@ -207,13 +199,11 @@
       width: 100%;
       height: 100%;
     }
-    /* Force n8n chat to render on solid dark background */
     #n8n-chat-container {
       background: #0D0D16 !important;
       color: var(--text) !important;
     }
 
-    /* Bottom Navigation */
     .tab-bar {
       position: fixed;
       bottom: 0;
@@ -251,6 +241,26 @@
     }
     .tab-btn:active {
       transform: scale(0.92);
+    }
+
+    .score-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 12px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 10px;
+      margin-bottom: 6px;
+      font-size: 14px;
+    }
+    .delete-btn {
+      background: none;
+      border: none;
+      color: #EF4444;
+      font-size: 18px;
+      cursor: pointer;
+      padding: 0 4px;
+      line-height: 1;
     }
   </style>
 </head>
@@ -325,12 +335,19 @@
 
       <div class="card">
         <h3>Log Test Score</h3>
-        <p style="color: var(--text-dim); font-size: 14px; margin-bottom: 12px;">Select a topic and enter your score. This will update your mastery.</p>
+        <p style="color: var(--text-dim); font-size: 14px; margin-bottom: 12px;">Select a topic and enter your score.</p>
         <select id="topic-select" style="width: 100%; padding: 12px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); color: var(--text); font-size: 14px; margin-bottom: 10px;">
           <option value="">Choose a topic...</option>
         </select>
         <input type="number" id="score-input" placeholder="Score (0-100)" min="0" max="100" style="width: 100%; padding: 12px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); color: var(--text); font-size: 14px; margin-bottom: 10px;">
-        <button onclick="logScore()" style="width: 100%; padding: 14px; border-radius: 12px; border: none; background: linear-gradient(135deg, #8B5CF6, #6D28D9); color: white; font-size: 15px; font-weight: 600; cursor: pointer; transition: opacity 0.3s ease;">Save Score</button>
+        <button onclick="logScore()" style="width: 100%; padding: 14px; border-radius: 12px; border: none; background: linear-gradient(135deg, #8B5CF6, #6D28D9); color: white; font-size: 15px; font-weight: 600; cursor: pointer;">Save Score</button>
+      </div>
+
+      <div class="card">
+        <h3>Recent Scores</h3>
+        <div id="recent-scores" style="display: flex; flex-direction: column;">
+          <p class="empty">Loading your scores...</p>
+        </div>
       </div>
     </div>
 
@@ -360,31 +377,31 @@
     import { createChat } from 'https://cdn.jsdelivr.net/npm/@n8n/chat/dist/chat.bundle.es.js';
 
     createChat({
-  target: '#n8n-chat-container',
-  mode: 'fullscreen',
-  webhookUrl: 'https://familysalesbot.camdvr.org/webhook/f5621c67-f92f-4be2-91ed-5b475df9e6d1/chat',
-  showWelcomeScreen: false,
-  options: {
-    title: 'Arlo',
-    welcomeMessage: 'Hey Joey, I\'m Arlo. I can manage your calendar, map LOs, and plan your study.',
-    placeholder: 'Message Arlo...'
-  }
-});
+      target: '#n8n-chat-container',
+      mode: 'fullscreen',
+      webhookUrl: 'https://familysalesbot.camdvr.org/webhook/f5621c67-f92f-4be2-91ed-5b475df9e6d1/chat',
+      showWelcomeScreen: false,
+      options: {
+        title: 'Arlo',
+        welcomeMessage: 'Hey Joey, I\'m Arlo. I can manage your calendar, map LOs, and plan your study.',
+        placeholder: 'Message Arlo...'
+      }
+    });
   </script>
 
   <script>
-    // Your Google Sheet CSV URL (Public)
     const SHEET_URL = 'https://docs.google.com/spreadsheets/d/1ElgT3pbdTA8Bd2r9r9nQI1wCayMoH2po8jcVZuoSeSw/export?format=csv&gid=0';
+    const STUDYLOG_URL = 'https://docs.google.com/spreadsheets/d/1ElgT3pbdTA8Bd2r9r9nQI1wCayMoH2po8jcVZuoSeSw/export?format=csv&gid=688195198';
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwS6hvQCyegIENF4CL7qkVytOKjYo-tFXiEyvKKiMFhn-GBVNA7D5zLhOOob0O4cfisGw/exec';
 
     let topics = [];
+    let recentScores = [];
 
-    // Load syllabus data from Google Sheet
     async function loadStudyData() {
       try {
         const response = await fetch(SHEET_URL);
         const csv = await response.text();
-        const rows = csv.split('\n').slice(1); // Skip header
-        
+        const rows = csv.split('\n').slice(1);
         topics = [];
         rows.forEach(row => {
           const cols = row.split(',');
@@ -398,17 +415,36 @@
             });
           }
         });
-
         renderStudyData();
       } catch (error) {
-        console.error('Error loading data:', error);
-        document.getElementById('high-yield-list').innerHTML = '<p class="empty">Unable to load topics. Please check your connection.</p>';
+        document.getElementById('high-yield-list').innerHTML = '<p class="empty">Unable to load topics.</p>';
       }
     }
 
-    // Render the data in the Study tab
+    async function loadRecentScores() {
+      try {
+        const response = await fetch(STUDYLOG_URL);
+        const csv = await response.text();
+        const rows = csv.split('\n').slice(1);
+        recentScores = [];
+        rows.forEach((row, index) => {
+          const cols = row.split(',');
+          if (cols.length >= 3 && cols[0].trim() !== '') {
+            recentScores.push({
+              date: cols[0].trim(),
+              topicId: cols[1].trim(),
+              score: cols[2].trim(),
+              rowIndex: index
+            });
+          }
+        });
+        renderRecentScores();
+      } catch (error) {
+        document.getElementById('recent-scores').innerHTML = '<p class="empty">Unable to load scores.</p>';
+      }
+    }
+
     function renderStudyData() {
-      // Populate the dropdown
       const select = document.getElementById('topic-select');
       select.innerHTML = '<option value="">Choose a topic...</option>';
       topics.forEach(t => {
@@ -418,7 +454,6 @@
         select.appendChild(option);
       });
 
-      // Show high yield topics
       const highYieldTopics = topics.filter(t => t.highYield.toLowerCase() === 'yes');
       const list = document.getElementById('high-yield-list');
       list.innerHTML = '';
@@ -429,57 +464,80 @@
         list.appendChild(chip);
       });
 
-      // Update coverage bar (just visual for now)
       const total = topics.length;
-      const covered = Math.floor(total * 0.25); // We'll make this dynamic later
+      const covered = Math.floor(total * 0.25);
       const pct = Math.round((covered / total) * 100);
       document.getElementById('coverage-bar').style.width = pct + '%';
       document.getElementById('coverage-text').textContent = `${covered} of ${total} topics started (${pct}%)`;
     }
 
-        // Log a test score to Google Sheet
+    function renderRecentScores() {
+      const list = document.getElementById('recent-scores');
+      list.innerHTML = '';
+      if (recentScores.length === 0) {
+        list.innerHTML = '<p class="empty">No scores logged yet.</p>';
+        return;
+      }
+      const reversed = recentScores.slice(-10).reverse();
+      reversed.forEach(item => {
+        const row = document.createElement('div');
+        row.className = 'score-row';
+        const info = document.createElement('span');
+        info.textContent = `${item.topicId} — ${item.score}%`;
+        const deleteBtn = document.createElement('button');
+        deleteBtn.className = 'delete-btn';
+        deleteBtn.textContent = '×';
+        deleteBtn.onclick = () => deleteScore(item.rowIndex);
+        row.appendChild(info);
+        row.appendChild(deleteBtn);
+        list.appendChild(row);
+      });
+    }
+
+    async function deleteScore(rowIndex) {
+      try {
+        await fetch(SCRIPT_URL, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'text/plain' },
+          body: JSON.stringify({ action: 'delete', row: rowIndex })
+        });
+        alert('Score deleted.');
+        loadRecentScores();
+      } catch (error) {
+        alert('Unable to delete score.');
+      }
+    }
+
     async function logScore() {
       const topicId = document.getElementById('topic-select').value;
       const score = document.getElementById('score-input').value;
-      
       if (!topicId || !score) {
         alert('Please select a topic and enter a score.');
         return;
       }
-      
-      const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwS6hvQCyegIENF4CL7qkVytOKjYo-tFXiEyvKKiMFhn-GBVNA7D5zLhOOob0O4cfisGw/exec';
-      
       try {
-        // Use no-cors mode to bypass CORS issues
-        const response = await fetch(SCRIPT_URL, {
+        await fetch(SCRIPT_URL, {
           method: 'POST',
           mode: 'no-cors',
           headers: { 'Content-Type': 'text/plain' },
-          body: JSON.stringify({
-            topicId: topicId,
-            score: score
-          })
+          body: JSON.stringify({ topicId, score })
         });
-        
-        // Since no-cors doesn't return readable data, we assume success
         alert(`Score logged for ${topicId}: ${score}%`);
         document.getElementById('score-input').value = '';
-        
+        loadRecentScores();
       } catch (error) {
-        console.error('Error:', error);
         alert('Unable to log score. Please try again.');
       }
     }
 
-    // Splash screen
     setTimeout(() => {
       document.getElementById('splash').classList.add('hide');
     }, 2000);
 
-    // Load study data when app opens
     loadStudyData();
+    loadRecentScores();
 
-    // Tab switching
     function switchTab(tabId) {
       document.querySelectorAll('.tab-view').forEach(view => view.classList.remove('active'));
       document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
