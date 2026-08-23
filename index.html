@@ -361,6 +361,12 @@
           <p class="empty">Loading your scores...</p>
         </div>
       </div>
+            <div class="card">
+        <h3>E-Portfolio Reflections</h3>
+        <div id="reflections-list" style="display: flex; flex-direction: column; gap: 10px;">
+          <p class="empty">Loading your reflections...</p>
+        </div>
+      </div>
     </div>
 
     <!-- ARLO -->
@@ -406,6 +412,7 @@
     const STUDYLOG_URL = 'https://docs.google.com/spreadsheets/d/1ElgT3pbdTA8Bd2r9r9nQI1wCayMoH2po8jcVZuoSeSw/export?format=csv&gid=688195198';
     const TASKS_URL = 'https://docs.google.com/spreadsheets/d/1ElgT3pbdTA8Bd2r9r9nQI1wCayMoH2po8jcVZuoSeSw/export?format=csv&gid=331487663';
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz8pFJsvzyzdtWqQnibE9NBILfsWHVCMHvZw5IURNTjJIMflQHvB_1-8fSm-LGsBsdb1w/exec';
+    const REFLECTIONS_URL = 'https://docs.google.com/spreadsheets/d/1ElgT3pbdTA8Bd2r9r9nQI1wCayMoH2po8jcVZuoSeSw/export?format=csv&gid=1128922294';
 
     let topics = [];
     let recentScores = [];
@@ -502,6 +509,63 @@
         });
       } catch (error) {
         document.getElementById('home-tasks').innerHTML = '<p class="empty">Unable to load tasks.</p>';
+      }
+    }
+        async function loadReflections() {
+      try {
+        const response = await fetch(REFLECTIONS_URL);
+        const csv = await response.text();
+        const rows = csv.split('\n').slice(1);
+        const list = document.getElementById('reflections-list');
+        list.innerHTML = '';
+
+        const reflections = rows.map(row => {
+          const cols = row.split(',');
+          return {
+            date: cols[0] ? cols[0].trim() : '',
+            raw: cols[1] ? cols[1].trim() : '',
+            refined: cols[2] ? cols[2].trim() : '',
+            mappedLOs: cols[3] ? cols[3].trim() : '',
+            status: cols[4] ? cols[4].trim() : ''
+          };
+        }).filter(item => item.refined !== '');
+
+        if (reflections.length === 0) {
+          list.innerHTML = '<p class="empty">No reflections yet. Ask Arlo to map one!</p>';
+          return;
+        }
+
+        reflections.slice(-5).reverse().forEach(item => {
+          const div = document.createElement('div');
+          div.style.cssText = 'padding: 12px; background: rgba(255,255,255,0.04); border-radius: 12px; border: 1px solid rgba(255,255,255,0.06);';
+
+          const refinedEl = document.createElement('p');
+          refinedEl.textContent = item.refined;
+          refinedEl.style.cssText = 'font-size: 13px; line-height: 1.5; margin-bottom: 8px;';
+
+          const loEl = document.createElement('div');
+          loEl.style.cssText = 'display: flex; flex-wrap: wrap; gap: 4px;';
+          
+          const loLabel = document.createElement('span');
+          loLabel.textContent = 'Mapped LOs:';
+          loLabel.style.cssText = 'font-size: 11px; color: var(--text-dim); margin-right: 4px; align-self: center;';
+          loEl.appendChild(loLabel);
+
+          if (item.mappedLOs) {
+            item.mappedLOs.split(',').forEach(lo => {
+              const chip = document.createElement('span');
+              chip.textContent = lo.trim();
+              chip.style.cssText = 'padding: 2px 8px; background: rgba(139, 92, 246, 0.2); border: 1px solid rgba(139, 92, 246, 0.4); border-radius: 20px; font-size: 11px; color: #A78BFA;';
+              loEl.appendChild(chip);
+            });
+          }
+
+          div.appendChild(refinedEl);
+          div.appendChild(loEl);
+          list.appendChild(div);
+        });
+      } catch (error) {
+        document.getElementById('reflections-list').innerHTML = '<p class="empty">Unable to load reflections.</p>';
       }
     }
 
@@ -670,6 +734,7 @@
     loadStudyData();
     loadRecentScores();
     loadHomeTasks();
+    loadReflections();
 
     setTimeout(() => {
       renderHomeRecentScores();
