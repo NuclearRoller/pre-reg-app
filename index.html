@@ -558,7 +558,7 @@
       }
     }
 
-    async function loadReflections() {
+        async function loadReflections() {
       try {
         const response = await fetch(REFLECTIONS_URL);
         const csv = await response.text();
@@ -573,6 +573,7 @@
             raw: cols[1] ? cols[1].trim().replace(/"/g, '') : '',
             refined: cols[2] ? cols[2].trim().replace(/"/g, '') : '',
             mappedLOs: cols[3] ? cols[3].trim().replace(/"/g, '') : '',
+            rating: cols[5] ? cols[5].trim().replace(/"/g, '') : '',
             status: cols[4] ? cols[4].trim().replace(/"/g, '') : ''
           };
         }).filter(item => item.refined !== '');
@@ -583,24 +584,38 @@
         }
 
         reflections.slice(-5).reverse().forEach(item => {
-          const div = document.createElement('div');
-          div.className = 'reflection-card';
+          const card = document.createElement('div');
+          card.className = 'reflection-card';
+          card.style.cursor = 'pointer';
 
-          const refinedEl = document.createElement('p');
-          refinedEl.className = 'reflection-text';
-          refinedEl.textContent = item.refined;
+          // Collapsed view
+          const previewRow = document.createElement('div');
+          previewRow.style.cssText = 'display: flex; justify-content: space-between; align-items: center; gap: 8px;';
+
+          const previewText = document.createElement('p');
+          previewText.className = 'reflection-text';
+          previewText.textContent = item.refined.length > 80 ? item.refined.slice(0, 80) + '…' : item.refined;
 
           const dateEl = document.createElement('span');
           dateEl.className = 'reflection-date';
           dateEl.textContent = item.date;
 
-          const header = document.createElement('div');
-          header.className = 'reflection-header';
-          header.appendChild(refinedEl);
-          header.appendChild(dateEl);
+          previewRow.appendChild(previewText);
+          previewRow.appendChild(dateEl);
+          card.appendChild(previewRow);
+
+          // Expanded view (hidden by default)
+          const expanded = document.createElement('div');
+          expanded.style.cssText = 'display: none; margin-top: 10px; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 10px;';
+
+          const fullText = document.createElement('p');
+          fullText.className = 'reflection-text';
+          fullText.textContent = item.refined;
+          expanded.appendChild(fullText);
 
           const loEl = document.createElement('div');
           loEl.className = 'lo-chips';
+          loEl.style.marginTop = '8px';
 
           if (item.mappedLOs && item.mappedLOs !== '') {
             const los = item.mappedLOs.split(',').map(lo => lo.trim()).filter(lo => lo !== '');
@@ -623,9 +638,27 @@
             loEl.appendChild(noLO);
           }
 
-          div.appendChild(header);
-          div.appendChild(loEl);
-          list.appendChild(div);
+          expanded.appendChild(loEl);
+
+          if (item.rating && item.rating !== '') {
+            const ratingEl = document.createElement('p');
+            ratingEl.style.cssText = 'margin-top: 10px; font-size: 12px; color: #FBBF24; font-weight: 600;';
+            ratingEl.textContent = `Arlo's Rating: ${item.rating}`;
+            expanded.appendChild(ratingEl);
+          }
+
+          card.appendChild(expanded);
+
+          // Toggle expand on click
+          card.addEventListener('click', () => {
+            if (expanded.style.display === 'none') {
+              expanded.style.display = 'block';
+            } else {
+              expanded.style.display = 'none';
+            }
+          });
+
+          list.appendChild(card);
         });
       } catch (error) {
         document.getElementById('reflections-list').innerHTML = '<p class="empty">Unable to load reflections.</p>';
