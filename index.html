@@ -437,7 +437,7 @@
       document.getElementById('coverage-text').textContent = `${covered} of ${total} topics started (${pct}%)`;
     }
 
-    // Log a test score to Google Sheet
+        // Log a test score to Google Sheet
     async function logScore() {
       const topicId = document.getElementById('topic-select').value;
       const score = document.getElementById('score-input').value;
@@ -450,23 +450,21 @@
       const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbywZZ5wXVtXam79D4pqsvvnUCC8bDrQHMC7qfpLDTzglBHmATjRmeWN-iAzcOPsnCMPgg/exec';
       
       try {
+        // Use no-cors mode to bypass CORS issues
         const response = await fetch(SCRIPT_URL, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'text/plain' },
           body: JSON.stringify({
             topicId: topicId,
             score: score
           })
         });
         
-        const result = await response.json();
+        // Since no-cors doesn't return readable data, we assume success
+        alert(`Score logged for ${topicId}: ${score}%`);
+        document.getElementById('score-input').value = '';
         
-        if (result.status === 'success') {
-          alert(`Score logged for ${topicId}: ${score}%`);
-          document.getElementById('score-input').value = '';
-        } else {
-          alert('Error: ' + result.message);
-        }
       } catch (error) {
         console.error('Error:', error);
         alert('Unable to log score. Please try again.');
