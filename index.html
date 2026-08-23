@@ -290,6 +290,32 @@
       transform: scale(0.85);
     }
 
+    #mic-fab {
+      position: fixed;
+      bottom: 165px;
+      right: 20px;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: white;
+      border: none;
+      font-size: 20px;
+      cursor: pointer;
+      z-index: 200;
+      box-shadow: 0 8px 20px rgba(139, 92, 246, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.3s ease, background 0.3s ease;
+    }
+    #mic-fab:active {
+      transform: scale(0.85);
+    }
+    #mic-fab.listening {
+      background: #EF4444;
+    }    
+
     #chat-modal {
       position: fixed;
       bottom: 0;
@@ -485,6 +511,8 @@
   </div>
 
   <button id="chat-fab" onclick="toggleChat()">💬</button>
+  <button id="mic-fab" onclick="startVoice()">🎤</button>
+  
 
   <div id="chat-modal">
     <div id="chat-header">
@@ -551,6 +579,52 @@
       modal.classList.toggle('active');
       if (modal.classList.contains('active')) {
         document.getElementById('chat-text-input').focus();
+      }
+    }
+      function startVoice() {
+      if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        const recognition = new SpeechRecognition();
+        recognition.lang = 'en-GB';
+        recognition.continuous = false;
+        recognition.interimResults = false;
+        
+        const micBtn = document.getElementById('mic-fab');
+        
+        recognition.onstart = () => {
+          micBtn.classList.add('listening');
+          micBtn.textContent = '🔴';
+          showToast('Listening...');
+        };
+        
+        recognition.onresult = (event) => {
+          const transcript = event.results[0][0].transcript;
+          micBtn.classList.remove('listening');
+          micBtn.textContent = '🎤';
+          
+          // Open chat and fill input
+          const modal = document.getElementById('chat-modal');
+          modal.classList.add('active');
+          const input = document.getElementById('chat-text-input');
+          input.value = transcript;
+          input.focus();
+          
+          // Show the user what was heard
+          addChatMessage(transcript, 'user');
+          
+          // Auto-send to Arlo
+          sendChatMessage();
+        };
+        
+        recognition.onerror = () => {
+          micBtn.classList.remove('listening');
+          micBtn.textContent = '🎤';
+          showToast('Voice recognition failed');
+        };
+        
+        recognition.start();
+      } else {
+        showToast('Voice recognition is not supported on this device');
       }
     }
 
