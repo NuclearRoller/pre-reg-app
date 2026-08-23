@@ -569,11 +569,11 @@
         const reflections = rows.map(row => {
           const cols = row.split(',');
           return {
-            date: cols[0] ? cols[0].trim() : '',
-            raw: cols[1] ? cols[1].trim() : '',
-            refined: cols[2] ? cols[2].trim() : '',
-            mappedLOs: cols[3] ? cols[3].trim() : '',
-            status: cols[4] ? cols[4].trim() : ''
+            date: cols[0] ? cols[0].trim().replace(/"/g, '') : '',
+            raw: cols[1] ? cols[1].trim().replace(/"/g, '') : '',
+            refined: cols[2] ? cols[2].trim().replace(/"/g, '') : '',
+            mappedLOs: cols[3] ? cols[3].trim().replace(/"/g, '') : '',
+            status: cols[4] ? cols[4].trim().replace(/"/g, '') : ''
           };
         }).filter(item => item.refined !== '');
 
@@ -586,9 +586,6 @@
           const div = document.createElement('div');
           div.className = 'reflection-card';
 
-          const header = document.createElement('div');
-          header.className = 'reflection-header';
-
           const refinedEl = document.createElement('p');
           refinedEl.className = 'reflection-text';
           refinedEl.textContent = item.refined;
@@ -597,24 +594,33 @@
           dateEl.className = 'reflection-date';
           dateEl.textContent = item.date;
 
+          const header = document.createElement('div');
+          header.className = 'reflection-header';
           header.appendChild(refinedEl);
           header.appendChild(dateEl);
 
           const loEl = document.createElement('div');
           loEl.className = 'lo-chips';
 
-          if (item.mappedLOs) {
-            item.mappedLOs.split(',').forEach(lo => {
+          if (item.mappedLOs && item.mappedLOs !== '') {
+            const los = item.mappedLOs.split(',').map(lo => lo.trim()).filter(lo => lo !== '');
+            los.forEach(lo => {
               const chip = document.createElement('span');
               chip.className = 'lo-chip';
-              chip.textContent = lo.trim();
-              const num = lo.trim().split('.')[0];
-              if (num === '1') chip.classList.add('lo-1');
-              else if (num === '2') chip.classList.add('lo-2');
-              else if (num === '3') chip.classList.add('lo-3');
-              else if (num === '4') chip.classList.add('lo-4');
+              chip.textContent = lo;
+              const firstPart = lo.split('.')[0].replace(/[^0-9]/g, '');
+              if (firstPart === '1') chip.classList.add('lo-1');
+              else if (firstPart === '2') chip.classList.add('lo-2');
+              else if (firstPart === '3') chip.classList.add('lo-3');
+              else if (firstPart === '4') chip.classList.add('lo-4');
+              else chip.classList.add('lo-1');
               loEl.appendChild(chip);
             });
+          } else {
+            const noLO = document.createElement('span');
+            noLO.style.cssText = 'font-size: 11px; color: var(--text-faint); font-style: italic;';
+            noLO.textContent = 'No LOs mapped';
+            loEl.appendChild(noLO);
           }
 
           div.appendChild(header);
