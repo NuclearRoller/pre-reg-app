@@ -256,12 +256,6 @@
       flex-direction: column;
       gap: 10px;
     }
-    .reflection-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 8px;
-    }
     .reflection-date {
       font-size: 11px;
       color: var(--text-dim);
@@ -293,7 +287,6 @@
     .lo-3 { background: rgba(251, 146, 60, 0.15); border-color: rgba(251, 146, 60, 0.4); color: #FDBA74; }
     .lo-4 { background: rgba(74, 222, 128, 0.15); border-color: rgba(74, 222, 128, 0.4); color: #86EFAC; }
 
-    /* Floating Chat Button */
     #chat-fab {
       position: fixed;
       bottom: 95px;
@@ -317,7 +310,6 @@
       transform: scale(0.85);
     }
 
-    /* Chat Modal */
     #chat-modal {
       position: fixed;
       bottom: 0;
@@ -400,7 +392,6 @@
       cursor: pointer;
     }
 
-    /* Toast */
     #toast {
       position: fixed;
       bottom: 170px;
@@ -426,53 +417,44 @@
 </head>
 <body>
 
-  <!-- Splash Screen -->
   <div id="splash">
     <div class="logo">ARLO</div>
     <div class="tagline">Pre-Reg Hub</div>
   </div>
 
-  <!-- Background -->
   <div class="orb orb-1"></div>
   <div class="orb orb-2"></div>
   <div class="orb orb-3"></div>
 
-  <!-- Main App -->
   <div id="app">
-    <!-- HOME -->
     <div id="home" class="tab-view active">
       <div class="greeting">
         <div class="hi" id="time-greeting">Good Evening</div>
         <div class="name">Hey, Joey</div>
       </div>
-
       <div class="card">
         <h3>Today's Schedule</h3>
         <p id="today-date" style="color: var(--text-dim); font-size: 13px; margin-bottom: 6px;"></p>
         <p>Tap <strong>Calendar</strong> to view today's full schedule.</p>
       </div>
-
       <div class="card">
         <h3>Today's Tasks</h3>
         <div id="home-tasks" style="display: flex; flex-direction: column; gap: 6px;">
           <p class="empty">Loading tasks...</p>
         </div>
       </div>
-
       <div class="card">
         <h3>Recent Study Activity</h3>
         <div id="home-recent-scores" style="display: flex; flex-direction: column; gap: 6px;">
           <p class="empty">Loading your recent scores...</p>
         </div>
       </div>
-
       <div class="card">
         <h3>Arlo's Smart Tip</h3>
         <p id="arlo-tip" class="empty">Arlo is thinking...</p>
       </div>
     </div>
 
-    <!-- CALENDAR -->
     <div id="calendar" class="tab-view">
       <div class="greeting" style="margin-top: 10px;">
         <div class="hi">Your Schedule</div>
@@ -483,13 +465,11 @@
       </div>
     </div>
 
-    <!-- STUDY -->
     <div id="study" class="tab-view">
       <div class="greeting" style="margin-top: 10px;">
         <div class="hi">Your Progress</div>
         <div class="name" style="font-size: 28px;">Study Planner</div>
       </div>
-
       <div class="card">
         <h3>Overall Coverage</h3>
         <div style="width: 100%; height: 8px; background: rgba(255,255,255,0.08); border-radius: 10px; margin: 10px 0; overflow: hidden;">
@@ -497,14 +477,12 @@
         </div>
         <p id="coverage-text" style="text-align: center; color: var(--text-dim); font-size: 14px;">Loading your topics...</p>
       </div>
-
       <div class="card">
         <h3>High Yield Topics</h3>
         <div id="high-yield-list" style="display: flex; flex-direction: column; gap: 8px;">
           <p class="empty">Loading topics...</p>
         </div>
       </div>
-
       <div class="card">
         <h3>Log Test Score</h3>
         <p style="color: var(--text-dim); font-size: 14px; margin-bottom: 12px;">Select a topic and enter your score.</p>
@@ -514,14 +492,12 @@
         <input type="number" id="score-input" placeholder="Score (0-100)" min="0" max="100" style="width: 100%; padding: 12px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); color: var(--text); font-size: 14px; margin-bottom: 10px;">
         <button onclick="logScore()" style="width: 100%; padding: 14px; border-radius: 12px; border: none; background: linear-gradient(135deg, #8B5CF6, #6D28D9); color: white; font-size: 15px; font-weight: 600; cursor: pointer;">Save Score</button>
       </div>
-
       <div class="card">
         <h3>Recent Scores</h3>
         <div id="recent-scores" style="display: flex; flex-direction: column;">
           <p class="empty">Loading your scores...</p>
         </div>
       </div>
-
       <div class="card">
         <h3>E-Portfolio Reflections</h3>
         <div id="reflections-list" style="display: flex; flex-direction: column; gap: 10px;">
@@ -531,10 +507,8 @@
     </div>
   </div>
 
-  <!-- Floating Chat Button -->
   <button id="chat-fab" onclick="toggleChat()">💬</button>
 
-  <!-- Chat Modal -->
   <div id="chat-modal">
     <div id="chat-header">
       <span style="font-weight: 600;">Arlo</span>
@@ -547,10 +521,8 @@
     </div>
   </div>
 
-  <!-- Toast -->
   <div id="toast"></div>
 
-  <!-- Bottom Navigation -->
   <div class="tab-bar">
     <button class="tab-btn active" onclick="switchTab('home')">Home</button>
     <button class="tab-btn" onclick="switchTab('calendar')">Calendar</button>
@@ -563,75 +535,38 @@
     const TASKS_URL = 'https://docs.google.com/spreadsheets/d/1ElgT3pbdTA8Bd2r9r9nQI1wCayMoH2po8jcVZuoSeSw/export?format=csv&gid=331487663';
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzn1_B1N4pzYHqqCCh8u-r58KTjnT2zPXYuzUqbcDMsNkZkqHSUZ6Gmr6SmuA7Qgt5qMA/exec';
     const REFLECTIONS_URL = 'https://docs.google.com/spreadsheets/d/1ElgT3pbdTA8Bd2r9r9nQI1wCayMoH2po8jcVZuoSeSw/export?format=csv&gid=1128922294';
+    const CHAT_URL = 'https://familysalesbot.camdvr.org/webhook/f5621c67-f92f-4be2-91ed-5b475df9e6d1/chat';
 
     let topics = [];
     let recentScores = [];
 
     const LO_TITLES = {
-      '1.1': 'Empathy & Person-Centred Care',
-      '1.2': 'Shared Decision Making',
-      '1.3': 'Effective Communication',
-      '1.4': 'Adapt Communication to Setting',
-      '1.5': 'Safe & Effective Medicines Use',
-      '1.6': 'Equality Dignity & Respect',
-      '1.7': 'Informed Consent',
-      '1.8': 'Individual Health Risks',
-      '1.9': 'Personal Values & Beliefs',
-      '1.10': 'Consultation Skills',
-      '1.11': 'Health Behaviour Factors',
-      '1.12': 'Inclusive Clinical Decision Making',
-      '1.13': 'Impact of Prescribing Decisions',
-      '1.14': 'Multidisciplinary Teamwork & Continuity of Care',
-      '2.15': 'Professional Values & Behaviours',
-      '2.16': 'Professional Judgement',
-      '2.17': 'Scope of Practice & Referral',
-      '2.18': 'Safe & Accurate Pharmacy Services',
-      '2.19': 'Health & Safety',
-      '2.20': 'Openness Honesty & Raising Concerns',
-      '2.21': 'Applying Pharmacy Science',
-      '2.22': 'Medicine Discovery & Development',
-      '2.23': 'Advanced & Precision Medicines',
-      '2.24': 'Digital Technology & Data',
-      '2.25': 'Formulation & Preparation of Medicines',
-      '2.26': 'Medicine Quality Safety & Risk',
-      '2.27': 'Legal & Safe Supply of Medicines',
-      '2.28': 'Diagnostic & Physical Examination Skills',
-      '2.29': 'Clinical Therapeutics Pharmacology & Genomics',
-      '2.30': 'Evidence-Based Clinical Reasoning',
-      '2.31': 'Guidelines Evidence & Cost-Effective Use',
-      '2.32': 'Calculations',
-      '2.33': 'Health Promotion',
-      '2.34': 'Monitoring & Managing Health Outcomes',
-      '2.35': 'Adverse Drug Reactions & Pharmacovigilance',
-      '2.36': 'Prescribing Legislation',
-      '2.37': 'Prescribing Within Frameworks',
-      '2.38': 'Clinical Governance in Prescribing',
-      '2.39': 'Health Records & Data Security',
-      '2.40': 'Safeguarding',
-      '2.41': 'Health & Social Care Policy',
-      '2.42': 'Public Health Promotion',
-      '2.43': 'Medicine Misuse',
-      '2.44': 'Medical Emergencies & First Aid',
-      '3.45': 'Leadership & Management',
-      '3.46': 'Team Skills Resources & Priorities',
-      '3.47': 'Quality Improvement & Medicines Safety',
-      '3.48': 'Risk Management',
-      '3.49': 'Error Prevention',
-      '3.50': 'Complaints Incidents & Error Management',
-      '3.51': 'Recognising & Managing Risk',
-      '3.52': 'Resilience Flexibility & Change',
-      '4.53': 'Reflection & Learning Needs',
-      '4.54': 'Supporting Others\' Learning',
-      '4.55': 'Research Audit & Quality Improvement'
+      '1.1': 'Empathy & Person-Centred Care', '1.2': 'Shared Decision Making', '1.3': 'Effective Communication',
+      '1.4': 'Adapt Communication to Setting', '1.5': 'Safe & Effective Medicines Use', '1.6': 'Equality Dignity & Respect',
+      '1.7': 'Informed Consent', '1.8': 'Individual Health Risks', '1.9': 'Personal Values & Beliefs',
+      '1.10': 'Consultation Skills', '1.11': 'Health Behaviour Factors', '1.12': 'Inclusive Clinical Decision Making',
+      '1.13': 'Impact of Prescribing Decisions', '1.14': 'Multidisciplinary Teamwork & Continuity of Care',
+      '2.15': 'Professional Values & Behaviours', '2.16': 'Professional Judgement', '2.17': 'Scope of Practice & Referral',
+      '2.18': 'Safe & Accurate Pharmacy Services', '2.19': 'Health & Safety', '2.20': 'Openness Honesty & Raising Concerns',
+      '2.21': 'Applying Pharmacy Science', '2.22': 'Medicine Discovery & Development', '2.23': 'Advanced & Precision Medicines',
+      '2.24': 'Digital Technology & Data', '2.25': 'Formulation & Preparation of Medicines', '2.26': 'Medicine Quality Safety & Risk',
+      '2.27': 'Legal & Safe Supply of Medicines', '2.28': 'Diagnostic & Physical Examination Skills', '2.29': 'Clinical Therapeutics Pharmacology & Genomics',
+      '2.30': 'Evidence-Based Clinical Reasoning', '2.31': 'Guidelines Evidence & Cost-Effective Use', '2.32': 'Calculations',
+      '2.33': 'Health Promotion', '2.34': 'Monitoring & Managing Health Outcomes', '2.35': 'Adverse Drug Reactions & Pharmacovigilance',
+      '2.36': 'Prescribing Legislation', '2.37': 'Prescribing Within Frameworks', '2.38': 'Clinical Governance in Prescribing',
+      '2.39': 'Health Records & Data Security', '2.40': 'Safeguarding', '2.41': 'Health & Social Care Policy',
+      '2.42': 'Public Health Promotion', '2.43': 'Medicine Misuse', '2.44': 'Medical Emergencies & First Aid',
+      '3.45': 'Leadership & Management', '3.46': 'Team Skills Resources & Priorities', '3.47': 'Quality Improvement & Medicines Safety',
+      '3.48': 'Risk Management', '3.49': 'Error Prevention', '3.50': 'Complaints Incidents & Error Management',
+      '3.51': 'Recognising & Managing Risk', '3.52': 'Resilience Flexibility & Change',
+      '4.53': 'Reflection & Learning Needs', '4.54': 'Supporting Others\' Learning', '4.55': 'Research Audit & Quality Improvement'
     };
 
     function showToast(message) {
       const toast = document.getElementById('toast');
       toast.textContent = message;
       toast.classList.add('show');
-      setTimeout(() => {
-        toast.classList.remove('show');
-      }, 2500);
+      setTimeout(() => toast.classList.remove('show'), 2500);
     }
 
     function toggleChat() {
@@ -656,21 +591,14 @@
       const input = document.getElementById('chat-text-input');
       const message = input.value.trim();
       if (!message) return;
-
       addChatMessage(message, 'user');
       input.value = '';
-
       const thinking = addChatMessage('Arlo is thinking...', 'arlo');
-
       try {
-        const response = await fetch('https://familysalesbot.camdvr.org/webhook/f5621c67-f92f-4be2-91ed-5b475df9e6d1/chat', {
+        const response = await fetch(CHAT_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            chatId: "web_" + Math.random().toString(36).substr(2, 9),
-            message: message,
-            route: 'general'
-          })
+          body: JSON.stringify({ chatId: "web_" + Math.random().toString(36).substr(2, 9), message: message, route: 'general' })
         });
         const data = await response.json();
         thinking.remove();
@@ -681,9 +609,370 @@
       }
     }
 
-    // ... (rest of the functions from previous version, but replace all alert() with showToast())
-    // To keep this answer concise, I am omitting the functions that stay exactly the same.
-    // You should reuse the functions from the previous version, and just replace alert() with showToast().
+    async function loadStudyData() {
+      try {
+        const response = await fetch(SHEET_URL);
+        const csv = await response.text();
+        const parseCSV = (text) => {
+          const rows = [];
+          let row = [];
+          let cell = '';
+          let inQuotes = false;
+          for (let i = 0; i < text.length; i++) {
+            const char = text[i];
+            if (inQuotes) {
+              if (char === '"') {
+                if (i + 1 < text.length && text[i + 1] === '"') { cell += '"'; i++; }
+                else { inQuotes = false; }
+              } else { cell += char; }
+            } else {
+              if (char === '"') { inQuotes = true; }
+              else if (char === ',') { row.push(cell.trim()); cell = ''; }
+              else if (char === '\n' || char === '\r') {
+                if (cell.trim() !== '' || row.length > 0) { row.push(cell.trim()); rows.push(row); row = []; cell = ''; }
+                if (char === '\r' && i + 1 < text.length && text[i + 1] === '\n') { i++; }
+              } else { cell += char; }
+            }
+          }
+          if (cell.trim() !== '' || row.length > 0) { row.push(cell.trim()); rows.push(row); }
+          return rows;
+        };
+        const rows = parseCSV(csv);
+        if (rows.length > 0) rows.shift();
+        topics = [];
+        rows.forEach(row => {
+          if (row.length >= 5 && row[0].trim() !== '') {
+            topics.push({ id: row[0].trim(), subject: row[1].trim(), topic: row[2].trim(), highYield: row[3].trim(), priority: row[4].trim() });
+          }
+        });
+        renderStudyData();
+      } catch (error) {
+        document.getElementById('high-yield-list').innerHTML = '<p class="empty">Unable to load topics.</p>';
+      }
+    }
+
+    function renderStudyData() {
+      const select = document.getElementById('topic-select');
+      select.innerHTML = '<option value="">Choose a topic...</option>';
+      topics.forEach(t => {
+        const option = document.createElement('option');
+        option.value = t.id;
+        option.textContent = `${t.id} - ${t.topic}`;
+        select.appendChild(option);
+      });
+      const highYieldTopics = topics.filter(t => t.highYield.toLowerCase() === 'yes');
+      const list = document.getElementById('high-yield-list');
+      list.innerHTML = '';
+      highYieldTopics.forEach(t => {
+        const chip = document.createElement('div');
+        chip.style.cssText = 'padding: 10px 14px; background: rgba(139, 92, 246, 0.15); border: 1px solid rgba(139, 92, 246, 0.3); border-radius: 12px; font-size: 14px;';
+        chip.innerHTML = `<strong>${t.id}</strong> — ${t.topic}`;
+        list.appendChild(chip);
+      });
+      const total = topics.length;
+      const studiedTopicIds = new Set(recentScores.map(score => score.topicId));
+      const covered = studiedTopicIds.size;
+      const pct = Math.round((covered / total) * 100);
+      document.getElementById('coverage-bar').style.width = pct + '%';
+      document.getElementById('coverage-text').textContent = `${covered} of ${total} topics studied (${pct}%)`;
+    }
+
+    async function loadRecentScores() {
+      try {
+        const response = await fetch(STUDYLOG_URL);
+        const csv = await response.text();
+        const rows = csv.split('\n').slice(1);
+        recentScores = [];
+        rows.forEach((row, index) => {
+          const cols = row.split(',');
+          if (cols.length >= 3 && cols[0].trim() !== '') {
+            recentScores.push({ date: cols[0].trim(), topicId: cols[1].trim(), score: cols[2].trim(), rowIndex: index });
+          }
+        });
+        renderRecentScores();
+      } catch (error) {
+        document.getElementById('recent-scores').innerHTML = '<p class="empty">Unable to load scores.</p>';
+      }
+    }
+
+    function renderRecentScores() {
+      const list = document.getElementById('recent-scores');
+      list.innerHTML = '';
+      if (recentScores.length === 0) {
+        list.innerHTML = '<p class="empty">No scores logged yet.</p>';
+        return;
+      }
+      const reversed = recentScores.slice(-10).reverse();
+      reversed.forEach(item => {
+        const row = document.createElement('div');
+        row.className = 'score-row';
+        const info = document.createElement('span');
+        info.textContent = `${item.topicId} — ${item.score}%`;
+        const deleteBtn = document.createElement('button');
+        deleteBtn.className = 'delete-btn';
+        deleteBtn.textContent = '×';
+        deleteBtn.onclick = () => deleteScore(item.rowIndex);
+        row.appendChild(info);
+        row.appendChild(deleteBtn);
+        list.appendChild(row);
+      });
+    }
+
+    async function loadHomeTasks() {
+      try {
+        const response = await fetch(TASKS_URL);
+        const csv = await response.text();
+        const rows = csv.split('\n').slice(1);
+        const list = document.getElementById('home-tasks');
+        list.innerHTML = '';
+        const pendingTasks = rows.map((row, index) => {
+          const cols = row.split(',');
+          return { task: cols[0] ? cols[0].trim() : '', dueDate: cols[1] ? cols[1].trim() : '', priority: cols[2] ? cols[2].trim() : '', status: cols[3] ? cols[3].trim() : '', rowIndex: index };
+        }).filter(item => item.status !== 'Done' && item.task !== '');
+        if (pendingTasks.length === 0) {
+          list.innerHTML = '<p class="empty">No pending tasks. You\'re all clear!</p>';
+          return;
+        }
+        pendingTasks.slice(0, 5).forEach(item => {
+          const div = document.createElement('div');
+          div.style.cssText = 'display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; background: rgba(255,255,255,0.05); border-radius: 10px; margin-bottom: 6px; font-size: 14px;';
+          const info = document.createElement('span');
+          info.textContent = `${item.task}`;
+          if (item.dueDate !== '') { info.textContent += ` — Due: ${item.dueDate}`; }
+          const doneBtn = document.createElement('button');
+          doneBtn.textContent = '✓';
+          doneBtn.style.cssText = 'background: rgba(139, 92, 246, 0.2); border: 1px solid rgba(139, 92, 246, 0.4); color: #A78BFA; font-size: 16px; width: 28px; height: 28px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center;';
+          doneBtn.onclick = () => completeTask(item.rowIndex);
+          div.appendChild(info);
+          div.appendChild(doneBtn);
+          list.appendChild(div);
+        });
+      } catch (error) {
+        document.getElementById('home-tasks').innerHTML = '<p class="empty">Unable to load tasks.</p>';
+      }
+    }
+
+    async function completeTask(rowIndex) {
+      try {
+        await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ action: 'complete_task', row: rowIndex }) });
+        showToast('Task marked as done');
+        loadHomeTasks();
+      } catch (error) {
+        showToast('Unable to mark task as done');
+      }
+    }
+
+    async function deleteScore(rowIndex) {
+      try {
+        await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ action: 'delete_score', row: rowIndex }) });
+        showToast('Score deleted');
+        loadRecentScores().then(() => { renderHomeRecentScores(); generateArloTip(); renderStudyData(); });
+      } catch (error) {
+        showToast('Unable to delete score');
+      }
+    }
+
+    async function logScore() {
+      const topicId = document.getElementById('topic-select').value;
+      const score = document.getElementById('score-input').value;
+      if (!topicId || !score) {
+        showToast('Please select a topic and enter a score');
+        return;
+      }
+      try {
+        await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ topicId, score }) });
+        showToast(`Score logged for ${topicId}: ${score}%`);
+        document.getElementById('score-input').value = '';
+        loadRecentScores().then(() => { renderHomeRecentScores(); generateArloTip(); renderStudyData(); });
+      } catch (error) {
+        showToast('Unable to log score');
+      }
+    }
+
+    async function loadReflections() {
+      try {
+        const response = await fetch(REFLECTIONS_URL);
+        const csv = await response.text();
+        const list = document.getElementById('reflections-list');
+        list.innerHTML = '';
+        const parseCSV = (text) => {
+          const rows = [];
+          let row = [];
+          let cell = '';
+          let inQuotes = false;
+          for (let i = 0; i < text.length; i++) {
+            const char = text[i];
+            if (inQuotes) {
+              if (char === '"') {
+                if (i + 1 < text.length && text[i + 1] === '"') { cell += '"'; i++; }
+                else { inQuotes = false; }
+              } else { cell += char; }
+            } else {
+              if (char === '"') { inQuotes = true; }
+              else if (char === ',') { row.push(cell.trim()); cell = ''; }
+              else if (char === '\n' || char === '\r') {
+                if (cell.trim() !== '' || row.length > 0) { row.push(cell.trim()); rows.push(row); row = []; cell = ''; }
+                if (char === '\r' && i + 1 < text.length && text[i + 1] === '\n') { i++; }
+              } else { cell += char; }
+            }
+          }
+          if (cell.trim() !== '' || row.length > 0) { row.push(cell.trim()); rows.push(row); }
+          return rows;
+        };
+        const rows = parseCSV(csv);
+        if (rows.length > 0) rows.shift();
+        const reflections = rows.map((row, index) => {
+          return { date: row[0] || '', raw: row[1] || '', refined: row[2] || '', mappedLOs: row[3] || '', status: row[4] || '', rating: row[5] || '', rowIndex: index };
+        }).filter(item => item.refined !== '');
+        if (reflections.length === 0) {
+          list.innerHTML = '<p class="empty">No reflections yet. Ask Arlo to map one!</p>';
+          return;
+        }
+        reflections.slice(-5).reverse().forEach(item => {
+          const card = document.createElement('div');
+          card.className = 'reflection-card';
+          card.style.cursor = 'pointer';
+          const previewRow = document.createElement('div');
+          previewRow.style.cssText = 'display: flex; justify-content: space-between; align-items: center; gap: 8px;';
+          const previewText = document.createElement('p');
+          previewText.className = 'reflection-text';
+          previewText.textContent = item.refined.length > 80 ? item.refined.slice(0, 80) + '…' : item.refined;
+          const dateEl = document.createElement('span');
+          dateEl.className = 'reflection-date';
+          dateEl.textContent = item.date;
+          previewRow.appendChild(previewText);
+          previewRow.appendChild(dateEl);
+          card.appendChild(previewRow);
+          const expanded = document.createElement('div');
+          expanded.style.cssText = 'display: none; margin-top: 10px; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 10px;';
+          const fullText = document.createElement('p');
+          fullText.className = 'reflection-text';
+          fullText.textContent = item.refined;
+          expanded.appendChild(fullText);
+          const loEl = document.createElement('div');
+          loEl.className = 'lo-chips';
+          loEl.style.marginTop = '8px';
+          if (item.mappedLOs && item.mappedLOs !== '') {
+            const los = item.mappedLOs.split(',').map(lo => lo.trim()).filter(lo => lo !== '');
+            los.forEach(lo => {
+              const chip = document.createElement('span');
+              chip.className = 'lo-chip';
+              const title = LO_TITLES[lo] || lo;
+              chip.textContent = `${lo} ${title}`;
+              const firstPart = lo.split('.')[0].replace(/[^0-9]/g, '');
+              if (firstPart === '1') chip.classList.add('lo-1');
+              else if (firstPart === '2') chip.classList.add('lo-2');
+              else if (firstPart === '3') chip.classList.add('lo-3');
+              else if (firstPart === '4') chip.classList.add('lo-4');
+              else chip.classList.add('lo-1');
+              loEl.appendChild(chip);
+            });
+          } else {
+            const noLO = document.createElement('span');
+            noLO.style.cssText = 'font-size: 11px; color: var(--text-faint); font-style: italic;';
+            noLO.textContent = 'No LOs mapped';
+            loEl.appendChild(noLO);
+          }
+          expanded.appendChild(loEl);
+          if (item.rating && item.rating !== '') {
+            const ratingEl = document.createElement('p');
+            ratingEl.style.cssText = 'margin-top: 10px; font-size: 12px; color: #FBBF24; font-weight: 600;';
+            ratingEl.textContent = `Arlo's Rating: ${item.rating}`;
+            expanded.appendChild(ratingEl);
+          }
+          const deleteBtn = document.createElement('button');
+          deleteBtn.textContent = 'Delete';
+          deleteBtn.style.cssText = 'margin-top: 10px; padding: 8px 12px; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.4); color: #FCA5A5; border-radius: 8px; font-size: 12px; cursor: pointer;';
+          deleteBtn.onclick = (e) => {
+            e.stopPropagation();
+            if (confirm('Delete this reflection?')) { deleteReflection(item.rowIndex); }
+          };
+          expanded.appendChild(deleteBtn);
+          card.appendChild(expanded);
+          card.addEventListener('click', () => {
+            if (expanded.style.display === 'none') { expanded.style.display = 'block'; }
+            else { expanded.style.display = 'none'; }
+          });
+          list.appendChild(card);
+        });
+      } catch (error) {
+        document.getElementById('reflections-list').innerHTML = '<p class="empty">Unable to load reflections.</p>';
+      }
+    }
+
+    async function deleteReflection(rowIndex) {
+      try {
+        await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ action: 'delete_reflection', row: rowIndex }) });
+        showToast('Reflection deleted');
+        loadReflections();
+      } catch (error) {
+        showToast('Unable to delete reflection');
+      }
+    }
+
+    function setGreeting() {
+      const hour = new Date().getHours();
+      const greetingEl = document.getElementById('time-greeting');
+      if (hour < 12) { greetingEl.textContent = 'Good Morning'; }
+      else if (hour < 18) { greetingEl.textContent = 'Good Afternoon'; }
+      else { greetingEl.textContent = 'Good Evening'; }
+    }
+
+    function setTodayDate() {
+      const today = new Date();
+      const options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
+      document.getElementById('today-date').textContent = today.toLocaleDateString('en-GB', options);
+    }
+
+    function renderHomeRecentScores() {
+      const list = document.getElementById('home-recent-scores');
+      list.innerHTML = '';
+      if (recentScores.length === 0) {
+        list.innerHTML = '<p class="empty">No scores logged yet. Go to Study to add your first score.</p>';
+        return;
+      }
+      const reversed = recentScores.slice(-3).reverse();
+      reversed.forEach(item => {
+        const div = document.createElement('div');
+        div.style.cssText = 'padding: 8px 12px; background: rgba(255,255,255,0.04); border-radius: 10px; font-size: 14px;';
+        div.textContent = `${item.topicId} — ${item.score}%`;
+        list.appendChild(div);
+      });
+    }
+
+    function generateArloTip() {
+      const tipEl = document.getElementById('arlo-tip');
+      if (recentScores.length === 0) {
+        tipEl.textContent = 'Log your first test score and I\'ll give you personalised study advice.';
+        return;
+      }
+      const latest = recentScores[recentScores.length - 1];
+      const score = parseInt(latest.score);
+      if (score < 60) { tipEl.textContent = `Your last score in ${latest.topicId} was ${score}%. Let's book a review block soon.`; }
+      else if (score < 80) { tipEl.textContent = `You scored ${score}% in ${latest.topicId}. A quick recap could push you into the high 80s.`; }
+      else { tipEl.textContent = `Great work! ${score}% in ${latest.topicId}. You're on track.`; }
+    }
+
+    setGreeting();
+    setTodayDate();
+
+    setTimeout(() => {
+      document.getElementById('splash').classList.add('hide');
+    }, 2000);
+
+    loadStudyData();
+    loadRecentScores().then(() => { renderStudyData(); renderHomeRecentScores(); generateArloTip(); });
+    loadHomeTasks();
+    loadReflections();
+
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-view').forEach(view => view.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.getElementById(tabId).classList.add('active');
+      event.currentTarget.classList.add('active');
+      if (tabId === 'home') { loadHomeTasks(); loadRecentScores().then(() => { renderHomeRecentScores(); generateArloTip(); }); loadReflections(); }
+      if (tabId === 'study') { loadStudyData(); loadRecentScores(); loadReflections(); }
+    }
   </script>
 </body>
 </html>
