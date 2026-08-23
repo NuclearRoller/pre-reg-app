@@ -279,24 +279,29 @@
 
   <!-- Main App -->
   <div id="app">
-    <!-- HOME -->
+       <!-- HOME -->
     <div id="home" class="tab-view active">
       <div class="greeting">
-        <div class="hi">Good Evening</div>
+        <div class="hi" id="time-greeting">Good Evening</div>
         <div class="name">Hey, Joey</div>
       </div>
+
       <div class="card">
-        <h3>Today's Overview</h3>
-        <p>You have <strong>2 events</strong> on your calendar and <strong>3 tasks</strong> to complete.</p>
-        <p class="empty" style="margin-top: 10px;">Task sync coming soon.</p>
+        <h3>Today's Schedule</h3>
+        <p id="today-date" style="color: var(--text-dim); font-size: 13px; margin-bottom: 6px;"></p>
+        <p>Tap <strong>Calendar</strong> to view today's full schedule.</p>
       </div>
+
       <div class="card">
-        <h3>Study Focus</h3>
-        <p>Your weakest area is <strong>Cardiovascular</strong>. Arlo suggests a 45-minute review block.</p>
+        <h3>Recent Study Activity</h3>
+        <div id="home-recent-scores" style="display: flex; flex-direction: column; gap: 6px;">
+          <p class="empty">Loading your recent scores...</p>
+        </div>
       </div>
+
       <div class="card">
-        <h3>Arlo's Tip</h3>
-        <p class="empty">"Ask me to add a study block or map a reflection!"</p>
+        <h3>Arlo's Smart Tip</h3>
+        <p id="arlo-tip" class="empty">Arlo is thinking...</p>
       </div>
     </div>
 
@@ -531,12 +536,77 @@
       }
     }
 
+    // Set greeting based on time of day
+    function setGreeting() {
+      const hour = new Date().getHours();
+      const greetingEl = document.getElementById('time-greeting');
+      if (hour < 12) {
+        greetingEl.textContent = 'Good Morning';
+      } else if (hour < 18) {
+        greetingEl.textContent = 'Good Afternoon';
+      } else {
+        greetingEl.textContent = 'Good Evening';
+      }
+    }
+
+    // Show today's date
+    function setTodayDate() {
+      const today = new Date();
+      const options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
+      document.getElementById('today-date').textContent = today.toLocaleDateString('en-GB', options);
+    }
+
+    // Show recent scores on Home tab
+    function renderHomeRecentScores() {
+      const list = document.getElementById('home-recent-scores');
+      list.innerHTML = '';
+      if (recentScores.length === 0) {
+        list.innerHTML = '<p class="empty">No scores logged yet. Go to Study to add your first score.</p>';
+        return;
+      }
+      const reversed = recentScores.slice(-3).reverse();
+      reversed.forEach(item => {
+        const div = document.createElement('div');
+        div.style.cssText = 'padding: 8px 12px; background: rgba(255,255,255,0.04); border-radius: 10px; font-size: 14px;';
+        div.textContent = `${item.topicId} — ${item.score}%`;
+        list.appendChild(div);
+      });
+    }
+
+    // Generate Arlo's Smart Tip
+    function generateArloTip() {
+      const tipEl = document.getElementById('arlo-tip');
+      if (recentScores.length === 0) {
+        tipEl.textContent = 'Log your first test score and I\'ll give you personalised study advice.';
+        return;
+      }
+      const latest = recentScores[recentScores.length - 1];
+      const score = parseInt(latest.score);
+      if (score < 60) {
+        tipEl.textContent = `Your last score in ${latest.topicId} was ${score}%. Let's book a review block soon.`;
+      } else if (score < 80) {
+        tipEl.textContent = `You scored ${score}% in ${latest.topicId}. A quick recap could push you into the high 80s.`;
+      } else {
+        tipEl.textContent = `Great work! ${score}% in ${latest.topicId}. You're on track.`;
+      }
+    }
+
+    // Call these on load
+    setGreeting();
+    setTodayDate();
+
     setTimeout(() => {
       document.getElementById('splash').classList.add('hide');
     }, 2000);
 
     loadStudyData();
     loadRecentScores();
+
+    // Update Home dashboard after scores load
+    setTimeout(() => {
+      renderHomeRecentScores();
+      generateArloTip();
+    }, 1500);
 
     function switchTab(tabId) {
       document.querySelectorAll('.tab-view').forEach(view => view.classList.remove('active'));
