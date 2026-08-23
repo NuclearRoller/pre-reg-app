@@ -279,7 +279,7 @@
 
   <!-- Main App -->
   <div id="app">
-       <!-- HOME -->
+    <!-- HOME -->
     <div id="home" class="tab-view active">
       <div class="greeting">
         <div class="hi" id="time-greeting">Good Evening</div>
@@ -290,6 +290,13 @@
         <h3>Today's Schedule</h3>
         <p id="today-date" style="color: var(--text-dim); font-size: 13px; margin-bottom: 6px;"></p>
         <p>Tap <strong>Calendar</strong> to view today's full schedule.</p>
+      </div>
+
+      <div class="card">
+        <h3>Today's Tasks</h3>
+        <div id="home-tasks" style="display: flex; flex-direction: column; gap: 6px;">
+          <p class="empty">Loading tasks...</p>
+        </div>
       </div>
 
       <div class="card">
@@ -397,7 +404,8 @@
   <script>
     const SHEET_URL = 'https://docs.google.com/spreadsheets/d/1ElgT3pbdTA8Bd2r9r9nQI1wCayMoH2po8jcVZuoSeSw/export?format=csv&gid=0';
     const STUDYLOG_URL = 'https://docs.google.com/spreadsheets/d/1ElgT3pbdTA8Bd2r9r9nQI1wCayMoH2po8jcVZuoSeSw/export?format=csv&gid=688195198';
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwS6hvQCyegIENF4CL7qkVytOKjYo-tFXiEyvKKiMFhn-GBVNA7D5zLhOOob0O4cfisGw/exec';
+    const TASKS_URL = 'https://docs.google.com/spreadsheets/d/1ElgT3pbdTA8Bd2r9r9nQI1wCayMoH2po8jcVZuoSeSw/export?format=csv&gid=331487663';
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwljxWO2OGLMQT4LnjHEIDdtjDAHKBbX2om0fWZAysyQk-DRajPkjzGrVAr7OmgPyZxGg/exec';
 
     let topics = [];
     let recentScores = [];
@@ -446,6 +454,39 @@
         renderRecentScores();
       } catch (error) {
         document.getElementById('recent-scores').innerHTML = '<p class="empty">Unable to load scores.</p>';
+      }
+    }
+
+    async function loadHomeTasks() {
+      try {
+        const response = await fetch(TASKS_URL);
+        const csv = await response.text();
+        const rows = csv.split('\n').slice(1);
+        const list = document.getElementById('home-tasks');
+        list.innerHTML = '';
+
+        const pendingTasks = rows.filter(row => {
+          const cols = row.split(',');
+          return cols.length >= 4 && cols[3].trim() !== 'Done' && cols[0].trim() !== '';
+        });
+
+        if (pendingTasks.length === 0) {
+          list.innerHTML = '<p class="empty">No pending tasks. You\'re all clear!</p>';
+          return;
+        }
+
+        pendingTasks.slice(0, 5).forEach(row => {
+          const cols = row.split(',');
+          const div = document.createElement('div');
+          div.style.cssText = 'padding: 10px 12px; background: rgba(255,255,255,0.05); border-radius: 10px; font-size: 14px;';
+          div.textContent = `${cols[0].trim()}`;
+          if (cols[1] && cols[1].trim() !== '') {
+            div.textContent += ` — Due: ${cols[1].trim()}`;
+          }
+          list.appendChild(div);
+        });
+      } catch (error) {
+        document.getElementById('home-tasks').innerHTML = '<p class="empty">Unable to load tasks.</p>';
       }
     }
 
@@ -536,7 +577,6 @@
       }
     }
 
-    // Set greeting based on time of day
     function setGreeting() {
       const hour = new Date().getHours();
       const greetingEl = document.getElementById('time-greeting');
@@ -549,14 +589,12 @@
       }
     }
 
-    // Show today's date
     function setTodayDate() {
       const today = new Date();
       const options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
       document.getElementById('today-date').textContent = today.toLocaleDateString('en-GB', options);
     }
 
-    // Show recent scores on Home tab
     function renderHomeRecentScores() {
       const list = document.getElementById('home-recent-scores');
       list.innerHTML = '';
@@ -573,7 +611,6 @@
       });
     }
 
-    // Generate Arlo's Smart Tip
     function generateArloTip() {
       const tipEl = document.getElementById('arlo-tip');
       if (recentScores.length === 0) {
@@ -591,7 +628,6 @@
       }
     }
 
-    // Call these on load
     setGreeting();
     setTodayDate();
 
@@ -601,8 +637,8 @@
 
     loadStudyData();
     loadRecentScores();
+    loadHomeTasks();
 
-    // Update Home dashboard after scores load
     setTimeout(() => {
       renderHomeRecentScores();
       generateArloTip();
