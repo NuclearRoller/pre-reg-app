@@ -437,8 +437,8 @@
       document.getElementById('coverage-text').textContent = `${covered} of ${total} topics started (${pct}%)`;
     }
 
-    // Log a test score (will connect to n8n later)
-    function logScore() {
+    // Log a test score to Google Sheet
+    async function logScore() {
       const topicId = document.getElementById('topic-select').value;
       const score = document.getElementById('score-input').value;
       
@@ -447,8 +447,30 @@
         return;
       }
       
-      alert(`Score logged: ${topicId} — ${score}%`);
-      document.getElementById('score-input').value = '';
+      const SCRIPT_URL = 'https://script.google.com/u/0/home/projects/1Xs0I8wPZ_7-CttYlTf0ekcuap1RIkD46bMFf8gAnJKXoPj4xmkeTKThv/edit';
+      
+      try {
+        const response = await fetch(SCRIPT_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            topicId: topicId,
+            score: score
+          })
+        });
+        
+        const result = await response.json();
+        
+        if (result.status === 'success') {
+          alert(`Score logged for ${topicId}: ${score}%`);
+          document.getElementById('score-input').value = '';
+        } else {
+          alert('Error: ' + result.message);
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        alert('Unable to log score. Please try again.');
+      }
     }
 
     // Splash screen
