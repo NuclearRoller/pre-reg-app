@@ -262,6 +262,51 @@
       padding: 0 4px;
       line-height: 1;
     }
+
+    .reflection-card {
+      padding: 14px;
+      background: rgba(255,255,255,0.04);
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.06);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .reflection-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+    .reflection-date {
+      font-size: 11px;
+      color: var(--text-dim);
+      white-space: nowrap;
+      letter-spacing: 0.5px;
+    }
+    .reflection-text {
+      font-size: 13px;
+      line-height: 1.5;
+      color: var(--text);
+    }
+    .lo-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      align-items: center;
+    }
+    .lo-chip {
+      padding: 3px 8px;
+      border-radius: 20px;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.3px;
+      border: 1px solid;
+    }
+    .lo-1 { background: rgba(139, 92, 246, 0.2); border-color: rgba(139, 92, 246, 0.5); color: #C4B5FD; }
+    .lo-2 { background: rgba(34, 211, 238, 0.15); border-color: rgba(34, 211, 238, 0.4); color: #67E8F9; }
+    .lo-3 { background: rgba(251, 146, 60, 0.15); border-color: rgba(251, 146, 60, 0.4); color: #FDBA74; }
+    .lo-4 { background: rgba(74, 222, 128, 0.15); border-color: rgba(74, 222, 128, 0.4); color: #86EFAC; }
   </style>
 </head>
 <body>
@@ -361,7 +406,8 @@
           <p class="empty">Loading your scores...</p>
         </div>
       </div>
-            <div class="card">
+
+      <div class="card">
         <h3>E-Portfolio Reflections</h3>
         <div id="reflections-list" style="display: flex; flex-direction: column; gap: 10px;">
           <p class="empty">Loading your reflections...</p>
@@ -511,7 +557,8 @@
         document.getElementById('home-tasks').innerHTML = '<p class="empty">Unable to load tasks.</p>';
       }
     }
-        async function loadReflections() {
+
+    async function loadReflections() {
       try {
         const response = await fetch(REFLECTIONS_URL);
         const csv = await response.text();
@@ -537,30 +584,40 @@
 
         reflections.slice(-5).reverse().forEach(item => {
           const div = document.createElement('div');
-          div.style.cssText = 'padding: 12px; background: rgba(255,255,255,0.04); border-radius: 12px; border: 1px solid rgba(255,255,255,0.06);';
+          div.className = 'reflection-card';
+
+          const header = document.createElement('div');
+          header.className = 'reflection-header';
 
           const refinedEl = document.createElement('p');
+          refinedEl.className = 'reflection-text';
           refinedEl.textContent = item.refined;
-          refinedEl.style.cssText = 'font-size: 13px; line-height: 1.5; margin-bottom: 8px;';
+
+          const dateEl = document.createElement('span');
+          dateEl.className = 'reflection-date';
+          dateEl.textContent = item.date;
+
+          header.appendChild(refinedEl);
+          header.appendChild(dateEl);
 
           const loEl = document.createElement('div');
-          loEl.style.cssText = 'display: flex; flex-wrap: wrap; gap: 4px;';
-          
-          const loLabel = document.createElement('span');
-          loLabel.textContent = 'Mapped LOs:';
-          loLabel.style.cssText = 'font-size: 11px; color: var(--text-dim); margin-right: 4px; align-self: center;';
-          loEl.appendChild(loLabel);
+          loEl.className = 'lo-chips';
 
           if (item.mappedLOs) {
             item.mappedLOs.split(',').forEach(lo => {
               const chip = document.createElement('span');
+              chip.className = 'lo-chip';
               chip.textContent = lo.trim();
-              chip.style.cssText = 'padding: 2px 8px; background: rgba(139, 92, 246, 0.2); border: 1px solid rgba(139, 92, 246, 0.4); border-radius: 20px; font-size: 11px; color: #A78BFA;';
+              const num = lo.trim().split('.')[0];
+              if (num === '1') chip.classList.add('lo-1');
+              else if (num === '2') chip.classList.add('lo-2');
+              else if (num === '3') chip.classList.add('lo-3');
+              else if (num === '4') chip.classList.add('lo-4');
               loEl.appendChild(chip);
             });
           }
 
-          div.appendChild(refinedEl);
+          div.appendChild(header);
           div.appendChild(loEl);
           list.appendChild(div);
         });
