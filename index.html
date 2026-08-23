@@ -560,11 +560,12 @@
         list.appendChild(chip);
       });
 
-      const total = topics.length;
-      const covered = Math.floor(total * 0.25);
+            const total = topics.length;
+      const studiedTopicIds = new Set(recentScores.map(score => score.topicId));
+      const covered = studiedTopicIds.size;
       const pct = Math.round((covered / total) * 100);
       document.getElementById('coverage-bar').style.width = pct + '%';
-      document.getElementById('coverage-text').textContent = `${covered} of ${total} topics started (${pct}%)`;
+      document.getElementById('coverage-text').textContent = `${covered} of ${total} topics studied (${pct}%)`;
     }
 
     async function loadRecentScores() {
