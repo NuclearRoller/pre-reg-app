@@ -373,10 +373,93 @@
   </script>
 
   <script>
+    // Your Google Sheet CSV URL (Public)
+    const SHEET_URL = 'https://docs.google.com/spreadsheets/d/1ElgT3pbdTA8Bd2r9r9nQI1wCayMoH2po8jcVZuoSeSw/export?format=csv&gid=0';
+
+    let topics = [];
+
+    // Load syllabus data from Google Sheet
+    async function loadStudyData() {
+      try {
+        const response = await fetch(SHEET_URL);
+        const csv = await response.text();
+        const rows = csv.split('\n').slice(1); // Skip header
+        
+        topics = [];
+        rows.forEach(row => {
+          const cols = row.split(',');
+          if (cols.length >= 5 && cols[0].trim() !== '') {
+            topics.push({
+              id: cols[0].trim(),
+              subject: cols[1].trim(),
+              topic: cols[2].trim(),
+              highYield: cols[3].trim(),
+              priority: cols[4].trim()
+            });
+          }
+        });
+
+        renderStudyData();
+      } catch (error) {
+        console.error('Error loading data:', error);
+        document.getElementById('high-yield-list').innerHTML = '<p class="empty">Unable to load topics. Please check your connection.</p>';
+      }
+    }
+
+    // Render the data in the Study tab
+    function renderStudyData() {
+      // Populate the dropdown
+      const select = document.getElementById('topic-select');
+      select.innerHTML = '<option value="">Choose a topic...</option>';
+      topics.forEach(t => {
+        const option = document.createElement('option');
+        option.value = t.id;
+        option.textContent = `${t.id} - ${t.topic}`;
+        select.appendChild(option);
+      });
+
+      // Show high yield topics
+      const highYieldTopics = topics.filter(t => t.highYield.toLowerCase() === 'yes');
+      const list = document.getElementById('high-yield-list');
+      list.innerHTML = '';
+      highYieldTopics.forEach(t => {
+        const chip = document.createElement('div');
+        chip.style.cssText = 'padding: 10px 14px; background: rgba(139, 92, 246, 0.15); border: 1px solid rgba(139, 92, 246, 0.3); border-radius: 12px; font-size: 14px;';
+        chip.innerHTML = `<strong>${t.id}</strong> — ${t.topic}`;
+        list.appendChild(chip);
+      });
+
+      // Update coverage bar (just visual for now)
+      const total = topics.length;
+      const covered = Math.floor(total * 0.25); // We'll make this dynamic later
+      const pct = Math.round((covered / total) * 100);
+      document.getElementById('coverage-bar').style.width = pct + '%';
+      document.getElementById('coverage-text').textContent = `${covered} of ${total} topics started (${pct}%)`;
+    }
+
+    // Log a test score (will connect to n8n later)
+    function logScore() {
+      const topicId = document.getElementById('topic-select').value;
+      const score = document.getElementById('score-input').value;
+      
+      if (!topicId || !score) {
+        alert('Please select a topic and enter a score.');
+        return;
+      }
+      
+      alert(`Score logged: ${topicId} — ${score}%`);
+      document.getElementById('score-input').value = '';
+    }
+
+    // Splash screen
     setTimeout(() => {
       document.getElementById('splash').classList.add('hide');
     }, 2000);
 
+    // Load study data when app opens
+    loadStudyData();
+
+    // Tab switching
     function switchTab(tabId) {
       document.querySelectorAll('.tab-view').forEach(view => view.classList.remove('active'));
       document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
