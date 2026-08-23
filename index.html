@@ -136,7 +136,11 @@
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-      transition: border-color 0.3s ease;
+      transition: transform 0.3s ease, opacity 0.3s ease, border-color 0.3s ease;
+    }
+    .card:active {
+      transform: scale(0.97);
+      opacity: 0.9;
     }
     .card h3 {
       font-size: 13px;
@@ -307,6 +311,29 @@
     .lo-2 { background: rgba(34, 211, 238, 0.15); border-color: rgba(34, 211, 238, 0.4); color: #67E8F9; }
     .lo-3 { background: rgba(251, 146, 60, 0.15); border-color: rgba(251, 146, 60, 0.4); color: #FDBA74; }
     .lo-4 { background: rgba(74, 222, 128, 0.15); border-color: rgba(74, 222, 128, 0.4); color: #86EFAC; }
+
+    #voice-btn {
+      position: fixed;
+      bottom: 95px;
+      right: 20px;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #8B5CF6, #6D28D9);
+      color: white;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      z-index: 200;
+      box-shadow: 0 8px 20px rgba(139, 92, 246, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.3s ease, background 0.3s ease;
+    }
+    #voice-btn:active {
+      transform: scale(0.85);
+    }
   </style>
 </head>
 <body>
@@ -427,6 +454,9 @@
     </div>
   </div>
 
+  <!-- Floating Mic Button -->
+  <button id="voice-btn" onclick="startVoice()">🎤</button>
+
   <!-- Bottom Navigation -->
   <div class="tab-bar">
     <button class="tab-btn active" onclick="switchTab('home')">Home</button>
@@ -454,7 +484,7 @@
   </script>
 
   <script>
-        const SHEET_URL = 'https://docs.google.com/spreadsheets/d/1ElgT3pbdTA8Bd2r9r9nQI1wCayMoH2po8jcVZuoSeSw/export?format=csv&gid=0';
+    const SHEET_URL = 'https://docs.google.com/spreadsheets/d/1ElgT3pbdTA8Bd2r9r9nQI1wCayMoH2po8jcVZuoSeSw/export?format=csv&gid=0';
     const STUDYLOG_URL = 'https://docs.google.com/spreadsheets/d/1ElgT3pbdTA8Bd2r9r9nQI1wCayMoH2po8jcVZuoSeSw/export?format=csv&gid=688195198';
     const TASKS_URL = 'https://docs.google.com/spreadsheets/d/1ElgT3pbdTA8Bd2r9r9nQI1wCayMoH2po8jcVZuoSeSw/export?format=csv&gid=331487663';
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzn1_B1N4pzYHqqCCh8u-r58KTjnT2zPXYuzUqbcDMsNkZkqHSUZ6Gmr6SmuA7Qgt5qMA/exec';
@@ -468,7 +498,6 @@
         const response = await fetch(SHEET_URL);
         const csv = await response.text();
         
-        // Robust CSV parser
         const parseCSV = (text) => {
           const rows = [];
           let row = [];
@@ -560,7 +589,7 @@
         list.appendChild(chip);
       });
 
-            const total = topics.length;
+      const total = topics.length;
       const studiedTopicIds = new Set(recentScores.map(score => score.topicId));
       const covered = studiedTopicIds.size;
       const pct = Math.round((covered / total) * 100);
@@ -638,6 +667,14 @@
           return;
         }
 
+        const highPriority = pendingTasks.filter(item => item.priority.toLowerCase() === 'high');
+        if (highPriority.length > 0 && Notification.permission === 'granted') {
+          new Notification('Pre-Reg Hub', {
+            body: `You have ${highPriority.length} high priority task${highPriority.length > 1 ? 's' : ''} due soon.`,
+            icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="50" fill="%238B5CF6"/></svg>'
+          });
+        }
+
         pendingTasks.slice(0, 5).forEach(item => {
           const div = document.createElement('div');
           div.style.cssText = 'display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; background: rgba(255,255,255,0.05); border-radius: 10px; margin-bottom: 6px; font-size: 14px;';
@@ -671,6 +708,10 @@
           body: JSON.stringify({ action: 'complete_task', row: rowIndex })
         });
         loadHomeTasks();
+        loadRecentScores().then(() => {
+          renderHomeRecentScores();
+          generateArloTip();
+        });
       } catch (error) {
         alert('Unable to mark task as done.');
       }
@@ -685,7 +726,11 @@
           body: JSON.stringify({ action: 'delete_score', row: rowIndex })
         });
         alert('Score deleted.');
-        loadRecentScores();
+        loadRecentScores().then(() => {
+          renderHomeRecentScores();
+          generateArloTip();
+          renderStudyData();
+        });
       } catch (error) {
         alert('Unable to delete score.');
       }
@@ -707,7 +752,11 @@
         });
         alert(`Score logged for ${topicId}: ${score}%`);
         document.getElementById('score-input').value = '';
-        loadRecentScores();
+        loadRecentScores().then(() => {
+          renderHomeRecentScores();
+          generateArloTip();
+          renderStudyData();
+        });
       } catch (error) {
         alert('Unable to log score. Please try again.');
       }
@@ -880,8 +929,55 @@
           body: JSON.stringify({ action: 'delete_reflection', row: rowIndex })
         });
         loadReflections();
+        loadRecentScores().then(() => {
+          renderHomeRecentScores();
+          generateArloTip();
+        });
       } catch (error) {
         alert('Unable to delete reflection.');
+      }
+    }
+
+    function requestNotificationPermission() {
+      if ('Notification' in window) {
+        Notification.requestPermission().then(permission => {
+          if (permission === 'granted') {
+            console.log('Notifications enabled');
+          }
+        });
+      }
+    }
+
+    function startVoice() {
+      if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        const recognition = new SpeechRecognition();
+        recognition.lang = 'en-GB';
+        recognition.continuous = false;
+        recognition.interimResults = false;
+        
+        recognition.onstart = () => {
+          document.getElementById('voice-btn').textContent = '🔴';
+          document.getElementById('voice-btn').style.background = 'linear-gradient(135deg, #EF4444, #DC2626)';
+        };
+        
+        recognition.onresult = (event) => {
+          const transcript = event.results[0][0].transcript;
+          document.getElementById('voice-btn').textContent = '🎤';
+          document.getElementById('voice-btn').style.background = 'linear-gradient(135deg, #8B5CF6, #6D28D9)';
+          
+          switchTab('arlo');
+          console.log('Voice captured:', transcript);
+        };
+        
+        recognition.onerror = () => {
+          document.getElementById('voice-btn').textContent = '🎤';
+          document.getElementById('voice-btn').style.background = 'linear-gradient(135deg, #8B5CF6, #6D28D9)';
+        };
+        
+        recognition.start();
+      } else {
+        alert('Voice recognition is not supported on this device.');
       }
     }
 
@@ -938,6 +1034,7 @@
 
     setGreeting();
     setTodayDate();
+    requestNotificationPermission();
 
     setTimeout(() => {
       document.getElementById('splash').classList.add('hide');
@@ -945,7 +1042,7 @@
 
     loadStudyData();
     loadRecentScores().then(() => {
-      renderStudyData(); // Update coverage after scores are loaded
+      renderStudyData();
     });
     loadHomeTasks();
     loadReflections();
@@ -960,6 +1057,21 @@
       document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
       document.getElementById(tabId).classList.add('active');
       event.currentTarget.classList.add('active');
+
+      if (tabId === 'home') {
+        loadHomeTasks();
+        loadRecentScores().then(() => {
+          renderHomeRecentScores();
+          generateArloTip();
+        });
+        loadReflections();
+      }
+
+      if (tabId === 'study') {
+        loadStudyData();
+        loadRecentScores();
+        loadReflections();
+      }
     }
   </script>
 </body>
