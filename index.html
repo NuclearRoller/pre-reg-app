@@ -581,15 +581,22 @@
         document.getElementById('chat-text-input').focus();
       }
     }
-      function startVoice() {
+        function startVoice() {
       if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         const recognition = new SpeechRecognition();
         recognition.lang = 'en-GB';
         recognition.continuous = false;
-        recognition.interimResults = false;
+        recognition.interimResults = true; // Enable live transcripts
         
         const micBtn = document.getElementById('mic-fab');
+        const modal = document.getElementById('chat-modal');
+        const input = document.getElementById('chat-text-input');
+        
+        // Open chat immediately
+        modal.classList.add('active');
+        input.placeholder = 'Listening...';
+        input.focus();
         
         recognition.onstart = () => {
           micBtn.classList.add('listening');
@@ -598,27 +605,31 @@
         };
         
         recognition.onresult = (event) => {
-          const transcript = event.results[0][0].transcript;
+          // Show live transcript as you speak
+          const transcript = Array.from(event.results)
+            .map(result => result[0].transcript)
+            .join('');
+          
+          input.value = transcript;
+        };
+        
+        recognition.onend = () => {
           micBtn.classList.remove('listening');
           micBtn.textContent = '🎤';
+          input.placeholder = 'Message Arlo...';
           
-          // Open chat and fill input
-          const modal = document.getElementById('chat-modal');
-          modal.classList.add('active');
-          const input = document.getElementById('chat-text-input');
-          input.value = transcript;
-          input.focus();
-          
-          // Show the user what was heard
-          addChatMessage(transcript, 'user');
-          
-          // Auto-send to Arlo
-          sendChatMessage();
+          const transcript = input.value.trim();
+          if (transcript) {
+            input.value = '';
+            addChatMessage(transcript, 'user');
+            sendChatMessage();
+          }
         };
         
         recognition.onerror = () => {
           micBtn.classList.remove('listening');
           micBtn.textContent = '🎤';
+          input.placeholder = 'Message Arlo...';
           showToast('Voice recognition failed');
         };
         
@@ -627,7 +638,6 @@
         showToast('Voice recognition is not supported on this device');
       }
     }
-
     function addChatMessage(text, type) {
       const body = document.getElementById('chat-body');
       const msg = document.createElement('div');
