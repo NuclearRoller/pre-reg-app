@@ -405,7 +405,7 @@
     const SHEET_URL = 'https://docs.google.com/spreadsheets/d/1ElgT3pbdTA8Bd2r9r9nQI1wCayMoH2po8jcVZuoSeSw/export?format=csv&gid=0';
     const STUDYLOG_URL = 'https://docs.google.com/spreadsheets/d/1ElgT3pbdTA8Bd2r9r9nQI1wCayMoH2po8jcVZuoSeSw/export?format=csv&gid=688195198';
     const TASKS_URL = 'https://docs.google.com/spreadsheets/d/1ElgT3pbdTA8Bd2r9r9nQI1wCayMoH2po8jcVZuoSeSw/export?format=csv&gid=331487663';
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyPYJxbGvgjraeiZD7uBeeRUDvmgFuidzTgC7XMxsDLM2aTR8_RbS6nMlUmFQ_oQeFslQ/exec';
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyfpHehBLao390eKWXJyGdmkyYb9DSVOIfd9cycrqdlsjSZMEt4cS39P7BX9UH_5WLFnQ/exec';
 
     let topics = [];
     let recentScores = [];
@@ -457,7 +457,7 @@
       }
     }
 
-       async function loadHomeTasks() {
+    async function loadHomeTasks() {
       try {
         const response = await fetch(TASKS_URL);
         const csv = await response.text();
@@ -554,6 +554,7 @@
         list.appendChild(row);
       });
     }
+
     async function completeTask(rowIndex) {
       try {
         await fetch(SCRIPT_URL, {
@@ -565,11 +566,12 @@
             row: rowIndex
           })
         });
-        loadHomeTasks(); // Reload the task list
+        loadHomeTasks();
       } catch (error) {
         alert('Unable to mark task as done.');
       }
     }
+
     async function deleteScore(rowIndex) {
       try {
         await fetch(SCRIPT_URL, {
