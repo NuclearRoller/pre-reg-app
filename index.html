@@ -558,14 +558,14 @@
       }
     }
 
-           async function loadReflections() {
+    async function loadReflections() {
       try {
         const response = await fetch(REFLECTIONS_URL);
         const csv = await response.text();
         const list = document.getElementById('reflections-list');
         list.innerHTML = '';
 
-        // Parse CSV properly (handles commas inside quotes)
+        // --- Proper CSV Parser (handles commas inside quotes) ---
         const rows = [];
         let current = '';
         let inQuotes = false;
@@ -581,7 +581,7 @@
           }
         }
         if (current) rows.push(current);
-        rows.shift(); // Remove header
+        rows.shift(); // Remove header row
 
         const reflections = rows.map((row, index) => {
           const cols = [];
@@ -621,6 +621,7 @@
           card.className = 'reflection-card';
           card.style.cursor = 'pointer';
 
+          // Collapsed view
           const previewRow = document.createElement('div');
           previewRow.style.cssText = 'display: flex; justify-content: space-between; align-items: center; gap: 8px;';
           const previewText = document.createElement('p');
@@ -633,6 +634,7 @@
           previewRow.appendChild(dateEl);
           card.appendChild(previewRow);
 
+          // Expanded view
           const expanded = document.createElement('div');
           expanded.style.cssText = 'display: none; margin-top: 10px; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 10px;';
 
