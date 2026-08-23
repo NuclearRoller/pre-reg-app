@@ -457,7 +457,7 @@
     const SHEET_URL = 'https://docs.google.com/spreadsheets/d/1ElgT3pbdTA8Bd2r9r9nQI1wCayMoH2po8jcVZuoSeSw/export?format=csv&gid=0';
     const STUDYLOG_URL = 'https://docs.google.com/spreadsheets/d/1ElgT3pbdTA8Bd2r9r9nQI1wCayMoH2po8jcVZuoSeSw/export?format=csv&gid=688195198';
     const TASKS_URL = 'https://docs.google.com/spreadsheets/d/1ElgT3pbdTA8Bd2r9r9nQI1wCayMoH2po8jcVZuoSeSw/export?format=csv&gid=331487663';
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyjyD5EGo3wOjHIcjG4BEMFG1_MuAAJ-GuCvQ8iwhmOcC8V9DzH_MQf0J6hhuBudvSp5w/exec';
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzn1_B1N4pzYHqqCCh8u-r58KTjnT2zPXYuzUqbcDMsNkZkqHSUZ6Gmr6SmuA7Qgt5qMA/exec';
     const REFLECTIONS_URL = 'https://docs.google.com/spreadsheets/d/1ElgT3pbdTA8Bd2r9r9nQI1wCayMoH2po8jcVZuoSeSw/export?format=csv&gid=1128922294';
 
     let topics = [];
@@ -558,23 +558,56 @@
       }
     }
 
-        async function loadReflections() {
+           async function loadReflections() {
       try {
         const response = await fetch(REFLECTIONS_URL);
         const csv = await response.text();
-        const rows = csv.split('\n').slice(1);
         const list = document.getElementById('reflections-list');
         list.innerHTML = '';
 
-        const reflections = rows.map(row => {
-          const cols = row.split(',');
+        // Parse CSV properly (handles commas inside quotes)
+        const rows = [];
+        let current = '';
+        let inQuotes = false;
+        for (let i = 0; i < csv.length; i++) {
+          const char = csv[i];
+          if (char === '"') {
+            inQuotes = !inQuotes;
+          } else if (char === '\n' && !inQuotes) {
+            rows.push(current);
+            current = '';
+          } else {
+            current += char;
+          }
+        }
+        if (current) rows.push(current);
+        rows.shift(); // Remove header
+
+        const reflections = rows.map((row, index) => {
+          const cols = [];
+          let col = '';
+          let inQ = false;
+          for (let i = 0; i < row.length; i++) {
+            const char = row[i];
+            if (char === '"') {
+              inQ = !inQ;
+            } else if (char === ',' && !inQ) {
+              cols.push(col.trim());
+              col = '';
+            } else {
+              col += char;
+            }
+          }
+          cols.push(col.trim());
+
           return {
-            date: cols[0] ? cols[0].trim().replace(/"/g, '') : '',
-            raw: cols[1] ? cols[1].trim().replace(/"/g, '') : '',
-            refined: cols[2] ? cols[2].trim().replace(/"/g, '') : '',
-            mappedLOs: cols[3] ? cols[3].trim().replace(/"/g, '') : '',
-            rating: cols[5] ? cols[5].trim().replace(/"/g, '') : '',
-            status: cols[4] ? cols[4].trim().replace(/"/g, '') : ''
+            date: cols[0] ? cols[0].replace(/"/g, '') : '',
+            raw: cols[1] ? cols[1].replace(/"/g, '') : '',
+            refined: cols[2] ? cols[2].replace(/"/g, '') : '',
+            mappedLOs: cols[3] ? cols[3].replace(/"/g, '') : '',
+            status: cols[4] ? cols[4].replace(/"/g, '') : '',
+            rating: cols[5] ? cols[5].replace(/"/g, '') : '',
+            rowIndex: index
           };
         }).filter(item => item.refined !== '');
 
@@ -588,23 +621,18 @@
           card.className = 'reflection-card';
           card.style.cursor = 'pointer';
 
-          // Collapsed view
           const previewRow = document.createElement('div');
           previewRow.style.cssText = 'display: flex; justify-content: space-between; align-items: center; gap: 8px;';
-
           const previewText = document.createElement('p');
           previewText.className = 'reflection-text';
           previewText.textContent = item.refined.length > 80 ? item.refined.slice(0, 80) + '…' : item.refined;
-
           const dateEl = document.createElement('span');
           dateEl.className = 'reflection-date';
           dateEl.textContent = item.date;
-
           previewRow.appendChild(previewText);
           previewRow.appendChild(dateEl);
           card.appendChild(previewRow);
 
-          // Expanded view (hidden by default)
           const expanded = document.createElement('div');
           expanded.style.cssText = 'display: none; margin-top: 10px; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 10px;';
 
@@ -647,9 +675,19 @@
             expanded.appendChild(ratingEl);
           }
 
+          const deleteBtn = document.createElement('button');
+          deleteBtn.textContent = 'Delete';
+          deleteBtn.style.cssText = 'margin-top: 10px; padding: 8px 12px; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.4); color: #FCA5A5; border-radius: 8px; font-size: 12px; cursor: pointer;';
+          deleteBtn.onclick = (e) => {
+            e.stopPropagation();
+            if (confirm('Delete this reflection?')) {
+              deleteReflection(item.rowIndex);
+            }
+          };
+          expanded.appendChild(deleteBtn);
+
           card.appendChild(expanded);
 
-          // Toggle expand on click
           card.addEventListener('click', () => {
             if (expanded.style.display === 'none') {
               expanded.style.display = 'block';
@@ -729,6 +767,19 @@
         loadHomeTasks();
       } catch (error) {
         alert('Unable to mark task as done.');
+      }
+    }
+        async function deleteReflection(rowIndex) {
+      try {
+        await fetch(SCRIPT_URL, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'text/plain' },
+          body: JSON.stringify({ action: 'delete_reflection', row: rowIndex })
+        });
+        loadReflections();
+      } catch (error) {
+        alert('Unable to delete reflection.');
       }
     }
 
