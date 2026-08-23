@@ -454,7 +454,7 @@
   </script>
 
   <script>
-    const SHEET_URL = 'https://docs.google.com/spreadsheets/d/1ElgT3pbdTA8Bd2r9r9nQI1wCayMoH2po8jcVZuoSeSw/export?format=csv&gid=0';
+        const SHEET_URL = 'https://docs.google.com/spreadsheets/d/1ElgT3pbdTA8Bd2r9r9nQI1wCayMoH2po8jcVZuoSeSw/export?format=csv&gid=0';
     const STUDYLOG_URL = 'https://docs.google.com/spreadsheets/d/1ElgT3pbdTA8Bd2r9r9nQI1wCayMoH2po8jcVZuoSeSw/export?format=csv&gid=688195198';
     const TASKS_URL = 'https://docs.google.com/spreadsheets/d/1ElgT3pbdTA8Bd2r9r9nQI1wCayMoH2po8jcVZuoSeSw/export?format=csv&gid=331487663';
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzn1_B1N4pzYHqqCCh8u-r58KTjnT2zPXYuzUqbcDMsNkZkqHSUZ6Gmr6SmuA7Qgt5qMA/exec';
@@ -463,12 +463,12 @@
     let topics = [];
     let recentScores = [];
 
-            async function loadStudyData() {
+    async function loadStudyData() {
       try {
         const response = await fetch(SHEET_URL);
         const csv = await response.text();
         
-        // Robust CSV parser that handles quotes and escaped characters
+        // Robust CSV parser
         const parseCSV = (text) => {
           const rows = [];
           let row = [];
@@ -480,7 +480,6 @@
             
             if (inQuotes) {
               if (char === '"') {
-                // Check for escaped double quote
                 if (i + 1 < text.length && text[i + 1] === '"') {
                   cell += '"';
                   i++;
@@ -512,7 +511,6 @@
             }
           }
           
-          // Push last cell/row if any
           if (cell.trim() !== '' || row.length > 0) {
             row.push(cell.trim());
             rows.push(row);
@@ -522,7 +520,6 @@
         };
         
         const rows = parseCSV(csv);
-        // Remove header row
         if (rows.length > 0) rows.shift();
         
         topics = [];
@@ -541,6 +538,79 @@
       } catch (error) {
         document.getElementById('high-yield-list').innerHTML = '<p class="empty">Unable to load topics: ' + error.message + '</p>';
       }
+    }
+
+    function renderStudyData() {
+      const select = document.getElementById('topic-select');
+      select.innerHTML = '<option value="">Choose a topic...</option>';
+      topics.forEach(t => {
+        const option = document.createElement('option');
+        option.value = t.id;
+        option.textContent = `${t.id} - ${t.topic}`;
+        select.appendChild(option);
+      });
+
+      const highYieldTopics = topics.filter(t => t.highYield.toLowerCase() === 'yes');
+      const list = document.getElementById('high-yield-list');
+      list.innerHTML = '';
+      highYieldTopics.forEach(t => {
+        const chip = document.createElement('div');
+        chip.style.cssText = 'padding: 10px 14px; background: rgba(139, 92, 246, 0.15); border: 1px solid rgba(139, 92, 246, 0.3); border-radius: 12px; font-size: 14px;';
+        chip.innerHTML = `<strong>${t.id}</strong> — ${t.topic}`;
+        list.appendChild(chip);
+      });
+
+      const total = topics.length;
+      const covered = Math.floor(total * 0.25);
+      const pct = Math.round((covered / total) * 100);
+      document.getElementById('coverage-bar').style.width = pct + '%';
+      document.getElementById('coverage-text').textContent = `${covered} of ${total} topics started (${pct}%)`;
+    }
+
+    async function loadRecentScores() {
+      try {
+        const response = await fetch(STUDYLOG_URL);
+        const csv = await response.text();
+        const rows = csv.split('\n').slice(1);
+        recentScores = [];
+        rows.forEach((row, index) => {
+          const cols = row.split(',');
+          if (cols.length >= 3 && cols[0].trim() !== '') {
+            recentScores.push({
+              date: cols[0].trim(),
+              topicId: cols[1].trim(),
+              score: cols[2].trim(),
+              rowIndex: index
+            });
+          }
+        });
+        renderRecentScores();
+      } catch (error) {
+        document.getElementById('recent-scores').innerHTML = '<p class="empty">Unable to load scores.</p>';
+      }
+    }
+
+    function renderRecentScores() {
+      const list = document.getElementById('recent-scores');
+      list.innerHTML = '';
+      if (recentScores.length === 0) {
+        list.innerHTML = '<p class="empty">No scores logged yet.</p>';
+        return;
+      }
+      const reversed = recentScores.slice(-10).reverse();
+      reversed.forEach(item => {
+        const row = document.createElement('div');
+        row.className = 'score-row';
+        const info = document.createElement('span');
+        info.textContent = `${item.topicId} — ${item.score}%`;
+        const deleteBtn = document.createElement('button');
+        deleteBtn.className = 'delete-btn';
+        deleteBtn.textContent = '×';
+        deleteBtn.onclick = () => deleteScore(item.rowIndex);
+        row.appendChild(info);
+        row.appendChild(deleteBtn);
+        list.appendChild(row);
+      });
     }
 
     async function loadHomeTasks() {
@@ -591,65 +661,121 @@
       }
     }
 
-       async function loadReflections() {
+    async function completeTask(rowIndex) {
+      try {
+        await fetch(SCRIPT_URL, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'text/plain' },
+          body: JSON.stringify({ action: 'complete_task', row: rowIndex })
+        });
+        loadHomeTasks();
+      } catch (error) {
+        alert('Unable to mark task as done.');
+      }
+    }
+
+    async function deleteScore(rowIndex) {
+      try {
+        await fetch(SCRIPT_URL, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'text/plain' },
+          body: JSON.stringify({ action: 'delete_score', row: rowIndex })
+        });
+        alert('Score deleted.');
+        loadRecentScores();
+      } catch (error) {
+        alert('Unable to delete score.');
+      }
+    }
+
+    async function logScore() {
+      const topicId = document.getElementById('topic-select').value;
+      const score = document.getElementById('score-input').value;
+      if (!topicId || !score) {
+        alert('Please select a topic and enter a score.');
+        return;
+      }
+      try {
+        await fetch(SCRIPT_URL, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'text/plain' },
+          body: JSON.stringify({ topicId, score })
+        });
+        alert(`Score logged for ${topicId}: ${score}%`);
+        document.getElementById('score-input').value = '';
+        loadRecentScores();
+      } catch (error) {
+        alert('Unable to log score. Please try again.');
+      }
+    }
+
+    async function loadReflections() {
       try {
         const response = await fetch(REFLECTIONS_URL);
         const csv = await response.text();
         const list = document.getElementById('reflections-list');
         list.innerHTML = '';
 
-        // --- Bulletproof CSV Parser ---
-        const parseCSVLine = (line) => {
-          const result = [];
-          let current = '';
+        const parseCSV = (text) => {
+          const rows = [];
+          let row = [];
+          let cell = '';
           let inQuotes = false;
-          for (let i = 0; i < line.length; i++) {
-            const char = line[i];
-            if (char === '"' && !inQuotes) {
-              inQuotes = true;
-            } else if (char === '"' && inQuotes) {
-              inQuotes = false;
-            } else if (char === ',' && !inQuotes) {
-              result.push(current.trim());
-              current = '';
+          for (let i = 0; i < text.length; i++) {
+            const char = text[i];
+            if (inQuotes) {
+              if (char === '"') {
+                if (i + 1 < text.length && text[i + 1] === '"') {
+                  cell += '"';
+                  i++;
+                } else {
+                  inQuotes = false;
+                }
+              } else {
+                cell += char;
+              }
             } else {
-              current += char;
+              if (char === '"') {
+                inQuotes = true;
+              } else if (char === ',') {
+                row.push(cell.trim());
+                cell = '';
+              } else if (char === '\n' || char === '\r') {
+                if (cell.trim() !== '' || row.length > 0) {
+                  row.push(cell.trim());
+                  rows.push(row);
+                  row = [];
+                  cell = '';
+                }
+                if (char === '\r' && i + 1 < text.length && text[i + 1] === '\n') {
+                  i++;
+                }
+              } else {
+                cell += char;
+              }
             }
           }
-          result.push(current.trim());
-          return result.map(cell => cell.replace(/^"|"$/g, '').trim());
+          if (cell.trim() !== '' || row.length > 0) {
+            row.push(cell.trim());
+            rows.push(row);
+          }
+          return rows;
         };
 
-        // Split CSV into rows (handle line breaks inside quotes)
-        const rows = [];
-        let currentRow = '';
-        let inQuotes = false;
-        for (let i = 0; i < csv.length; i++) {
-          const char = csv[i];
-          if (char === '"') {
-            inQuotes = !inQuotes;
-          }
-          if (char === '\n' && !inQuotes) {
-            rows.push(currentRow);
-            currentRow = '';
-          } else {
-            currentRow += char;
-          }
-        }
-        if (currentRow) rows.push(currentRow);
-
-        // Remove header row
-        rows.shift();
+        const rows = parseCSV(csv);
+        if (rows.length > 0) rows.shift();
 
         const reflections = rows.map((row, index) => {
-          const cols = parseCSVLine(row);
           return {
-            date: cols[0] || '',
-            raw: cols[1] || '',
-            refined: cols[2] || '',
-            mappedLOs: cols[3] || '',
-            status: cols[4] || '',
-            rating: cols[5] || '',
+            date: row[0] || '',
+            raw: row[1] || '',
+            refined: row[2] || '',
+            mappedLOs: row[3] || '',
+            status: row[4] || '',
+            rating: row[5] || '',
             rowIndex: index
           };
         }).filter(item => item.refined !== '');
@@ -730,7 +856,6 @@
           expanded.appendChild(deleteBtn);
 
           card.appendChild(expanded);
-
           card.addEventListener('click', () => {
             if (expanded.style.display === 'none') {
               expanded.style.display = 'block';
@@ -738,7 +863,6 @@
               expanded.style.display = 'none';
             }
           });
-
           list.appendChild(card);
         });
       } catch (error) {
@@ -746,23 +870,7 @@
       }
     }
 
-    async function completeTask(rowIndex) {
-      try {
-        await fetch(SCRIPT_URL, {
-          method: 'POST',
-          mode: 'no-cors',
-          headers: { 'Content-Type': 'text/plain' },
-          body: JSON.stringify({
-            action: 'complete_task',
-            row: rowIndex
-          })
-        });
-        loadHomeTasks();
-      } catch (error) {
-        alert('Unable to mark task as done.');
-      }
-    }
-        async function deleteReflection(rowIndex) {
+    async function deleteReflection(rowIndex) {
       try {
         await fetch(SCRIPT_URL, {
           method: 'POST',
@@ -773,43 +881,6 @@
         loadReflections();
       } catch (error) {
         alert('Unable to delete reflection.');
-      }
-    }
-
-    async function deleteScore(rowIndex) {
-      try {
-        await fetch(SCRIPT_URL, {
-          method: 'POST',
-          mode: 'no-cors',
-          headers: { 'Content-Type': 'text/plain' },
-          body: JSON.stringify({ action: 'delete', row: rowIndex })
-        });
-        alert('Score deleted.');
-        loadRecentScores();
-      } catch (error) {
-        alert('Unable to delete score.');
-      }
-    }
-
-    async function logScore() {
-      const topicId = document.getElementById('topic-select').value;
-      const score = document.getElementById('score-input').value;
-      if (!topicId || !score) {
-        alert('Please select a topic and enter a score.');
-        return;
-      }
-      try {
-        await fetch(SCRIPT_URL, {
-          method: 'POST',
-          mode: 'no-cors',
-          headers: { 'Content-Type': 'text/plain' },
-          body: JSON.stringify({ topicId, score })
-        });
-        alert(`Score logged for ${topicId}: ${score}%`);
-        document.getElementById('score-input').value = '';
-        loadRecentScores();
-      } catch (error) {
-        alert('Unable to log score. Please try again.');
       }
     }
 
