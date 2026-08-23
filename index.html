@@ -944,7 +944,9 @@
     }, 2000);
 
     loadStudyData();
-    loadRecentScores();
+    loadRecentScores().then(() => {
+      renderStudyData(); // Update coverage after scores are loaded
+    });
     loadHomeTasks();
     loadReflections();
 
