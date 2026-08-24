@@ -665,6 +665,7 @@
         thinking.remove();
         addChatMessage(data.text || data.output || data.message || 'Sorry, I could not process that.', 'arlo');
         loadReflections();
+        showToast('Arlo completed your request');
       } catch (error) {
         thinking.remove();
         addChatMessage('Error connecting to Arlo.', 'arlo');
@@ -1042,6 +1043,9 @@
     loadHomeTasks();
     loadReflections();
     checkNotifications();
+    if ('Notification' in window) {
+      Notification.requestPermission();
+    }
     
     function switchTab(tabId) {
       document.querySelectorAll('.tab-view').forEach(view => view.classList.remove('active'));
@@ -1050,6 +1054,12 @@
       event.currentTarget.classList.add('active');
       if (tabId === 'home') { loadHomeTasks(); loadRecentScores().then(() => { renderHomeRecentScores(); generateArloTip(); }); loadReflections(); }
       if (tabId === 'study') { loadStudyData(); loadRecentScores(); loadReflections(); }
+      if (tabId === 'calendar') {
+        const iframe = document.querySelector('.calendar-wrap iframe');
+        if (iframe) {
+          iframe.src = iframe.src;
+        }
+      }
     }
   </script>
 </body>
