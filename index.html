@@ -538,7 +538,7 @@
     const SHEET_URL = 'https://docs.google.com/spreadsheets/d/1ElgT3pbdTA8Bd2r9r9nQI1wCayMoH2po8jcVZuoSeSw/export?format=csv&gid=0';
     const STUDYLOG_URL = 'https://docs.google.com/spreadsheets/d/1ElgT3pbdTA8Bd2r9r9nQI1wCayMoH2po8jcVZuoSeSw/export?format=csv&gid=688195198';
     const TASKS_URL = 'https://docs.google.com/spreadsheets/d/1ElgT3pbdTA8Bd2r9r9nQI1wCayMoH2po8jcVZuoSeSw/export?format=csv&gid=331487663';
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxIpVHWIN44bW30vhbpdoONpB0XnN4xUo6u7jPqetpxFnOgB8tAx7hp8y4xEWl50rKeVA/exec';
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby2cYRmKX2Tqd3IRiRc9CrcOm0Tl1PrqmtAzLPaIIeXbY7BNoD4ptT9fv54NqSZjzs7/exec';
     const REFLECTIONS_URL = 'https://docs.google.com/spreadsheets/d/1ElgT3pbdTA8Bd2r9r9nQI1wCayMoH2po8jcVZuoSeSw/export?format=csv&gid=1128922294';
     const CHAT_URL = 'https://familysalesbot.camdvr.org/webhook/f5621c67-f92f-4be2-91ed-5b475df9e6d1/chat';
 
@@ -663,9 +663,14 @@
         });
         const data = await response.json();
         thinking.remove();
-        addChatMessage(data.text || data.output || data.message || 'Sorry, I could not process that.', 'arlo');
+        const reply = data.text || data.output || data.message || 'Sorry, I could not process that.';
+        addChatMessage(reply, 'arlo');
         loadReflections();
-        showToast('Arlo completed your request');
+        
+        // Only show toast if Arlo actually did something
+        if (reply.includes('✅')) {
+          showToast('Arlo completed an action');
+        }
       } catch (error) {
         thinking.remove();
         addChatMessage('Error connecting to Arlo.', 'arlo');
