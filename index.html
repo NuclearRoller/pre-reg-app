@@ -670,20 +670,32 @@
         });
         const data = await response.json();
         thinking.remove();
-        const reply = data.text || data.output || data.message || 'Sorry, I could not process that.';
+        let reply = data.text || data.output || data.message || 'Sorry, I could not process that.';
+        
+        // Strip action markers from the visible reply
+        const actionMarkers = ['[TASK_ADDED]', '[REMINDER_ADDED]', '[MEMORY_ADDED]', '[MEMORY_DELETED]', '[REFLECTION_MAPPED]', '[EVENT_CREATED]', '[PLAN_APPROVED]'];
+        let detectedAction = null;
+        
+        actionMarkers.forEach(marker => {
+          if (reply.includes(marker)) {
+            detectedAction = marker;
+            reply = reply.replace(marker, '').trim();
+          }
+        });
+        
         addChatMessage(reply, 'arlo');
         loadReflections();
+        loadHomeTasks();
+        loadReminders();
         
-        // Only show toast if Arlo actually did something
-        if (reply.includes('✅')) {
-        if (reply.includes('[TASK_ADDED]')) showToast('Arlo added a task');
-        else if (reply.includes('[REMINDER_ADDED]')) showToast('Arlo set a reminder');
-        else if (reply.includes('[MEMORY_ADDED]')) showToast('Arlo will remember that');
-        else if (reply.includes('[MEMORY_DELETED]')) showToast('Arlo forgot that');
-        else if (reply.includes('[REFLECTION_MAPPED]')) showToast('Arlo mapped your reflection');
-        else if (reply.includes('[EVENT_CREATED]')) showToast('Arlo added an event');
-        else if (reply.includes('[PLAN_APPROVED]')) showToast('Study plan approved');
-        }
+        // Show toast based on detected action
+        if (detectedAction === '[TASK_ADDED]') showToast('Arlo added a task');
+        else if (detectedAction === '[REMINDER_ADDED]') showToast('Arlo set a reminder');
+        else if (detectedAction === '[MEMORY_ADDED]') showToast('Arlo will remember that');
+        else if (detectedAction === '[MEMORY_DELETED]') showToast('Arlo forgot that');
+        else if (detectedAction === '[REFLECTION_MAPPED]') showToast('Arlo mapped your reflection');
+        else if (detectedAction === '[EVENT_CREATED]') showToast('Arlo added an event');
+        else if (detectedAction === '[PLAN_APPROVED]') showToast('Study plan approved');
       } catch (error) {
         thinking.remove();
         addChatMessage('Error connecting to Arlo.', 'arlo');
