@@ -446,6 +446,12 @@
           <p class="empty">Loading tasks...</p>
         </div>
       </div>
+            <div class="card">
+        <h3>Today's Reminders</h3>
+        <div id="home-reminders" style="display: flex; flex-direction: column; gap: 6px;">
+          <p class="empty">Loading reminders...</p>
+        </div>
+      </div>
       <div class="card">
         <h3>Recent Study Activity</h3>
         <div id="home-recent-scores" style="display: flex; flex-direction: column; gap: 6px;">
@@ -538,7 +544,8 @@
     const SHEET_URL = 'https://docs.google.com/spreadsheets/d/1ElgT3pbdTA8Bd2r9r9nQI1wCayMoH2po8jcVZuoSeSw/export?format=csv&gid=0';
     const STUDYLOG_URL = 'https://docs.google.com/spreadsheets/d/1ElgT3pbdTA8Bd2r9r9nQI1wCayMoH2po8jcVZuoSeSw/export?format=csv&gid=688195198';
     const TASKS_URL = 'https://docs.google.com/spreadsheets/d/1ElgT3pbdTA8Bd2r9r9nQI1wCayMoH2po8jcVZuoSeSw/export?format=csv&gid=331487663';
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby2cYRmKX2Tqd3IRiRc9CrcOm0Tl1PrqmtAzLPaIIeXbY7BNoD4ptT9fv54NqSZjzs7/exec';
+    const REMINDERS_URL = 'https://docs.google.com/spreadsheets/d/1ElgT3pbdTA8Bd2r9r9nQI1wCayMoH2po8jcVZuoSeSw/export?format=csv&gid=1548981654';
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw6lBOMX5F1IbcD2zMTZJEbH3OE-XNvQbOMondQhjD0H8CInJ0Jvkl5BtgFHTsO4pzm3w/exec';
     const REFLECTIONS_URL = 'https://docs.google.com/spreadsheets/d/1ElgT3pbdTA8Bd2r9r9nQI1wCayMoH2po8jcVZuoSeSw/export?format=csv&gid=1128922294';
     const CHAT_URL = 'https://familysalesbot.camdvr.org/webhook/f5621c67-f92f-4be2-91ed-5b475df9e6d1/chat';
 
@@ -669,11 +676,59 @@
         
         // Only show toast if Arlo actually did something
         if (reply.includes('✅')) {
-          showToast('Arlo completed an action');
+        if (reply.includes('[TASK_ADDED]')) showToast('Arlo added a task');
+        else if (reply.includes('[REMINDER_ADDED]')) showToast('Arlo set a reminder');
+        else if (reply.includes('[MEMORY_ADDED]')) showToast('Arlo will remember that');
+        else if (reply.includes('[MEMORY_DELETED]')) showToast('Arlo forgot that');
+        else if (reply.includes('[REFLECTION_MAPPED]')) showToast('Arlo mapped your reflection');
+        else if (reply.includes('[EVENT_CREATED]')) showToast('Arlo added an event');
+        else if (reply.includes('[PLAN_APPROVED]')) showToast('Study plan approved');
         }
       } catch (error) {
         thinking.remove();
         addChatMessage('Error connecting to Arlo.', 'arlo');
+      }
+    }
+        async function loadReminders() {
+      try {
+        const response = await fetch(REMINDERS_URL);
+        const csv = await response.text();
+        const rows = csv.split('\n').slice(1);
+        const list = document.getElementById('home-reminders');
+        list.innerHTML = '';
+        const pending = rows.map((row, index) => {
+          const cols = row.split(',');
+          return { reminder: cols[0] ? cols[0].trim() : '', dueDate: cols[1] ? cols[1].trim() : '', time: cols[2] ? cols[2].trim() : '', status: cols[3] ? cols[3].trim() : '', rowIndex: index };
+        }).filter(item => item.status !== 'Done' && item.reminder !== '');
+        if (pending.length === 0) {
+          list.innerHTML = '<p class="empty">No reminders set.</p>';
+          return;
+        }
+        pending.slice(0, 5).forEach(item => {
+          const div = document.createElement('div');
+          div.style.cssText = 'display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; background: rgba(251, 146, 60, 0.1); border: 1px solid rgba(251, 146, 60, 0.3); border-radius: 10px; margin-bottom: 6px; font-size: 14px;';
+          const info = document.createElement('span');
+          info.textContent = `${item.reminder}`;
+          if (item.time !== '') { info.textContent += ` — ${item.time}`; }
+          const doneBtn = document.createElement('button');
+          doneBtn.textContent = '✓';
+          doneBtn.style.cssText = 'background: rgba(251, 146, 60, 0.3); border: none; color: #EA580C; font-size: 16px; width: 28px; height: 28px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center;';
+          doneBtn.onclick = () => completeReminder(item.rowIndex);
+          div.appendChild(info);
+          div.appendChild(doneBtn);
+          list.appendChild(div);
+        });
+      } catch (error) {
+        document.getElementById('home-reminders').innerHTML = '<p class="empty">Unable to load reminders.</p>';
+      }
+    }
+        async function completeReminder(rowIndex) {
+      try {
+        await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ action: 'complete_reminder', row: rowIndex }) });
+        showToast('Reminder marked as done');
+        loadReminders();
+      } catch (error) {
+        showToast('Unable to mark reminder as done');
       }
     }
     async function checkNotifications() {
@@ -1046,6 +1101,7 @@
     loadStudyData();
     loadRecentScores().then(() => { renderStudyData(); renderHomeRecentScores(); generateArloTip(); });
     loadHomeTasks();
+    loadReminders();
     loadReflections();
     checkNotifications();
     if ('Notification' in window) {
@@ -1057,7 +1113,7 @@
       document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
       document.getElementById(tabId).classList.add('active');
       event.currentTarget.classList.add('active');
-      if (tabId === 'home') { loadHomeTasks(); loadRecentScores().then(() => { renderHomeRecentScores(); generateArloTip(); }); loadReflections(); }
+      if (tabId === 'home') { loadHomeTasks(); loadReminders(); loadRecentScores().then(() => { renderHomeRecentScores(); generateArloTip(); }); loadReflections(); }
       if (tabId === 'study') { loadStudyData(); loadRecentScores(); loadReflections(); }
       if (tabId === 'calendar') {
         const iframe = document.querySelector('.calendar-wrap iframe');
