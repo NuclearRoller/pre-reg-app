@@ -153,20 +153,6 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
-    .calendar-wrap {
-      margin-top: 14px;
-      border-radius: 18px;
-      overflow: hidden;
-      border: 1px solid var(--card-border);
-      background: #FFFFFF;
-    }
-    .calendar-wrap iframe {
-      width: 100%;
-      height: 580px;
-      border: none;
-      display: block;
-    }
-
     .tab-bar {
       position: fixed;
       bottom: 0;
@@ -267,36 +253,96 @@
     .lo-3 { border-color: rgba(251, 146, 60, 0.5); color: #EA580C; }
     .lo-4 { border-color: rgba(74, 222, 128, 0.5); color: #16A34A; }
 
-    .cal-day {
+    .cal-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+    .cal-weekday {
+      text-align: center;
+      font-size: 11px;
+      color: var(--text-dim);
+      font-weight: 600;
+      padding: 6px 0;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .cal-day-cell {
+      background: #FFFFFF;
+      border: 1px solid rgba(0,0,0,0.06);
+      border-radius: 10px;
+      min-height: 60px;
+      padding: 6px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      position: relative;
+    }
+    .cal-day-cell:active {
+      transform: scale(0.95);
+      background: #F5F5F7;
+    }
+    .cal-day-cell.today {
+      border-color: var(--accent);
+      background: rgba(139, 92, 246, 0.05);
+    }
+    .cal-day-number {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+    .cal-day-cell.today .cal-day-number {
+      color: var(--accent);
+    }
+    .cal-day-event {
+      font-size: 9px;
+      padding: 2px 4px;
+      border-radius: 4px;
+      margin-bottom: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .cal-month-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .cal-month-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .cal-nav-btn {
+      background: #FFFFFF;
+      border: 1px solid rgba(0,0,0,0.06);
+      border-radius: 8px;
+      width: 32px;
+      height: 32px;
+      font-size: 16px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--accent);
+    }
+    .cal-selected-day {
       background: #FFFFFF;
       border: 1px solid rgba(0,0,0,0.06);
       border-radius: 14px;
       padding: 14px;
-      margin-bottom: 10px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+      margin-top: 10px;
+      animation: viewFade 0.3s ease;
     }
-    .cal-day-header {
+    .cal-selected-title {
       font-weight: 600;
-      font-size: 15px;
+      font-size: 14px;
       margin-bottom: 8px;
       color: var(--text);
     }
-    .cal-event {
-      padding: 8px 12px;
-      border-radius: 10px;
-      margin-bottom: 6px;
-      font-size: 13px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 8px;
-    }
-    .cal-event-time {
-      font-size: 11px;
-      color: var(--text-dim);
-      white-space: nowrap;
-    }
-    
+
     #chat-fab {
       position: fixed;
       bottom: 95px;
@@ -476,7 +522,7 @@
           <p class="empty">Loading tasks...</p>
         </div>
       </div>
-            <div class="card">
+      <div class="card">
         <h3>Today's Reminders</h3>
         <div id="home-reminders" style="display: flex; flex-direction: column; gap: 6px;">
           <p class="empty">Loading reminders...</p>
@@ -546,7 +592,6 @@
 
   <button id="chat-fab" onclick="toggleChat()">💬</button>
   <button id="mic-fab" onclick="startVoice()">🎤</button>
-  
 
   <div id="chat-modal">
     <div id="chat-header">
@@ -580,6 +625,8 @@
 
     let topics = [];
     let recentScores = [];
+    let calendarEvents = [];
+    let currentMonth = new Date();
 
     const LO_TITLES = {
       '1.1': 'Empathy & Person-Centred Care', '1.2': 'Shared Decision Making', '1.3': 'Effective Communication',
@@ -603,83 +650,164 @@
       '4.53': 'Reflection & Learning Needs', '4.54': 'Supporting Others\' Learning', '4.55': 'Research Audit & Quality Improvement'
     };
 
-
-        async function loadCustomCalendar() {
+    async function loadCustomCalendar() {
       try {
         const response = await fetch(CALENDAR_API_URL);
         const data = await response.json();
-        
         if (data.status !== 'success') {
           document.getElementById('custom-calendar').innerHTML = '<div class="card"><p class="empty">Unable to load calendar.</p></div>';
           return;
         }
-        
-        const events = data.events || [];
-        const container = document.getElementById('custom-calendar');
-        container.innerHTML = '';
-        
-        const grouped = {};
-        events.forEach(event => {
-          const date = new Date(event.start);
-          const dateKey = date.toDateString();
-          if (!grouped[dateKey]) {
-            grouped[dateKey] = [];
-          }
-          grouped[dateKey].push(event);
-        });
-        
-        const sortedDates = Object.keys(grouped).sort((a, b) => new Date(a) - new Date(b));
-        
-        if (sortedDates.length === 0) {
-          container.innerHTML = '<div class="card"><p class="empty">No events in the next 14 days.</p></div>';
-          return;
-        }
-        
-        sortedDates.forEach(dateKey => {
-          const dayDiv = document.createElement('div');
-          dayDiv.className = 'cal-day';
-          
-          const date = new Date(dateKey);
-          const header = document.createElement('div');
-          header.className = 'cal-day-header';
-          header.textContent = date.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' });
-          dayDiv.appendChild(header);
-          
-          grouped[dateKey].forEach(event => {
-            const eventDiv = document.createElement('div');
-            eventDiv.className = 'cal-event';
-            
-            let bgColour = 'rgba(139, 92, 246, 0.1)';
-            let textColour = '#7C3AED';
-            if (event.title.includes('🟡')) { bgColour = 'rgba(251, 191, 36, 0.1)'; textColour = '#D97706'; }
-            else if (event.title.includes('🔵')) { bgColour = 'rgba(59, 130, 246, 0.1)'; textColour = '#2563EB'; }
-            else if (event.title.includes('🔴')) { bgColour = 'rgba(239, 68, 68, 0.1)'; textColour = '#DC2626'; }
-            else if (event.title.includes('🟣')) { bgColour = 'rgba(139, 92, 246, 0.1)'; textColour = '#7C3AED'; }
-            else if (event.title.includes('🟢')) { bgColour = 'rgba(74, 222, 128, 0.1)'; textColour = '#16A34A'; }
-            
-            eventDiv.style.background = bgColour;
-            eventDiv.style.color = textColour;
-            
-            const titleSpan = document.createElement('span');
-            titleSpan.textContent = event.title;
-            
-            const timeSpan = document.createElement('span');
-            timeSpan.className = 'cal-event-time';
-            const startTime = new Date(event.start);
-            timeSpan.textContent = startTime.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
-            
-            eventDiv.appendChild(titleSpan);
-            eventDiv.appendChild(timeSpan);
-            dayDiv.appendChild(eventDiv);
-          });
-          
-          container.appendChild(dayDiv);
-        });
+        calendarEvents = data.events || [];
+        renderCalendar();
       } catch (error) {
         document.getElementById('custom-calendar').innerHTML = '<div class="card"><p class="empty">Unable to load calendar.</p></div>';
       }
     }
-    
+
+    function getEventColours(title) {
+      if (title.includes('🟡')) return { bg: 'rgba(251, 191, 36, 0.15)', text: '#D97706' };
+      if (title.includes('🔵')) return { bg: 'rgba(59, 130, 246, 0.15)', text: '#2563EB' };
+      if (title.includes('🔴')) return { bg: 'rgba(239, 68, 68, 0.15)', text: '#DC2626' };
+      if (title.includes('🟣')) return { bg: 'rgba(139, 92, 246, 0.15)', text: '#7C3AED' };
+      if (title.includes('🟢')) return { bg: 'rgba(74, 222, 128, 0.15)', text: '#16A34A' };
+      return { bg: 'rgba(139, 92, 246, 0.15)', text: '#7C3AED' };
+    }
+
+    function renderCalendar() {
+      const container = document.getElementById('custom-calendar');
+      container.innerHTML = '';
+      const year = currentMonth.getFullYear();
+      const month = currentMonth.getMonth();
+
+      const header = document.createElement('div');
+      header.className = 'cal-month-header';
+      const prevBtn = document.createElement('button');
+      prevBtn.className = 'cal-nav-btn';
+      prevBtn.textContent = '‹';
+      prevBtn.onclick = () => { currentMonth.setMonth(currentMonth.getMonth() - 1); renderCalendar(); };
+      const nextBtn = document.createElement('button');
+      nextBtn.className = 'cal-nav-btn';
+      nextBtn.textContent = '›';
+      nextBtn.onclick = () => { currentMonth.setMonth(currentMonth.getMonth() + 1); renderCalendar(); };
+      const title = document.createElement('div');
+      title.className = 'cal-month-title';
+      title.textContent = currentMonth.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
+      header.appendChild(prevBtn);
+      header.appendChild(title);
+      header.appendChild(nextBtn);
+      container.appendChild(header);
+
+      const weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+      const weekdayRow = document.createElement('div');
+      weekdayRow.className = 'cal-grid';
+      weekdays.forEach(day => {
+        const label = document.createElement('div');
+        label.className = 'cal-weekday';
+        label.textContent = day;
+        weekdayRow.appendChild(label);
+      });
+      container.appendChild(weekdayRow);
+
+      const firstDay = new Date(year, month, 1);
+      const lastDay = new Date(year, month + 1, 0);
+      const daysInMonth = lastDay.getDate();
+      const startWeekday = (firstDay.getDay() + 6) % 7;
+
+      const grid = document.createElement('div');
+      grid.className = 'cal-grid';
+
+      for (let i = 0; i < startWeekday; i++) {
+        const empty = document.createElement('div');
+        empty.className = 'cal-day-cell';
+        empty.style.opacity = '0.3';
+        grid.appendChild(empty);
+      }
+
+      for (let day = 1; day <= daysInMonth; day++) {
+        const cell = document.createElement('div');
+        cell.className = 'cal-day-cell';
+        const today = new Date();
+        if (day === today.getDate() && month === today.getMonth() && year === today.getFullYear()) {
+          cell.classList.add('today');
+        }
+        const dayNumber = document.createElement('div');
+        dayNumber.className = 'cal-day-number';
+        dayNumber.textContent = day;
+        cell.appendChild(dayNumber);
+
+        const dayEvents = calendarEvents.filter(event => {
+          const eventDate = new Date(event.start);
+          return eventDate.getDate() === day && eventDate.getMonth() === month && eventDate.getFullYear() === year;
+        });
+
+        dayEvents.slice(0, 3).forEach(event => {
+          const chip = document.createElement('div');
+          chip.className = 'cal-day-event';
+          const colours = getEventColours(event.title);
+          chip.style.background = colours.bg;
+          chip.style.color = colours.text;
+          chip.textContent = event.title;
+          cell.appendChild(chip);
+        });
+
+        if (dayEvents.length > 3) {
+          const more = document.createElement('div');
+          more.style.cssText = 'font-size: 9px; color: var(--text-dim); margin-top: 2px;';
+          more.textContent = `+${dayEvents.length - 3} more`;
+          cell.appendChild(more);
+        }
+
+        cell.onclick = () => showDayDetails(day, month, year);
+        grid.appendChild(cell);
+      }
+
+      container.appendChild(grid);
+    }
+
+    function showDayDetails(day, month, year) {
+      const existing = document.querySelector('.cal-selected-day');
+      if (existing) existing.remove();
+      const container = document.getElementById('custom-calendar');
+      const detailDiv = document.createElement('div');
+      detailDiv.className = 'cal-selected-day';
+      const title = document.createElement('div');
+      title.className = 'cal-selected-title';
+      const date = new Date(year, month, day);
+      title.textContent = date.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' });
+      detailDiv.appendChild(title);
+
+      const dayEvents = calendarEvents.filter(event => {
+        const eventDate = new Date(event.start);
+        return eventDate.getDate() === day && eventDate.getMonth() === month && eventDate.getFullYear() === year;
+      });
+
+      if (dayEvents.length === 0) {
+        const empty = document.createElement('p');
+        empty.className = 'empty';
+        empty.textContent = 'No events for this day.';
+        detailDiv.appendChild(empty);
+      } else {
+        dayEvents.forEach(event => {
+          const eventDiv = document.createElement('div');
+          eventDiv.className = 'cal-event';
+          const colours = getEventColours(event.title);
+          eventDiv.style.background = colours.bg;
+          eventDiv.style.color = colours.text;
+          const titleSpan = document.createElement('span');
+          titleSpan.textContent = event.title;
+          const timeSpan = document.createElement('span');
+          timeSpan.className = 'cal-event-time';
+          const startTime = new Date(event.start);
+          timeSpan.textContent = startTime.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+          eventDiv.appendChild(titleSpan);
+          eventDiv.appendChild(timeSpan);
+          detailDiv.appendChild(eventDiv);
+        });
+      }
+      container.appendChild(detailDiv);
+    }
+
     function showToast(message) {
       const toast = document.getElementById('toast');
       toast.textContent = message;
@@ -694,43 +822,33 @@
         document.getElementById('chat-text-input').focus();
       }
     }
-        function startVoice() {
+
+    function startVoice() {
       if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         const recognition = new SpeechRecognition();
         recognition.lang = 'en-GB';
         recognition.continuous = false;
-        recognition.interimResults = true; // Enable live transcripts
-        
+        recognition.interimResults = true;
         const micBtn = document.getElementById('mic-fab');
         const modal = document.getElementById('chat-modal');
         const input = document.getElementById('chat-text-input');
-        
-        // Open chat immediately
         modal.classList.add('active');
         input.placeholder = 'Listening...';
         input.focus();
-        
         recognition.onstart = () => {
           micBtn.classList.add('listening');
           micBtn.textContent = '🔴';
           showToast('Listening...');
         };
-        
         recognition.onresult = (event) => {
-          // Show live transcript as you speak
-          const transcript = Array.from(event.results)
-            .map(result => result[0].transcript)
-            .join('');
-          
+          const transcript = Array.from(event.results).map(result => result[0].transcript).join('');
           input.value = transcript;
         };
-        
         recognition.onend = () => {
           micBtn.classList.remove('listening');
           micBtn.textContent = '🎤';
           input.placeholder = 'Message Arlo...';
-          
           const transcript = input.value.trim();
           if (transcript) {
             input.value = '';
@@ -738,19 +856,18 @@
             sendChatMessage();
           }
         };
-        
         recognition.onerror = () => {
           micBtn.classList.remove('listening');
           micBtn.textContent = '🎤';
           input.placeholder = 'Message Arlo...';
           showToast('Voice recognition failed');
         };
-        
         recognition.start();
       } else {
         showToast('Voice recognition is not supported on this device');
       }
     }
+
     function addChatMessage(text, type) {
       const body = document.getElementById('chat-body');
       const msg = document.createElement('div');
@@ -777,24 +894,18 @@
         const data = await response.json();
         thinking.remove();
         let reply = data.text || data.output || data.message || 'Sorry, I could not process that.';
-        
-        // Strip action markers from the visible reply
         const actionMarkers = ['[TASK_ADDED]', '[REMINDER_ADDED]', '[MEMORY_ADDED]', '[MEMORY_DELETED]', '[REFLECTION_MAPPED]', '[EVENT_CREATED]', '[PLAN_APPROVED]'];
         let detectedAction = null;
-        
         actionMarkers.forEach(marker => {
           if (reply.includes(marker)) {
             detectedAction = marker;
             reply = reply.replace(marker, '').trim();
           }
         });
-        
         addChatMessage(reply, 'arlo');
         loadReflections();
         loadHomeTasks();
         loadReminders();
-        
-        // Show toast based on detected action
         if (detectedAction === '[TASK_ADDED]') showToast('Arlo added a task');
         else if (detectedAction === '[REMINDER_ADDED]') showToast('Arlo set a reminder');
         else if (detectedAction === '[MEMORY_ADDED]') showToast('Arlo will remember that');
@@ -807,7 +918,8 @@
         addChatMessage('Error connecting to Arlo.', 'arlo');
       }
     }
-        async function loadReminders() {
+
+    async function loadReminders() {
       try {
         const response = await fetch(REMINDERS_URL);
         const csv = await response.text();
@@ -840,7 +952,8 @@
         document.getElementById('home-reminders').innerHTML = '<p class="empty">Unable to load reminders.</p>';
       }
     }
-        async function completeReminder(rowIndex) {
+
+    async function completeReminder(rowIndex) {
       try {
         await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ action: 'complete_reminder', row: rowIndex }) });
         showToast('Reminder marked as done');
@@ -849,12 +962,12 @@
         showToast('Unable to mark reminder as done');
       }
     }
+
     async function checkNotifications() {
       try {
         const response = await fetch('https://docs.google.com/spreadsheets/d/1ElgT3pbdTA8Bd2r9r9nQI1wCayMoH2po8jcVZuoSeSw/export?format=csv&gid=939012947');
         const csv = await response.text();
         const rows = csv.split('\n').slice(1);
-        
         rows.forEach(row => {
           const cols = row.split(',');
           if (cols.length >= 3 && cols[2].trim() !== 'Yes') {
@@ -865,6 +978,7 @@
         console.log('No notifications to show');
       }
     }
+
     async function loadStudyData() {
       try {
         const response = await fetch(SHEET_URL);
@@ -1226,7 +1340,7 @@
     if ('Notification' in window) {
       Notification.requestPermission();
     }
-    
+
     function switchTab(tabId) {
       document.querySelectorAll('.tab-view').forEach(view => view.classList.remove('active'));
       document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
@@ -1234,9 +1348,7 @@
       event.currentTarget.classList.add('active');
       if (tabId === 'home') { loadHomeTasks(); loadReminders(); loadRecentScores().then(() => { renderHomeRecentScores(); generateArloTip(); }); loadReflections(); }
       if (tabId === 'study') { loadStudyData(); loadRecentScores(); loadReflections(); }
-      if (tabId === 'calendar') {
-        loadCustomCalendar();
-      }
+      if (tabId === 'calendar') { loadCustomCalendar(); }
     }
   </script>
 </body>
