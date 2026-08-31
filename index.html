@@ -13,15 +13,16 @@
     }
 
     :root {
-      --bg: #F5F5F7;
+      --bg: #FAF6F0;
       --card: #FFFFFF;
-      --card-border: rgba(0, 0, 0, 0.06);
-      --accent: #8B5CF6;
-      --accent-soft: #A78BFA;
-      --text: #1C1C1E;
-      --text-dim: rgba(60, 60, 67, 0.6);
-      --text-faint: rgba(60, 60, 67, 0.3);
-      --shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+      --card-border: rgba(74, 93, 78, 0.12);
+      --accent: #4A5D4E;
+      --accent-soft: #6B7D6E;
+      --text: #2C2C2C;
+      --text-dim: rgba(44, 44, 44, 0.6);
+      --text-faint: rgba(44, 44, 44, 0.35);
+      --shadow: 0 4px 20px rgba(74, 93, 78, 0.08);
+      --warm: #8B7355;
     }
 
     body {
@@ -36,10 +37,31 @@
       user-select: none;
     }
 
+    /* Animated particles */
+    #particles {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+    .particle {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(74, 93, 78, 0.15);
+      animation: floatUp linear infinite;
+    }
+    @keyframes floatUp {
+      0% { transform: translateY(100vh) scale(0.5); opacity: 0; }
+      20% { opacity: 0.6; }
+      80% { opacity: 0.3; }
+      100% { transform: translateY(-10vh) scale(1.2); opacity: 0; }
+    }
+
     #splash {
       position: fixed;
       inset: 0;
-      background: #FFFFFF;
+      background: #FAF6F0;
       z-index: 1000;
       display: flex;
       flex-direction: column;
@@ -58,6 +80,7 @@
       letter-spacing: 8px;
       color: var(--accent);
       animation: pulse 2.5s ease-in-out infinite;
+      font-family: Georgia, 'Times New Roman', serif;
     }
     #splash .tagline {
       color: var(--text-dim);
@@ -97,12 +120,14 @@
       letter-spacing: 2px;
       font-weight: 600;
       margin-bottom: 4px;
+      font-family: Georgia, 'Times New Roman', serif;
     }
     .greeting .name {
       font-size: 34px;
       font-weight: 700;
       letter-spacing: -0.5px;
       color: var(--text);
+      font-family: Georgia, 'Times New Roman', serif;
     }
     @keyframes slideIn {
       from { opacity: 0; transform: translateX(-40px); }
@@ -129,6 +154,7 @@
       color: var(--text-dim);
       margin-bottom: 10px;
       font-weight: 600;
+      font-family: Georgia, 'Times New Roman', serif;
     }
     .card p {
       color: var(--text);
@@ -159,10 +185,10 @@
       left: 0;
       right: 0;
       height: 80px;
-      background: rgba(255, 255, 255, 0.9);
+      background: rgba(250, 246, 240, 0.92);
       backdrop-filter: blur(30px);
       -webkit-backdrop-filter: blur(30px);
-      border-top: 1px solid rgba(0, 0, 0, 0.06);
+      border-top: 1px solid rgba(74, 93, 78, 0.1);
       display: flex;
       justify-content: space-around;
       align-items: center;
@@ -197,7 +223,7 @@
       justify-content: space-between;
       align-items: center;
       padding: 10px 12px;
-      background: #F5F5F7;
+      background: #F5F0E8;
       border-radius: 10px;
       margin-bottom: 6px;
       font-size: 14px;
@@ -205,7 +231,7 @@
     .delete-btn {
       background: none;
       border: none;
-      color: #EF4444;
+      color: #B91C1C;
       font-size: 18px;
       cursor: pointer;
       padding: 0 4px;
@@ -214,9 +240,9 @@
 
     .reflection-card {
       padding: 14px;
-      background: #F5F5F7;
+      background: #F5F0E8;
       border-radius: 14px;
-      border: 1px solid rgba(0, 0, 0, 0.04);
+      border: 1px solid rgba(74, 93, 78, 0.08);
       display: flex;
       flex-direction: column;
       gap: 10px;
@@ -248,10 +274,10 @@
       white-space: nowrap;
       background: white;
     }
-    .lo-1 { border-color: rgba(139, 92, 246, 0.5); color: #7C3AED; }
-    .lo-2 { border-color: rgba(34, 211, 238, 0.5); color: #0891B2; }
-    .lo-3 { border-color: rgba(251, 146, 60, 0.5); color: #EA580C; }
-    .lo-4 { border-color: rgba(74, 222, 128, 0.5); color: #16A34A; }
+    .lo-1 { border-color: rgba(74, 93, 78, 0.5); color: #4A5D4E; }
+    .lo-2 { border-color: rgba(139, 115, 85, 0.5); color: #8B7355; }
+    .lo-3 { border-color: rgba(180, 120, 60, 0.5); color: #B4783C; }
+    .lo-4 { border-color: rgba(100, 140, 110, 0.5); color: #648C6E; }
 
     .cal-grid {
       display: grid;
@@ -270,7 +296,7 @@
     }
     .cal-day-cell {
       background: #FFFFFF;
-      border: 1px solid rgba(0,0,0,0.06);
+      border: 1px solid rgba(74, 93, 78, 0.1);
       border-radius: 10px;
       min-height: 60px;
       padding: 6px;
@@ -280,17 +306,18 @@
     }
     .cal-day-cell:active {
       transform: scale(0.95);
-      background: #F5F5F7;
+      background: #F5F0E8;
     }
     .cal-day-cell.today {
       border-color: var(--accent);
-      background: rgba(139, 92, 246, 0.05);
+      background: rgba(74, 93, 78, 0.06);
     }
     .cal-day-number {
       font-size: 14px;
       font-weight: 600;
       color: var(--text);
       margin-bottom: 4px;
+      font-family: Georgia, 'Times New Roman', serif;
     }
     .cal-day-cell.today .cal-day-number {
       color: var(--accent);
@@ -314,10 +341,11 @@
       font-size: 18px;
       font-weight: 700;
       color: var(--text);
+      font-family: Georgia, 'Times New Roman', serif;
     }
     .cal-nav-btn {
       background: #FFFFFF;
-      border: 1px solid rgba(0,0,0,0.06);
+      border: 1px solid rgba(74, 93, 78, 0.1);
       border-radius: 8px;
       width: 32px;
       height: 32px;
@@ -330,7 +358,7 @@
     }
     .cal-selected-day {
       background: #FFFFFF;
-      border: 1px solid rgba(0,0,0,0.06);
+      border: 1px solid rgba(74, 93, 78, 0.1);
       border-radius: 14px;
       padding: 14px;
       margin-top: 10px;
@@ -341,6 +369,7 @@
       font-size: 14px;
       margin-bottom: 8px;
       color: var(--text);
+      font-family: Georgia, 'Times New Roman', serif;
     }
 
     #chat-fab {
@@ -356,7 +385,7 @@
       font-size: 24px;
       cursor: pointer;
       z-index: 200;
-      box-shadow: 0 8px 20px rgba(139, 92, 246, 0.4);
+      box-shadow: 0 8px 20px rgba(74, 93, 78, 0.35);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -373,13 +402,13 @@
       width: 50px;
       height: 50px;
       border-radius: 50%;
-      background: var(--accent);
+      background: var(--warm);
       color: white;
       border: none;
       font-size: 20px;
       cursor: pointer;
       z-index: 200;
-      box-shadow: 0 8px 20px rgba(139, 92, 246, 0.4);
+      box-shadow: 0 8px 20px rgba(139, 115, 85, 0.35);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -389,8 +418,8 @@
       transform: scale(0.85);
     }
     #mic-fab.listening {
-      background: #EF4444;
-    }    
+      background: #B91C1C;
+    }
 
     #chat-modal {
       position: fixed;
@@ -398,14 +427,14 @@
       left: 0;
       right: 0;
       height: 70vh;
-      background: #FFFFFF;
+      background: #FAF6F0;
       border-top-left-radius: 20px;
       border-top-right-radius: 20px;
       z-index: 300;
       display: none;
       flex-direction: column;
       animation: slideUp 0.3s ease;
-      box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 -10px 40px rgba(74, 93, 78, 0.15);
     }
     #chat-modal.active {
       display: flex;
@@ -416,7 +445,7 @@
     }
     #chat-header {
       padding: 16px 20px;
-      border-bottom: 1px solid rgba(0,0,0,0.06);
+      border-bottom: 1px solid rgba(74, 93, 78, 0.1);
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -444,13 +473,13 @@
     }
     .msg.arlo {
       align-self: flex-start;
-      background: #F5F5F7;
+      background: #F5F0E8;
       color: var(--text);
       border-bottom-left-radius: 4px;
     }
     #chat-input-row {
       padding: 12px;
-      border-top: 1px solid rgba(0,0,0,0.06);
+      border-top: 1px solid rgba(74, 93, 78, 0.1);
       display: flex;
       gap: 10px;
     }
@@ -458,8 +487,8 @@
       flex: 1;
       padding: 12px 16px;
       border-radius: 25px;
-      border: 1px solid rgba(0,0,0,0.1);
-      background: #F5F5F7;
+      border: 1px solid rgba(74, 93, 78, 0.15);
+      background: #FFFFFF;
       color: var(--text);
       font-size: 14px;
       outline: none;
@@ -480,7 +509,7 @@
       bottom: 170px;
       left: 50%;
       transform: translateX(-50%);
-      background: rgba(30, 30, 40, 0.95);
+      background: rgba(44, 44, 44, 0.95);
       color: white;
       padding: 12px 20px;
       border-radius: 25px;
@@ -499,6 +528,8 @@
   </style>
 </head>
 <body>
+
+  <div id="particles"></div>
 
   <div id="splash">
     <div class="logo">ARLO</div>
@@ -555,7 +586,7 @@
       </div>
       <div class="card">
         <h3>Overall Coverage</h3>
-        <div style="width: 100%; height: 8px; background: rgba(0,0,0,0.06); border-radius: 10px; margin: 10px 0; overflow: hidden;">
+        <div style="width: 100%; height: 8px; background: rgba(74, 93, 78, 0.1); border-radius: 10px; margin: 10px 0; overflow: hidden;">
           <div id="coverage-bar" style="width: 0%; height: 100%; background: var(--accent); border-radius: 10px; transition: width 1s ease;"></div>
         </div>
         <p id="coverage-text" style="text-align: center; color: var(--text-dim); font-size: 14px;">Loading your topics...</p>
@@ -569,10 +600,10 @@
       <div class="card">
         <h3>Log Test Score</h3>
         <p style="color: var(--text-dim); font-size: 14px; margin-bottom: 12px;">Select a topic and enter your score.</p>
-        <select id="topic-select" style="width: 100%; padding: 12px; border-radius: 12px; border: 1px solid rgba(0,0,0,0.1); background: #F5F5F7; color: var(--text); font-size: 14px; margin-bottom: 10px;">
+        <select id="topic-select" style="width: 100%; padding: 12px; border-radius: 12px; border: 1px solid rgba(74, 93, 78, 0.15); background: #FFFFFF; color: var(--text); font-size: 14px; margin-bottom: 10px;">
           <option value="">Choose a topic...</option>
         </select>
-        <input type="number" id="score-input" placeholder="Score (0-100)" min="0" max="100" style="width: 100%; padding: 12px; border-radius: 12px; border: 1px solid rgba(0,0,0,0.1); background: #F5F5F7; color: var(--text); font-size: 14px; margin-bottom: 10px;">
+        <input type="number" id="score-input" placeholder="Score (0-100)" min="0" max="100" style="width: 100%; padding: 12px; border-radius: 12px; border: 1px solid rgba(74, 93, 78, 0.15); background: #FFFFFF; color: var(--text); font-size: 14px; margin-bottom: 10px;">
         <button onclick="logScore()" style="width: 100%; padding: 14px; border-radius: 12px; border: none; background: var(--accent); color: white; font-size: 15px; font-weight: 600; cursor: pointer;">Save Score</button>
       </div>
       <div class="card">
@@ -614,12 +645,28 @@
   </div>
 
   <script>
+    // Particle animation
+    function createParticles() {
+      const container = document.getElementById('particles');
+      for (let i = 0; i < 20; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        particle.style.left = Math.random() * 100 + '%';
+        particle.style.width = (Math.random() * 4 + 2) + 'px';
+        particle.style.height = particle.style.width;
+        particle.style.animationDuration = (Math.random() * 15 + 10) + 's';
+        particle.style.animationDelay = (Math.random() * 10) + 's';
+        container.appendChild(particle);
+      }
+    }
+    createParticles();
+
     const SHEET_URL = 'https://docs.google.com/spreadsheets/d/1ElgT3pbdTA8Bd2r9r9nQI1wCayMoH2po8jcVZuoSeSw/export?format=csv&gid=0';
     const STUDYLOG_URL = 'https://docs.google.com/spreadsheets/d/1ElgT3pbdTA8Bd2r9r9nQI1wCayMoH2po8jcVZuoSeSw/export?format=csv&gid=688195198';
     const TASKS_URL = 'https://docs.google.com/spreadsheets/d/1ElgT3pbdTA8Bd2r9r9nQI1wCayMoH2po8jcVZuoSeSw/export?format=csv&gid=331487663';
     const REMINDERS_URL = 'https://docs.google.com/spreadsheets/d/1ElgT3pbdTA8Bd2r9r9nQI1wCayMoH2po8jcVZuoSeSw/export?format=csv&gid=1548981654';
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzAvKCPXPvX_qRmLrTT2922fBB49DxPZzfuZjGlquUHIWTsgtHFZ70BfdTeI8ppCuSp1w/exec';
-    const CALENDAR_API_URL = 'https://script.google.com/macros/s/AKfycbzAvKCPXPvX_qRmLrTT2922fBB49DxPZzfuZjGlquUHIWTsgtHFZ70BfdTeI8ppCuSp1w/exec?action=get_calendar';
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxMSHsckMDDKpU-B3zLGsrtihn6LxTQEEWgYMi9REKzLvKxiTOqjgLs49MVYL0qdL9J3A/exec';
+    const CALENDAR_API_URL = 'https://script.google.com/macros/s/AKfycbxMSHsckMDDKpU-B3zLGsrtihn6LxTQEEWgYMi9REKzLvKxiTOqjgLs49MVYL0qdL9J3A/exec?action=get_calendar';
     const REFLECTIONS_URL = 'https://docs.google.com/spreadsheets/d/1ElgT3pbdTA8Bd2r9r9nQI1wCayMoH2po8jcVZuoSeSw/export?format=csv&gid=1128922294';
     const CHAT_URL = 'https://familysalesbot.camdvr.org/webhook/f5621c67-f92f-4be2-91ed-5b475df9e6d1/chat';
 
@@ -666,12 +713,12 @@
     }
 
     function getEventColours(title) {
-      if (title.includes('🟡')) return { bg: 'rgba(251, 191, 36, 0.15)', text: '#D97706' };
-      if (title.includes('🔵')) return { bg: 'rgba(59, 130, 246, 0.15)', text: '#2563EB' };
-      if (title.includes('🔴')) return { bg: 'rgba(239, 68, 68, 0.15)', text: '#DC2626' };
-      if (title.includes('🟣')) return { bg: 'rgba(139, 92, 246, 0.15)', text: '#7C3AED' };
-      if (title.includes('🟢')) return { bg: 'rgba(74, 222, 128, 0.15)', text: '#16A34A' };
-      return { bg: 'rgba(139, 92, 246, 0.15)', text: '#7C3AED' };
+      if (title.includes('🟡')) return { bg: 'rgba(180, 120, 60, 0.15)', text: '#B4783C' };
+      if (title.includes('🔵')) return { bg: 'rgba(100, 140, 110, 0.15)', text: '#648C6E' };
+      if (title.includes('🔴')) return { bg: 'rgba(185, 28, 28, 0.12)', text: '#B91C1C' };
+      if (title.includes('🟣')) return { bg: 'rgba(74, 93, 78, 0.15)', text: '#4A5D4E' };
+      if (title.includes('🟢')) return { bg: 'rgba(139, 115, 85, 0.15)', text: '#8B7355' };
+      return { bg: 'rgba(74, 93, 78, 0.12)', text: '#4A5D4E' };
     }
 
     function renderCalendar() {
@@ -794,18 +841,45 @@
           const colours = getEventColours(event.title);
           eventDiv.style.background = colours.bg;
           eventDiv.style.color = colours.text;
+          eventDiv.style.cssText = 'padding: 8px 12px; border-radius: 10px; margin-bottom: 6px; font-size: 13px; display: flex; justify-content: space-between; align-items: center; gap: 8px;';
           const titleSpan = document.createElement('span');
           titleSpan.textContent = event.title;
           const timeSpan = document.createElement('span');
           timeSpan.className = 'cal-event-time';
+          timeSpan.style.cssText = 'font-size: 11px; color: var(--text-dim); white-space: nowrap;';
           const startTime = new Date(event.start);
           timeSpan.textContent = startTime.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+          const deleteBtn = document.createElement('button');
+          deleteBtn.textContent = '×';
+          deleteBtn.style.cssText = 'background: none; border: none; color: #B91C1C; font-size: 18px; cursor: pointer; padding: 0 4px;';
+          deleteBtn.onclick = (e) => {
+            e.stopPropagation();
+            if (confirm('Delete this event?')) {
+              deleteCalendarEvent(event.title, event.start);
+            }
+          };
           eventDiv.appendChild(titleSpan);
           eventDiv.appendChild(timeSpan);
+          eventDiv.appendChild(deleteBtn);
           detailDiv.appendChild(eventDiv);
         });
       }
       container.appendChild(detailDiv);
+    }
+
+    async function deleteCalendarEvent(title, date) {
+      try {
+        await fetch(SCRIPT_URL, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'text/plain' },
+          body: JSON.stringify({ action: 'delete_calendar_event', title: title, date: date })
+        });
+        showToast('Event deleted');
+        loadCustomCalendar();
+      } catch (error) {
+        showToast('Unable to delete event');
+      }
     }
 
     function showToast(message) {
@@ -936,13 +1010,13 @@
         }
         pending.slice(0, 5).forEach(item => {
           const div = document.createElement('div');
-          div.style.cssText = 'display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; background: rgba(251, 146, 60, 0.1); border: 1px solid rgba(251, 146, 60, 0.3); border-radius: 10px; margin-bottom: 6px; font-size: 14px;';
+          div.style.cssText = 'display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; background: rgba(139, 115, 85, 0.12); border: 1px solid rgba(139, 115, 85, 0.25); border-radius: 10px; margin-bottom: 6px; font-size: 14px;';
           const info = document.createElement('span');
           info.textContent = `${item.reminder}`;
           if (item.time !== '') { info.textContent += ` — ${item.time}`; }
           const doneBtn = document.createElement('button');
           doneBtn.textContent = '✓';
-          doneBtn.style.cssText = 'background: rgba(251, 146, 60, 0.3); border: none; color: #EA580C; font-size: 16px; width: 28px; height: 28px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center;';
+          doneBtn.style.cssText = 'background: rgba(139, 115, 85, 0.25); border: none; color: #8B7355; font-size: 16px; width: 28px; height: 28px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center;';
           doneBtn.onclick = () => completeReminder(item.rowIndex);
           div.appendChild(info);
           div.appendChild(doneBtn);
@@ -1035,7 +1109,7 @@
       list.innerHTML = '';
       highYieldTopics.forEach(t => {
         const chip = document.createElement('div');
-        chip.style.cssText = 'padding: 10px 14px; background: rgba(139, 92, 246, 0.1); border: 1px solid rgba(139, 92, 246, 0.3); border-radius: 12px; font-size: 14px;';
+        chip.style.cssText = 'padding: 10px 14px; background: rgba(74, 93, 78, 0.08); border: 1px solid rgba(74, 93, 78, 0.2); border-radius: 12px; font-size: 14px;';
         chip.innerHTML = `<strong>${t.id}</strong> — ${t.topic}`;
         list.appendChild(chip);
       });
@@ -1105,7 +1179,7 @@
         }
         pendingTasks.slice(0, 5).forEach(item => {
           const div = document.createElement('div');
-          div.style.cssText = 'display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; background: #F5F5F7; border-radius: 10px; margin-bottom: 6px; font-size: 14px;';
+          div.style.cssText = 'display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; background: #F5F0E8; border-radius: 10px; margin-bottom: 6px; font-size: 14px;';
           const info = document.createElement('span');
           info.textContent = `${item.task}`;
           if (item.dueDate !== '') { info.textContent += ` — Due: ${item.dueDate}`; }
@@ -1214,7 +1288,7 @@
           previewRow.appendChild(dateEl);
           card.appendChild(previewRow);
           const expanded = document.createElement('div');
-          expanded.style.cssText = 'display: none; margin-top: 10px; border-top: 1px solid rgba(0,0,0,0.06); padding-top: 10px;';
+          expanded.style.cssText = 'display: none; margin-top: 10px; border-top: 1px solid rgba(74, 93, 78, 0.1); padding-top: 10px;';
           const fullText = document.createElement('p');
           fullText.className = 'reflection-text';
           fullText.textContent = item.refined;
@@ -1246,13 +1320,13 @@
           expanded.appendChild(loEl);
           if (item.rating && item.rating !== '') {
             const ratingEl = document.createElement('p');
-            ratingEl.style.cssText = 'margin-top: 10px; font-size: 12px; color: #D97706; font-weight: 600;';
+            ratingEl.style.cssText = 'margin-top: 10px; font-size: 12px; color: #B4783C; font-weight: 600;';
             ratingEl.textContent = `Arlo's Rating: ${item.rating}`;
             expanded.appendChild(ratingEl);
           }
           const deleteBtn = document.createElement('button');
           deleteBtn.textContent = 'Delete';
-          deleteBtn.style.cssText = 'margin-top: 10px; padding: 8px 12px; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); color: #EF4444; border-radius: 8px; font-size: 12px; cursor: pointer;';
+          deleteBtn.style.cssText = 'margin-top: 10px; padding: 8px 12px; background: rgba(185, 28, 28, 0.08); border: 1px solid rgba(185, 28, 28, 0.2); color: #B91C1C; border-radius: 8px; font-size: 12px; cursor: pointer;';
           deleteBtn.onclick = (e) => {
             e.stopPropagation();
             if (confirm('Delete this reflection?')) { deleteReflection(item.rowIndex); }
@@ -1304,7 +1378,7 @@
       const reversed = recentScores.slice(-3).reverse();
       reversed.forEach(item => {
         const div = document.createElement('div');
-        div.style.cssText = 'padding: 8px 12px; background: #F5F5F7; border-radius: 10px; font-size: 14px;';
+        div.style.cssText = 'padding: 8px 12px; background: #F5F0E8; border-radius: 10px; font-size: 14px;';
         div.textContent = `${item.topicId} — ${item.score}%`;
         list.appendChild(div);
       });
