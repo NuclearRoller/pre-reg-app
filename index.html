@@ -254,7 +254,7 @@
     <button class="tab-btn" onclick="switchTab('study')"><span class="tab-icon">◈</span>Study</button>
   </div>
 
-  <script>
+ <script>
     // --- HARDCODED GPhC FRAMEWORK ---
     const gphcFramework = {
       "1": { name: "Learning Agreement", group: "Setup", allowed: ["Learning Needs Analysis", "Personal Development Plan", "Multi-source Feedback", "Patient Satisfaction Questionnaire"] },
@@ -298,8 +298,7 @@
     let recentScores = [];
     let calendarEvents = [];
     let currentMonth = new Date();
-    let evidenceData = []; // from EvidenceEntries tab
-    let reflectionData = []; // from Reflections tab
+    let evidenceData = []; 
 
     // --- INIT ---
     function createParticles() {
@@ -340,6 +339,8 @@
       const body = document.getElementById('chat-body');
       const msg = document.createElement('div');
       msg.className = `msg ${type}`;
+      msg.style.userSelect = 'text'; 
+      msg.style.webkitUserSelect = 'text';
       msg.textContent = text;
       body.appendChild(msg);
       body.scrollTop = body.scrollHeight;
@@ -434,7 +435,6 @@
       document.getElementById('evidence-modal').classList.add('active');
       document.getElementById('evidence-situation').value = '';
       
-      // Populate evidence type buttons
       const typeContainer = document.getElementById('evidence-type-buttons');
       typeContainer.innerHTML = '';
       const types = [
@@ -464,7 +464,6 @@
       });
       window.selectedEvidenceType = null;
 
-      // Populate activity select
       const select = document.getElementById('evidence-activity-select');
       select.innerHTML = '<option value="">Select Activity...</option>';
       Object.keys(gphcFramework).forEach(num => {
@@ -513,6 +512,62 @@
       }
     }
 
+    // Function called when you click "Make Evidence" on a reflection
+    function openEvidenceTypePicker(rowIndex, currentType, reflectionText) {
+      // Set the default evidence type if already tagged
+      window.selectedEvidenceType = currentType || 'CBD';
+      
+      // Open the builder modal
+      openEvidenceBuilder();
+      
+      // Pre-fill the situation with the reflection text
+      document.getElementById('evidence-situation').value = reflectionText || '';
+      
+      // Highlight the default evidence type
+      setTimeout(() => {
+        document.querySelectorAll('#evidence-type-buttons button').forEach(b => {
+          if (b.textContent === window.selectedEvidenceType) {
+            b.style.background = b.dataset.color;
+            b.style.color = '#fff';
+          }
+        });
+      }, 10);
+      
+      // Change the submit button action to send the correct payload
+      const submitBtn = document.getElementById('evidence-submit');
+      submitBtn.onclick = async () => {
+        const activityNum = document.getElementById('evidence-activity-select').value;
+        if (!activityNum) return showToast('Please select a GPhC Activity');
+        if (!reflectionText) return showToast('No reflection text found');
+        
+        const activity = gphcFramework[activityNum];
+        submitBtn.textContent = 'Sending to Arlo...';
+        submitBtn.disabled = true;
+        
+        try {
+          const message = `EVIDENCE ENTRY | Type: ${window.selectedEvidenceType} | Activity: ${activityNum} ${activity.name} | Situation: ${reflectionText}`;
+          await fetch(CHAT_URL, {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ chatId: "evidence_" + Math.random().toString(36).substr(2, 9), message: message, route: 'general' })
+          });
+          showToast('Evidence created from reflection');
+          closeEvidenceBuilder();
+          loadEvidenceData();
+          loadReflections();
+        } catch (error) {
+          showToast('Unable to submit evidence');
+        } finally {
+          submitBtn.textContent = 'Submit to Arlo';
+          submitBtn.disabled = false;
+          submitBtn.onclick = submitEvidence; // Reset to default
+        }
+      };
+    }
+
+    function closeEvidencePicker() {
+      document.getElementById('evidence-picker').classList.remove('active');
+    }
+
     // --- DATA LOADERS ---
     async function loadEvidenceData() {
       try {
@@ -521,7 +576,6 @@
         const rows = csv.split('\n').slice(1);
         evidenceData = [];
         rows.forEach((row) => {
-          // Basic comma split, may fail if commas inside text, but the CSV parser below handles reflections
           const cols = row.split(',');
           if (cols.length >= 3 && cols[0].trim() !== '') {
              evidenceData.push({ activityNumber: cols[2].trim() });
@@ -538,18 +592,15 @@
       container.innerHTML = '';
 
       let completedCounts = {};
-      // Count from EvidenceEntries
       evidenceData.forEach(e => {
         if (e.activityNumber) {
            const num = e.activityNumber.replace(/[^0-9]/g, '');
            if (num) completedCounts[num] = (completedCounts[num] || 0) + 1;
         }
       });
-      // Count from Reflections (if they are tagged with an activity number - note: we only added EvidenceType tag to reflections previously, not activity number. For simplicity, let's assume tagged reflections don't count toward activity gap unless we add activity to reflections too. We'll just use EvidenceEntries for now.)
 
       let totalRequired = 0;
       let totalDone = 0;
-      let html = '';
 
       const groups = { "Setup": [], "Supplying Medicines": [], "Education & Research": [], "Mandatory": [], "Clinical": [], "Prescribing": [] };
       Object.keys(gphcFramework).forEach(num => {
@@ -576,7 +627,7 @@
         
         groups[groupName].forEach(act => {
           const req = requiredCounts[act.num] || 0;
-          if (req === 0) return; // Skip Log 90 hours
+          if (req === 0) return;
           const done = completedCounts[act.num] || 0;
           totalRequired += req;
           totalDone += Math.min(done, req);
@@ -586,10 +637,7 @@
           
           const row = document.createElement('div');
           row.style.cssText = 'display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px; color: var(--text-dim);';
-          row.innerHTML = `
-            <span>${act.num}. ${act.name}</span>
-            <span style="color: ${color}; font-weight: 600;">${done}/${req}</span>
-          `;
+          row.innerHTML = `<span>${act.num}. ${act.name}</span><span style="color: ${color}; font-weight: 600;">${done}/${req}</span>`;
           groupDiv.appendChild(row);
         });
         container.appendChild(groupDiv);
@@ -652,7 +700,7 @@
       const total = topics.length;
       const studiedTopicIds = new Set(recentScores.map(score => score.topicId));
       const covered = studiedTopicIds.size;
-      const pct = Math.round((covered / total) * 100);
+      const pct = total > 0 ? Math.round((covered / total) * 100) : 0;
       document.getElementById('coverage-bar').style.width = pct + '%';
       document.getElementById('coverage-text').textContent = `${covered} of ${total} topics studied (${pct}%)`;
     }
@@ -826,7 +874,7 @@
           const evidenceBtn = document.createElement('button');
           evidenceBtn.textContent = item.evidenceType ? 'Change Evidence Type' : 'Make Evidence';
           evidenceBtn.style.cssText = 'padding: 8px 12px; background: rgba(108, 92, 231, 0.15); border: 1px solid rgba(108, 92, 231, 0.4); color: #A29BFE; border-radius: 8px; font-size: 12px; cursor: pointer;';
-          evidenceBtn.onclick = (e) => { e.stopPropagation(); openEvidenceTypePicker(item.rowIndex, item.evidenceType); };
+          evidenceBtn.onclick = (e) => { e.stopPropagation(); openEvidenceTypePicker(item.rowIndex, item.evidenceType, item.refined); };
           
           const deleteBtn = document.createElement('button');
           deleteBtn.textContent = 'Delete';
@@ -849,29 +897,7 @@
       }
     }
 
-    // --- EVIDENCE TAG PICKER ---
-    let currentEvidenceRow = null;
-    function openEvidenceTypePicker(rowIndex, currentType) {
-      currentEvidenceRow = rowIndex;
-      document.getElementById('evidence-picker').classList.add('active');
-    }
-    function closeEvidencePicker() {
-      document.getElementById('evidence-picker').classList.remove('active');
-      currentEvidenceRow = null;
-    }
-    async function setEvidenceType(type) {
-      if (currentEvidenceRow === null) return;
-      try {
-        await fetch(SCRIPT_URL, {
-          method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain' },
-          body: JSON.stringify({ action: 'set_evidence_type', row: currentEvidenceRow, evidenceType: type })
-        });
-        showToast(type ? `Tagged as ${type}` : 'Evidence tag removed');
-        closeEvidencePicker();
-        loadReflections();
-      } catch (error) { showToast('Unable to set evidence type'); }
-    }
-
+    // --- ACTIONS ---
     async function deleteReflection(rowIndex) {
       try {
         await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ action: 'delete_reflection', row: rowIndex }) });
@@ -880,7 +906,6 @@
       } catch (error) { showToast('Unable to delete reflection'); }
     }
 
-    // --- ACTIONS ---
     async function completeTask(rowIndex) {
       try {
         await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ action: 'complete_task', row: rowIndex }) });
@@ -911,7 +936,7 @@
       } catch (error) { showToast('Unable to log score'); }
     }
 
-    // --- CALENDAR (Same as before) ---
+    // --- CALENDAR ---
     async function loadCustomCalendar() {
       try {
         const response = await fetch(CALENDAR_API_URL);
@@ -929,9 +954,161 @@
       if (title.includes('🟢')) return { bg: 'rgba(0, 210, 255, 0.1)', text: '#00D2FF' };
       return { bg: 'rgba(108, 92, 231, 0.15)', text: '#A29BFE' };
     }
-    function renderCalendar() { /* Same as before */ }
-    function showDayDetails(day, month, year) { /* Same as before */ }
-    async function deleteCalendarEvent(title, date) { /* Same as before */ }
+
+    function renderCalendar() {
+      const container = document.getElementById('custom-calendar');
+      container.innerHTML = '';
+      const year = currentMonth.getFullYear();
+      const month = currentMonth.getMonth();
+
+      const header = document.createElement('div');
+      header.className = 'cal-month-header';
+      const prevBtn = document.createElement('button');
+      prevBtn.className = 'cal-nav-btn';
+      prevBtn.textContent = '‹';
+      prevBtn.onclick = () => { currentMonth.setMonth(currentMonth.getMonth() - 1); renderCalendar(); };
+      const nextBtn = document.createElement('button');
+      nextBtn.className = 'cal-nav-btn';
+      nextBtn.textContent = '›';
+      nextBtn.onclick = () => { currentMonth.setMonth(currentMonth.getMonth() + 1); renderCalendar(); };
+      const title = document.createElement('div');
+      title.className = 'cal-month-title';
+      title.textContent = currentMonth.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
+      header.appendChild(prevBtn);
+      header.appendChild(title);
+      header.appendChild(nextBtn);
+      container.appendChild(header);
+
+      const weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+      const weekdayRow = document.createElement('div');
+      weekdayRow.className = 'cal-grid';
+      weekdays.forEach(day => {
+        const label = document.createElement('div');
+        label.className = 'cal-weekday';
+        label.textContent = day;
+        weekdayRow.appendChild(label);
+      });
+      container.appendChild(weekdayRow);
+
+      const firstDay = new Date(year, month, 1);
+      const lastDay = new Date(year, month + 1, 0);
+      const daysInMonth = lastDay.getDate();
+      const startWeekday = (firstDay.getDay() + 6) % 7;
+
+      const grid = document.createElement('div');
+      grid.className = 'cal-grid';
+
+      for (let i = 0; i < startWeekday; i++) {
+        const empty = document.createElement('div');
+        empty.className = 'cal-day-cell';
+        empty.style.opacity = '0.3';
+        grid.appendChild(empty);
+      }
+
+      for (let day = 1; day <= daysInMonth; day++) {
+        const cell = document.createElement('div');
+        cell.className = 'cal-day-cell';
+        const today = new Date();
+        if (day === today.getDate() && month === today.getMonth() && year === today.getFullYear()) {
+          cell.classList.add('today');
+        }
+        const dayNumber = document.createElement('div');
+        dayNumber.className = 'cal-day-number';
+        dayNumber.textContent = day;
+        cell.appendChild(dayNumber);
+
+        const dayEvents = calendarEvents.filter(event => {
+          const eventDate = new Date(event.start);
+          return eventDate.getDate() === day && eventDate.getMonth() === month && eventDate.getFullYear() === year;
+        });
+
+        dayEvents.slice(0, 3).forEach(event => {
+          const chip = document.createElement('div');
+          chip.className = 'cal-day-event';
+          const colours = getEventColours(event.title);
+          chip.style.background = colours.bg;
+          chip.style.color = colours.text;
+          chip.textContent = event.title;
+          cell.appendChild(chip);
+        });
+
+        if (dayEvents.length > 3) {
+          const more = document.createElement('div');
+          more.style.cssText = 'font-size: 9px; color: var(--text-dim); margin-top: 2px;';
+          more.textContent = `+${dayEvents.length - 3} more`;
+          cell.appendChild(more);
+        }
+
+        cell.onclick = () => showDayDetails(day, month, year);
+        grid.appendChild(cell);
+      }
+
+      container.appendChild(grid);
+    }
+
+    function showDayDetails(day, month, year) {
+      const existing = document.querySelector('.cal-selected-day');
+      if (existing) existing.remove();
+      const container = document.getElementById('custom-calendar');
+      const detailDiv = document.createElement('div');
+      detailDiv.className = 'cal-selected-day';
+      const title = document.createElement('div');
+      title.className = 'cal-selected-title';
+      const date = new Date(year, month, day);
+      title.textContent = date.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' });
+      detailDiv.appendChild(title);
+
+      const dayEvents = calendarEvents.filter(event => {
+        const eventDate = new Date(event.start);
+        return eventDate.getDate() === day && eventDate.getMonth() === month && eventDate.getFullYear() === year;
+      });
+
+      if (dayEvents.length === 0) {
+        const empty = document.createElement('p');
+        empty.className = 'empty';
+        empty.textContent = 'No events for this day.';
+        detailDiv.appendChild(empty);
+      } else {
+        dayEvents.forEach(event => {
+          const eventDiv = document.createElement('div');
+          eventDiv.style.cssText = 'padding: 8px 12px; border-radius: 10px; margin-bottom: 6px; font-size: 13px; display: flex; justify-content: space-between; align-items: center; gap: 8px;';
+          const colours = getEventColours(event.title);
+          eventDiv.style.background = colours.bg;
+          eventDiv.style.color = colours.text;
+          const titleSpan = document.createElement('span');
+          titleSpan.textContent = event.title;
+          const timeSpan = document.createElement('span');
+          timeSpan.style.cssText = 'font-size: 11px; color: var(--text-dim); white-space: nowrap;';
+          const startTime = new Date(event.start);
+          timeSpan.textContent = startTime.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+          const deleteBtn = document.createElement('button');
+          deleteBtn.textContent = '×';
+          deleteBtn.style.cssText = 'background: none; border: none; color: var(--coral); font-size: 18px; cursor: pointer; padding: 0 4px;';
+          deleteBtn.onclick = (e) => {
+            e.stopPropagation();
+            if (confirm('Delete this event?')) {
+              deleteCalendarEvent(event.title, event.start);
+            }
+          };
+          eventDiv.appendChild(titleSpan);
+          eventDiv.appendChild(timeSpan);
+          eventDiv.appendChild(deleteBtn);
+          detailDiv.appendChild(eventDiv);
+        });
+      }
+      container.appendChild(detailDiv);
+    }
+
+    async function deleteCalendarEvent(title, date) {
+      try {
+        await fetch(SCRIPT_URL, {
+          method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain' },
+          body: JSON.stringify({ action: 'delete_calendar_event', title: title, date: date })
+        });
+        showToast('Event deleted');
+        loadCustomCalendar();
+      } catch (error) { showToast('Unable to delete event'); }
+    }
 
     // --- GREETING ---
     function setGreeting() {
@@ -946,7 +1123,21 @@
       const options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
       document.getElementById('today-date').textContent = today.toLocaleDateString('en-GB', options);
     }
-    function renderHomeRecentScores() { /* Same as before */ }
+    function renderHomeRecentScores() {
+      const list = document.getElementById('home-recent-scores');
+      list.innerHTML = '';
+      if (recentScores.length === 0) {
+        list.innerHTML = '<p class="empty">No scores logged yet. Go to Study to add your first score.</p>';
+        return;
+      }
+      const reversed = recentScores.slice(-3).reverse();
+      reversed.forEach(item => {
+        const div = document.createElement('div');
+        div.style.cssText = 'padding: 8px 12px; background: rgba(255,255,255,0.03); border-radius: 10px; font-size: 14px;';
+        div.textContent = `${item.topicId} — ${item.score}%`;
+        list.appendChild(div);
+      });
+    }
 
     // --- INIT ---
     setGreeting();
