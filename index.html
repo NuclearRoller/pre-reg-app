@@ -165,8 +165,7 @@
     <button class="tab-btn" onclick="switchTab('study')"><span class="tab-icon">◈</span>Study</button>
   </div>
 
-  <script>
-    // --- HARDCODED GPhC FRAMEWORK ---
+<script>
     const gphcFramework = {
       "Group B: Supplying Medicines": ["Technical and Legal Prescription Issues", "Preparing Medicinal Product"],
       "Group C: Education and Research": ["Teaching and Mentoring", "Research, Audit and Quality Improvement"],
@@ -175,7 +174,6 @@
       "Group F: Prescribing": ["History Taking", "Physical and Clinical Examination Skills", "Prescribing Consultation", "Prescription Writing", "Log of 90 Hours"]
     };
 
-    // Required counts per activity (B=1, C=1, D=1, E=3, F=3)
     const reqCounts = {
       "Technical and Legal Prescription Issues": 1, "Preparing Medicinal Product": 1,
       "Teaching and Mentoring": 1, "Research, Audit and Quality Improvement": 1,
@@ -199,8 +197,8 @@
     const TASKS_URL = 'https://docs.google.com/spreadsheets/d/1ElgT3pbdTA8Bd2r9r9nQI1wCayMoH2po8jcVZuoSeSw/export?format=csv&gid=331487663';
     const REMINDERS_URL = 'https://docs.google.com/spreadsheets/d/1ElgT3pbdTA8Bd2r9r9nQI1wCayMoH2po8jcVZuoSeSw/export?format=csv&gid=1548981654';
     const EVIDENCE_URL = 'https://docs.google.com/spreadsheets/d/1ElgT3pbdTA8Bd2r9r9nQI1wCayMoH2po8jcVZuoSeSw/export?format=csv&gid=2128123491'; 
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyQWiXL5r_U9iVQ6KeWadPRsrY_1iSI4oXBeAXwWXpUs1UEuBkuvShqDywpmvuz8Ylgtw/exec';
-    const CALENDAR_API_URL = 'https://script.google.com/macros/s/AKfycbyQWiXL5r_U9iVQ6KeWadPRsrY_1iSI4oXBeAXwWXpUs1UEuBkuvShqDywpmvuz8Ylgtw/exec?action=get_calendar';
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby4YrVXUR1-sbvRMyDpbmfmhYzFCAi14cgAIxNM0qMYK9C1YBFx6ZSN8fzYgi-ssee-vw/exec';
+    const CALENDAR_API_URL = 'https://script.google.com/macros/s/AKfycby4YrVXUR1-sbvRMyDpbmfmhYzFCAi14cgAIxNM0qMYK9C1YBFx6ZSN8fzYgi-ssee-vw/exec?action=get_calendar';
     const REFLECTIONS_URL = 'https://docs.google.com/spreadsheets/d/1ElgT3pbdTA8Bd2r9r9nQI1wCayMoH2po8jcVZuoSeSw/export?format=csv&gid=1128922294';
     const CHAT_URL = 'https://familysalesbot.camdvr.org/webhook/f5621c67-f92f-4be2-91ed-5b475df9e6d1/chat';
 
@@ -208,35 +206,11 @@
     function toggleChat() { const m = document.getElementById('chat-modal'); m.classList.toggle('active'); if (m.classList.contains('active')) document.getElementById('chat-text-input').focus(); }
     function switchTab(id) { document.querySelectorAll('.tab-view').forEach(v => v.classList.remove('active')); document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); document.getElementById(id).classList.add('active'); event.currentTarget.classList.add('active'); if (id === 'home') loadHome(); if (id === 'study') loadStudy(); if (id === 'calendar') loadCalendar(); }
 
-    function startVoice() {
-      if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-        const rec = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-        rec.lang = 'en-GB'; rec.continuous = false; rec.interimResults = true;
-        const btn = document.getElementById('mic-fab'); const inp = document.getElementById('chat-text-input');
-        document.getElementById('chat-modal').classList.add('active');
-        inp.placeholder = 'Listening...'; inp.focus();
-        rec.onstart = () => { btn.classList.add('listening'); btn.textContent = '■'; showToast('Listening...'); };
-        rec.onresult = (e) => { inp.value = Array.from(e.results).map(r => r[0].transcript).join(''); };
-        rec.onend = () => { btn.classList.remove('listening'); btn.textContent = '●'; inp.placeholder = 'Message Arlo...'; const t = inp.value.trim(); if (t) { inp.value = ''; addChatMsg(t, 'user'); sendChat(); } };
-        rec.onerror = () => { btn.classList.remove('listening'); btn.textContent = '●'; inp.placeholder = 'Message Arlo...'; showToast('Voice recognition failed'); };
-        rec.start();
-      } else { showToast('Voice not supported'); }
-    }
+    function startVoice() { if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) { const rec = new (window.SpeechRecognition || window.webkitSpeechRecognition)(); rec.lang = 'en-GB'; rec.continuous = false; rec.interimResults = true; const btn = document.getElementById('mic-fab'); const inp = document.getElementById('chat-text-input'); document.getElementById('chat-modal').classList.add('active'); inp.placeholder = 'Listening...'; inp.focus(); rec.onstart = () => { btn.classList.add('listening'); btn.textContent = '■'; showToast('Listening...'); }; rec.onresult = (e) => { inp.value = Array.from(e.results).map(r => r[0].transcript).join(''); }; rec.onend = () => { btn.classList.remove('listening'); btn.textContent = '●'; inp.placeholder = 'Message Arlo...'; const t = inp.value.trim(); if (t) { inp.value = ''; addChatMsg(t, 'user'); sendChat(); } }; rec.onerror = () => { btn.classList.remove('listening'); btn.textContent = '●'; inp.placeholder = 'Message Arlo...'; showToast('Voice recognition failed'); }; rec.start(); } else { showToast('Voice not supported'); } }
 
     function addChatMsg(text, type) { const body = document.getElementById('chat-body'); const msg = document.createElement('div'); msg.className = `msg ${type}`; msg.textContent = text; body.appendChild(msg); body.scrollTop = body.scrollHeight; return msg; }
 
-    async function sendChat() {
-      const inp = document.getElementById('chat-text-input'); const msg = inp.value.trim(); if (!msg) return;
-      addChatMsg(msg, 'user'); inp.value = ''; const think = addChatMsg('Arlo is thinking...', 'arlo');
-      try {
-        const res = await fetch(CHAT_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ chatId: "web_" + Math.random().toString(36).substr(2, 9), message: msg, route: 'general' }) });
-        const data = await res.json(); think.remove(); let reply = data.text || data.output || data.message || 'Error.';
-        const markers = ['[TASK_ADDED]', '[REMINDER_ADDED]', '[MEMORY_ADDED]', '[MEMORY_DELETED]', '[REFLECTION_MAPPED]', '[EVENT_CREATED]', '[EVIDENCE_ADDED]'];
-        let action = null; markers.forEach(m => { if (reply.includes(m)) { action = m; reply = reply.replace(m, '').trim(); } });
-        addChatMsg(reply, 'arlo'); loadReflections(); loadEvidence(); loadHome();
-        if (action === '[TASK_ADDED]') showToast('Arlo added a task'); else if (action === '[REMINDER_ADDED]') showToast('Arlo set a reminder'); else if (action === '[MEMORY_ADDED]') showToast('Arlo will remember that'); else if (action === '[REFLECTION_MAPPED]') showToast('Arlo mapped your reflection'); else if (action === '[EVENT_CREATED]') showToast('Arlo added an event'); else if (action === '[EVIDENCE_ADDED]') showToast('Arlo added evidence');
-      } catch (e) { think.remove(); addChatMsg('Error connecting to Arlo.', 'arlo'); }
-    }
+    async function sendChat() { const inp = document.getElementById('chat-text-input'); const msg = inp.value.trim(); if (!msg) return; addChatMsg(msg, 'user'); inp.value = ''; const think = addChatMsg('Arlo is thinking...', 'arlo'); try { const res = await fetch(CHAT_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ chatId: "web_" + Math.random().toString(36).substr(2, 9), message: msg, route: 'general' }) }); const data = await res.json(); think.remove(); let reply = data.text || data.output || data.message || 'Error.'; const markers = ['[TASK_ADDED]', '[REMINDER_ADDED]', '[MEMORY_ADDED]', '[MEMORY_DELETED]', '[REFLECTION_MAPPED]', '[EVENT_CREATED]', '[EVIDENCE_ADDED]']; let action = null; markers.forEach(m => { if (reply.includes(m)) { action = m; reply = reply.replace(m, '').trim(); } }); addChatMsg(reply, 'arlo'); loadReflections(); loadEvidence(); loadHome(); if (action === '[TASK_ADDED]') showToast('Arlo added a task'); else if (action === '[REMINDER_ADDED]') showToast('Arlo set a reminder'); else if (action === '[MEMORY_ADDED]') showToast('Arlo will remember that'); else if (action === '[REFLECTION_MAPPED]') showToast('Arlo mapped your reflection'); else if (action === '[EVENT_CREATED]') showToast('Arlo added an event'); else if (action === '[EVIDENCE_ADDED]') showToast('Arlo added evidence'); } catch (e) { think.remove(); addChatMsg('Error connecting to Arlo.', 'arlo'); } }
 
     // --- RECOMMENDATION LOGIC ---
     let pendingReflectionText = "";
@@ -244,18 +218,10 @@
 
     function recommendType(text) {
       const l = text.toLowerCase();
-      if (l.includes('inhaler') || l.includes('blood pressure') || l.includes('injection') || l.includes('venepuncture') || l.includes('procedure') || l.includes('technique') || l.includes('examination') || l.includes('observation') || l.includes('counselling')) {
-        return { type: 'DOPS', reason: 'This describes a clinical procedure or observed technique. DOPS is ideal for demonstrating procedural skills.' };
-      }
-      if (l.includes('discussed') || l.includes('doctor') || l.includes('gp') || l.includes('team') || l.includes('colleague') || l.includes('prescri')) {
-        return { type: 'CBD', reason: 'This describes a case-based discussion or professional decision-making. CBD is best for exploring clinical reasoning.' };
-      }
-      if (l.includes('patient') || l.includes('consultation') || l.includes('explained') || l.includes('medicine')) {
-        return { type: 'MRCF', reason: 'This describes a medicines-related consultation. MRCF is designed to assess how you structure consultations around medicines.' };
-      }
-      if (l.includes('assessed') || l.includes('clinical skills') || l.includes('observed consultation')) {
-        return { type: 'Mini-CEX', reason: 'This describes an observed clinical encounter. Mini-CEX provides feedback on clinical assessment skills.' };
-      }
+      if (l.includes('inhaler') || l.includes('blood pressure') || l.includes('injection') || l.includes('venepuncture') || l.includes('procedure') || l.includes('technique') || l.includes('examination') || l.includes('observation') || l.includes('counselling')) return { type: 'DOPS', reason: 'This describes a clinical procedure or observed technique. DOPS is ideal for demonstrating procedural skills.' };
+      if (l.includes('discussed') || l.includes('doctor') || l.includes('gp') || l.includes('team') || l.includes('colleague') || l.includes('prescri')) return { type: 'CBD', reason: 'This describes a case-based discussion or professional decision-making. CBD is best for exploring clinical reasoning.' };
+      if (l.includes('patient') || l.includes('consultation') || l.includes('explained') || l.includes('medicine')) return { type: 'MRCF', reason: 'This describes a medicines-related consultation. MRCF is designed to assess how you structure consultations around medicines.' };
+      if (l.includes('assessed') || l.includes('clinical skills') || l.includes('observed consultation')) return { type: 'Mini-CEX', reason: 'This describes an observed clinical encounter. Mini-CEX provides feedback on clinical assessment skills.' };
       return { type: 'Full Reflection', reason: 'This is a broader professional experience. A full reflective account captures the learning well.' };
     }
 
@@ -263,42 +229,28 @@
       pendingReflectionText = reflectionText;
       const rec = recommendType(reflectionText);
       pendingType = rec.type;
-
       document.getElementById('recommend-type').textContent = rec.type;
       document.getElementById('recommend-reason').textContent = rec.reason;
-
-      const btnContainer = document.getElementById('recommend-buttons');
-      btnContainer.innerHTML = '';
+      const btnContainer = document.getElementById('recommend-buttons'); btnContainer.innerHTML = '';
       const types = ['CBD', 'DOPS', 'MRCF', 'Mini-CEX', 'Full Reflection'];
       types.forEach(t => {
-        const btn = document.createElement('button');
-        btn.textContent = t;
+        const btn = document.createElement('button'); btn.textContent = t;
         btn.style.cssText = `padding: 10px 14px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1); background: ${t === pendingType ? 'rgba(108,92,231,0.4)' : 'transparent'}; color: ${t === pendingType ? '#fff' : 'var(--text)'}; font-size: 13px; font-weight: 600; cursor: pointer;`;
-        btn.onclick = () => {
-          pendingType = t;
-          document.querySelectorAll('#recommend-buttons button').forEach(b => { b.style.background = 'transparent'; b.style.color = 'var(--text)'; });
-          btn.style.background = 'rgba(108,92,231,0.4)'; btn.style.color = '#fff';
-        };
+        btn.onclick = () => { pendingType = t; document.querySelectorAll('#recommend-buttons button').forEach(b => { b.style.background = 'transparent'; b.style.color = 'var(--text)'; }); btn.style.background = 'rgba(108,92,231,0.4)'; btn.style.color = '#fff'; };
         btnContainer.appendChild(btn);
       });
-
-      document.getElementById('recommend-confirm').onclick = () => {
-        closeRecommendModal();
-        openEvidenceBuilder(pendingType, pendingReflectionText);
-      };
-
+      document.getElementById('recommend-confirm').onclick = () => { closeRecommendModal(); openEvidenceBuilder(pendingType, pendingReflectionText); };
       document.getElementById('recommend-modal').classList.add('active');
     }
-
-    function closeRecommendModal() {
-      document.getElementById('recommend-modal').classList.remove('active');
-    }
+    function closeRecommendModal() { document.getElementById('recommend-modal').classList.remove('active'); }
 
     // --- EVIDENCE BUILDER ---
     function openEvidenceBuilder(type, text) {
       document.getElementById('evidence-modal').classList.add('active');
       document.getElementById('builder-situation').style.display = text ? 'none' : 'block';
       document.getElementById('builder-edit').style.display = 'none';
+      document.getElementById('builder-edit-checkboxes').style.display = 'none';
+      
       document.getElementById('evidence-situation').value = text || '';
       document.getElementById('evidence-title').textContent = text ? `Confirm ${type} Entry` : 'New Evidence Entry';
       window.currentEvidenceType = type || null;
@@ -310,13 +262,39 @@
     function openEditEvidence(rowIndex, currentActivities) {
       document.getElementById('evidence-modal').classList.add('active');
       document.getElementById('builder-situation').style.display = 'none';
-      document.getElementById('builder-edit').style.display = 'block';
-      document.getElementById('edit-activities').value = currentActivities;
+      document.getElementById('builder-edit').style.display = 'none';
+      document.getElementById('builder-edit-checkboxes').style.display = 'block';
       document.getElementById('evidence-title').textContent = 'Edit Activities';
       window.currentEditRow = rowIndex;
+
+      // Build Checkboxes
+      const container = document.getElementById('edit-checkbox-container');
+      container.innerHTML = '';
+      const activeActs = currentActivities ? currentActivities.split('|').map(s => s.trim()) : [];
+
+      Object.keys(gphcFramework).forEach(group => {
+        const groupTitle = document.createElement('p');
+        groupTitle.style.cssText = 'font-size: 11px; font-weight: 700; color: var(--accent-soft); margin-top: 10px; margin-bottom: 4px;';
+        groupTitle.textContent = group;
+        container.appendChild(groupTitle);
+
+        gphcFramework[group].forEach(act => {
+          const label = document.createElement('label');
+          label.style.cssText = 'display: flex; align-items: center; gap: 8px; font-size: 13px; margin-bottom: 6px; color: var(--text); cursor: pointer;';
+          const cb = document.createElement('input');
+          cb.type = 'checkbox';
+          cb.value = `${group}: ${act}`;
+          cb.checked = activeActs.includes(`${group}: ${act}`);
+          cb.style.cssText = 'width: 16px; height: 16px; accent-color: var(--accent);';
+          label.appendChild(cb);
+          label.appendChild(document.createTextNode(act));
+          container.appendChild(label);
+        });
+      });
       
       document.getElementById('evidence-submit').onclick = async () => {
-        const newActivities = document.getElementById('edit-activities').value;
+        const checked = Array.from(document.querySelectorAll('#edit-checkbox-container input:checked')).map(cb => cb.value);
+        const newActivities = checked.join(' | ');
         try {
           await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ action: 'update_evidence_entry', row: rowIndex, activities: newActivities }) });
           showToast('Activities updated');
@@ -326,9 +304,7 @@
       };
     }
 
-    function closeEvidenceBuilder() {
-      document.getElementById('evidence-modal').classList.remove('active');
-    }
+    function closeEvidenceBuilder() { document.getElementById('evidence-modal').classList.remove('active'); }
 
     async function submitEvidence() {
       const situation = document.getElementById('evidence-situation').value.trim();
@@ -336,7 +312,6 @@
       const type = window.currentEvidenceType || 'Full Reflection';
       const btn = document.getElementById('evidence-submit');
       btn.textContent = 'Sending to Arlo...'; btn.disabled = true;
-
       try {
         const msg = `EVIDENCE ENTRY | Type: ${type} | Situation: ${situation}`;
         await fetch(CHAT_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ chatId: "evidence_" + Math.random().toString(36).substr(2, 9), message: msg, route: 'general' }) });
@@ -402,9 +377,11 @@
     function renderTracker() {
       const container = document.getElementById('gap-analysis-content'); container.innerHTML = '';
       let counts = {};
+      
       evidenceData.forEach(e => {
         if (e.activities) {
-          e.activities.split(',').forEach(a => { const name = a.trim(); if (name) counts[name] = (counts[name] || 0) + 1; });
+          // SPLIT BY PIPE NOW
+          e.activities.split('|').forEach(a => { const name = a.trim(); if (name) counts[name] = (counts[name] || 0) + 1; });
         }
       });
 
@@ -414,7 +391,10 @@
         gDiv.innerHTML = `<p style="font-size: 11px; font-weight: 700; color: var(--accent-soft); text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.5px;">${group}</p>`;
         gphcFramework[group].forEach(act => {
           const req = reqCounts[act] || 0; if (req === 0) return;
-          const done = counts[act] || 0;
+          
+          // Check with and without group prefix
+          const done = (counts[`${group}: ${act}`] || 0) + (counts[act] || 0);
+          
           totalReq += req; totalDone += Math.min(done, req);
           const color = done >= req ? '#86EFAC' : (done > 0 ? '#FCD34D' : '#FF8A8A');
           const row = document.createElement('div'); row.style.cssText = 'display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px; color: var(--text-dim);';
@@ -467,39 +447,17 @@
       try { await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ action: 'delete_reflection', row: row }) }); showToast('Deleted'); loadReflections(); } catch (e) { showToast('Error'); }
     }
 
-    // Standard Loaders (Task, Calendar, etc.)
+    // Standard Loaders
     async function loadHome() { loadHomeTasks(); loadReminders(); loadRecentScores().then(() => renderHomeRecentScores()); }
     async function loadStudy() { loadStudyData(); loadRecentScores(); loadEvidence(); loadReflections(); }
     
-    async function loadStudyData() {
-      try {
-        const res = await fetch(SHEET_URL); const csv = await res.text();
-        const parseCSV = (text) => { const rows=[]; let row=[],cell='',inQ=false; for(let i=0;i<text.length;i++){const c=text[i]; if(inQ){ if(c==='"'){ if(i+1<text.length&&text[i+1]==='"'){cell+='"';i++;}else{inQ=false;} }else{cell+=c;} }else{ if(c==='"'){inQ=true;} else if(c===','){row.push(cell.trim());cell='';} else if(c==='\n'||c==='\r'){ if(cell.trim()!==''||row.length>0){row.push(cell.trim());rows.push(row);row=[];cell='';} if(c==='\r'&&i+1<text.length&&text[i+1]==='\n'){i++;} }else{cell+=c;} } } if(cell.trim()!==''||row.length>0){row.push(cell.trim());rows.push(row);} return rows; };
-        const rows = parseCSV(csv); if (rows.length > 0) rows.shift();
-        topics = []; rows.forEach(row => { if (row.length >= 5 && row[0].trim() !== '') topics.push({ id: row[0].trim(), subject: row[1].trim(), topic: row[2].trim(), highYield: row[3].trim(), priority: row[4].trim() }); });
-        renderStudyData();
-      } catch (e) {}
-    }
+    async function loadStudyData() { try { const res = await fetch(SHEET_URL); const csv = await res.text(); const parseCSV = (text) => { const rows=[]; let row=[],cell='',inQ=false; for(let i=0;i<text.length;i++){const c=text[i]; if(inQ){ if(c==='"'){ if(i+1<text.length&&text[i+1]==='"'){cell+='"';i++;}else{inQ=false;} }else{cell+=c;} }else{ if(c==='"'){inQ=true;} else if(c===','){row.push(cell.trim());cell='';} else if(c==='\n'||c==='\r'){ if(cell.trim()!==''||row.length>0){row.push(cell.trim());rows.push(row);row=[];cell='';} if(c==='\r'&&i+1<text.length&&text[i+1]==='\n'){i++;} }else{cell+=c;} } } if(cell.trim()!==''||row.length>0){row.push(cell.trim());rows.push(row);} return rows; }; const rows = parseCSV(csv); if (rows.length > 0) rows.shift(); topics = []; rows.forEach(row => { if (row.length >= 5 && row[0].trim() !== '') topics.push({ id: row[0].trim(), subject: row[1].trim(), topic: row[2].trim(), highYield: row[3].trim(), priority: row[4].trim() }); }); renderStudyData(); } catch (e) {} }
 
-    function renderStudyData() {
-      const select = document.getElementById('topic-select'); select.innerHTML = '<option value="">Choose a topic...</option>';
-      topics.forEach(t => { const o = document.createElement('option'); o.value = t.id; o.textContent = `${t.id} - ${t.topic}`; select.appendChild(o); });
-      const total = topics.length; const covered = new Set(recentScores.map(s => s.topicId)).size; const pct = total > 0 ? Math.round((covered / total) * 100) : 0;
-      document.getElementById('coverage-bar').style.width = pct + '%'; document.getElementById('coverage-text').textContent = `${covered} of ${total} topics studied (${pct}%)`;
-    }
+    function renderStudyData() { const select = document.getElementById('topic-select'); select.innerHTML = '<option value="">Choose a topic...</option>'; topics.forEach(t => { const o = document.createElement('option'); o.value = t.id; o.textContent = `${t.id} - ${t.topic}`; select.appendChild(o); }); const total = topics.length; const covered = new Set(recentScores.map(s => s.topicId)).size; const pct = total > 0 ? Math.round((covered / total) * 100) : 0; document.getElementById('coverage-bar').style.width = pct + '%'; document.getElementById('coverage-text').textContent = `${covered} of ${total} topics studied (${pct}%)`; }
 
-    async function loadRecentScores() {
-      try { const res = await fetch(STUDYLOG_URL); const csv = await res.text(); const rows = csv.split('\n').slice(1); recentScores = [];
-        rows.forEach((row, index) => { const c = row.split(','); if (c.length >= 3 && c[0].trim() !== '') recentScores.push({ date: c[0].trim(), topicId: c[1].trim(), score: c[2].trim(), rowIndex: index }); });
-        renderRecentScores();
-      } catch (e) {}
-    }
+    async function loadRecentScores() { try { const res = await fetch(STUDYLOG_URL); const csv = await res.text(); const rows = csv.split('\n').slice(1); recentScores = []; rows.forEach((row, index) => { const c = row.split(','); if (c.length >= 3 && c[0].trim() !== '') recentScores.push({ date: c[0].trim(), topicId: c[1].trim(), score: c[2].trim(), rowIndex: index }); }); renderRecentScores(); } catch (e) {} }
 
-    function renderRecentScores() {
-      const list = document.getElementById('recent-scores'); list.innerHTML = '';
-      if (recentScores.length === 0) { list.innerHTML = '<p class="empty">No scores logged.</p>'; return; }
-      recentScores.slice(-10).reverse().forEach(item => { const row = document.createElement('div'); row.className = 'score-row'; row.innerHTML = `<span>${item.topicId} — ${item.score}%</span><button class="delete-btn" onclick="deleteScore(${item.rowIndex})">×</button>`; list.appendChild(row); });
-    }
+    function renderRecentScores() { const list = document.getElementById('recent-scores'); list.innerHTML = ''; if (recentScores.length === 0) { list.innerHTML = '<p class="empty">No scores logged.</p>'; return; } recentScores.slice(-10).reverse().forEach(item => { const row = document.createElement('div'); row.className = 'score-row'; row.innerHTML = `<span>${item.topicId} — ${item.score}%</span><button class="delete-btn" onclick="deleteScore(${item.rowIndex})">×</button>`; list.appendChild(row); }); }
     
     async function logScore() { const topicId = document.getElementById('topic-select').value; const score = document.getElementById('score-input').value; if (!topicId || !score) return showToast('Select topic/score'); try { await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ topicId, score }) }); showToast('Score logged'); document.getElementById('score-input').value = ''; loadRecentScores().then(() => renderHomeRecentScores()); } catch (e) {} }
     async function deleteScore(row) { try { await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ action: 'delete_score', row }) }); loadRecentScores(); } catch (e) {} }
@@ -512,9 +470,7 @@
     
     function renderHomeRecentScores() { const list = document.getElementById('home-recent-scores'); list.innerHTML = ''; if (recentScores.length === 0) { list.innerHTML = '<p class="empty">No scores yet.</p>'; return; } recentScores.slice(-3).reverse().forEach(i => { const d = document.createElement('div'); d.style.cssText = 'padding: 8px 12px; background: rgba(255,255,255,0.03); border-radius: 10px; font-size: 14px;'; d.textContent = `${i.topicId} — ${i.score}%`; list.appendChild(d); }); }
 
-    async function loadCalendar() {
-      try { const res = await fetch(CALENDAR_API_URL); const data = await res.json(); if (data.status !== 'success') { document.getElementById('custom-calendar').innerHTML = '<div class="card"><p class="empty">Unable to load.</p></div>'; return; } calendarEvents = data.events || []; renderCalendar(); } catch (e) {}
-    }
+    async function loadCalendar() { try { const res = await fetch(CALENDAR_API_URL); const data = await res.json(); if (data.status !== 'success') { document.getElementById('custom-calendar').innerHTML = '<div class="card"><p class="empty">Unable to load.</p></div>'; return; } calendarEvents = data.events || []; renderCalendar(); } catch (e) {} }
     function getEventColours(title) { if (title.includes('🟡')) return { bg: 'rgba(108, 92, 231, 0.2)', text: '#A29BFE' }; if (title.includes('🔵')) return { bg: 'rgba(0, 210, 255, 0.15)', text: '#81ECEC' }; if (title.includes('🔴')) return { bg: 'rgba(255, 107, 107, 0.15)', text: '#FF8A8A' }; if (title.includes('🟣')) return { bg: 'rgba(162, 155, 254, 0.15)', text: '#C4B5FD' }; if (title.includes('🟢')) return { bg: 'rgba(0, 210, 255, 0.1)', text: '#00D2FF' }; return { bg: 'rgba(108, 92, 231, 0.15)', text: '#A29BFE' }; }
     function renderCalendar() { const container = document.getElementById('custom-calendar'); container.innerHTML = ''; const year = currentMonth.getFullYear(); const month = currentMonth.getMonth(); const header = document.createElement('div'); header.className = 'cal-month-header'; const prev = document.createElement('button'); prev.className = 'cal-nav-btn'; prev.textContent = '‹'; prev.onclick = () => { currentMonth.setMonth(currentMonth.getMonth() - 1); renderCalendar(); }; const next = document.createElement('button'); next.className = 'cal-nav-btn'; next.textContent = '›'; next.onclick = () => { currentMonth.setMonth(currentMonth.getMonth() + 1); renderCalendar(); }; const title = document.createElement('div'); title.className = 'cal-month-title'; title.textContent = currentMonth.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' }); header.appendChild(prev); header.appendChild(title); header.appendChild(next); container.appendChild(header); const weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']; const weekdayRow = document.createElement('div'); weekdayRow.className = 'cal-grid'; weekdays.forEach(day => { const label = document.createElement('div'); label.className = 'cal-weekday'; label.textContent = day; weekdayRow.appendChild(label); }); container.appendChild(weekdayRow); const firstDay = new Date(year, month, 1); const lastDay = new Date(year, month + 1, 0); const daysInMonth = lastDay.getDate(); const startWeekday = (firstDay.getDay() + 6) % 7; const grid = document.createElement('div'); grid.className = 'cal-grid'; for (let i = 0; i < startWeekday; i++) { const empty = document.createElement('div'); empty.className = 'cal-day-cell'; empty.style.opacity = '0.3'; grid.appendChild(empty); } for (let day = 1; day <= daysInMonth; day++) { const cell = document.createElement('div'); cell.className = 'cal-day-cell'; const today = new Date(); if (day === today.getDate() && month === today.getMonth() && year === today.getFullYear()) cell.classList.add('today'); const dayNumber = document.createElement('div'); dayNumber.className = 'cal-day-number'; dayNumber.textContent = day; cell.appendChild(dayNumber); const dayEvents = calendarEvents.filter(event => { const d = new Date(event.start); return d.getDate() === day && d.getMonth() === month && d.getFullYear() === year; }); dayEvents.slice(0, 3).forEach(event => { const chip = document.createElement('div'); chip.className = 'cal-day-event'; const colours = getEventColours(event.title); chip.style.background = colours.bg; chip.style.color = colours.text; chip.textContent = event.title; cell.appendChild(chip); }); if (dayEvents.length > 3) { const more = document.createElement('div'); more.style.cssText = 'font-size: 9px; color: var(--text-dim); margin-top: 2px;'; more.textContent = `+${dayEvents.length - 3} more`; cell.appendChild(more); } cell.onclick = () => showDayDetails(day, month, year); grid.appendChild(cell); } container.appendChild(grid); }
     function showDayDetails(day, month, year) { const existing = document.querySelector('.cal-selected-day'); if (existing) existing.remove(); const container = document.getElementById('custom-calendar'); const detailDiv = document.createElement('div'); detailDiv.className = 'cal-selected-day'; const title = document.createElement('div'); title.className = 'cal-selected-title'; const date = new Date(year, month, day); title.textContent = date.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' }); detailDiv.appendChild(title); const dayEvents = calendarEvents.filter(event => { const d = new Date(event.start); return d.getDate() === day && d.getMonth() === month && d.getFullYear() === year; }); if (dayEvents.length === 0) { const empty = document.createElement('p'); empty.className = 'empty'; empty.textContent = 'No events for this day.'; detailDiv.appendChild(empty); } else { dayEvents.forEach(event => { const eventDiv = document.createElement('div'); eventDiv.style.cssText = 'padding: 8px 12px; border-radius: 10px; margin-bottom: 6px; font-size: 13px; display: flex; justify-content: space-between; align-items: center; gap: 8px;'; const colours = getEventColours(event.title); eventDiv.style.background = colours.bg; eventDiv.style.color = colours.text; const titleSpan = document.createElement('span'); titleSpan.textContent = event.title; const timeSpan = document.createElement('span'); timeSpan.style.cssText = 'font-size: 11px; color: var(--text-dim); white-space: nowrap;'; const startTime = new Date(event.start); timeSpan.textContent = startTime.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }); const deleteBtn = document.createElement('button'); deleteBtn.textContent = '×'; deleteBtn.style.cssText = 'background: none; border: none; color: var(--coral); font-size: 18px; cursor: pointer; padding: 0 4px;'; deleteBtn.onclick = (e) => { e.stopPropagation(); if (confirm('Delete this event?')) deleteCalendarEvent(event.title, event.start); }; eventDiv.appendChild(titleSpan); eventDiv.appendChild(timeSpan); eventDiv.appendChild(deleteBtn); detailDiv.appendChild(eventDiv); }); } container.appendChild(detailDiv); }
