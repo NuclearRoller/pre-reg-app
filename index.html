@@ -40,10 +40,8 @@
     .tab-btn.active { color: var(--accent-soft); }
     .tab-btn:active { transform: scale(0.92); }
     .tab-icon { font-size: 20px; line-height: 1; }
-    
     .score-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; background: rgba(255,255,255,0.03); border-radius: 10px; margin-bottom: 6px; font-size: 14px; }
     .delete-btn { background: none; border: none; color: var(--coral); font-size: 18px; cursor: pointer; padding: 0 4px; line-height: 1; }
-    
     .reflection-card { padding: 14px; background: rgba(255,255,255,0.03); border-radius: 14px; border: 1px solid rgba(255,255,255,0.06); display: flex; flex-direction: column; gap: 10px; margin-bottom: 10px; }
     .reflection-date { font-size: 11px; color: var(--text-dim); white-space: nowrap; letter-spacing: 0.5px; }
     .reflection-text { font-size: 13px; line-height: 1.5; color: var(--text); }
@@ -53,7 +51,6 @@
     .lo-2 { border-color: rgba(0, 210, 255, 0.5); color: #81ECEC; }
     .lo-3 { border-color: rgba(255, 107, 107, 0.5); color: #FF8A8A; }
     .lo-4 { border-color: rgba(162, 155, 254, 0.5); color: #C4B5FD; }
-    
     .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin-bottom: 10px; }
     .cal-weekday { text-align: center; font-size: 11px; color: var(--text-dim); font-weight: 600; padding: 6px 0; text-transform: uppercase; letter-spacing: 0.5px; }
     .cal-day-cell { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; min-height: 60px; padding: 6px; cursor: pointer; transition: all 0.2s ease; position: relative; }
@@ -67,13 +64,11 @@
     .cal-nav-btn { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; width: 32px; height: 32px; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--accent-soft); }
     .cal-selected-day { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 14px; padding: 14px; margin-top: 10px; animation: viewFade 0.3s ease; }
     .cal-selected-title { font-weight: 600; font-size: 14px; margin-bottom: 8px; color: var(--text); }
-
     .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(20px); z-index: 500; display: none; align-items: center; justify-content: center; padding: 20px; }
     .modal-overlay.active { display: flex; }
     .modal-content { background: #16161F; border-radius: 20px; width: 100%; max-width: 450px; max-height: 90vh; overflow-y: auto; border: 1px solid rgba(255,255,255,0.08); }
     .modal-header { padding: 20px; border-bottom: 1px solid rgba(255,255,255,0.06); display: flex; justify-content: space-between; align-items: center; }
     .modal-body { padding: 20px; }
-    
     #chat-fab { position: fixed; bottom: 95px; right: 20px; width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, #6C5CE7, #00D2FF); color: white; border: none; font-size: 22px; cursor: pointer; z-index: 200; box-shadow: 0 8px 20px rgba(108, 92, 231, 0.4); display: flex; align-items: center; justify-content: center; transition: transform 0.3s ease; }
     #chat-fab:active { transform: scale(0.85); }
     #mic-fab { position: fixed; bottom: 165px; right: 20px; width: 50px; height: 50px; border-radius: 50%; background: var(--cyan); color: #0B0B12; border: none; font-size: 18px; cursor: pointer; z-index: 200; box-shadow: 0 8px 20px rgba(0, 210, 255, 0.35); display: flex; align-items: center; justify-content: center; transition: transform 0.3s ease, background 0.3s ease; }
@@ -95,175 +90,98 @@
   </style>
 </head>
 <body>
-
   <div id="particles"></div>
-
-  <div id="splash">
-    <div class="logo">ARLO</div>
-    <div class="tagline">Pre-Reg Hub</div>
-  </div>
-
+  <div id="splash"><div class="logo">ARLO</div><div class="tagline">Pre-Reg Hub</div></div>
   <div id="app">
     <div id="home" class="tab-view active">
-      <div class="greeting">
-        <div class="hi" id="time-greeting">Good Evening</div>
-        <div class="name">Hey, Joey</div>
-      </div>
-      <div class="card">
-        <h3>Today's Schedule</h3>
-        <p id="today-date" style="color: var(--text-dim); font-size: 13px; margin-bottom: 6px;"></p>
-        <p>Tap <strong>Calendar</strong> to view today's full schedule.</p>
-      </div>
-      <div class="card">
-        <h3>Today's Tasks</h3>
-        <div id="home-tasks" style="display: flex; flex-direction: column; gap: 6px;">
-          <p class="empty">Loading tasks...</p>
-        </div>
-      </div>
-      <div class="card">
-        <h3>Today's Reminders</h3>
-        <div id="home-reminders" style="display: flex; flex-direction: column; gap: 6px;">
-          <p class="empty">Loading reminders...</p>
-        </div>
-      </div>
-      <div class="card">
-        <h3>Recent Study Activity</h3>
-        <div id="home-recent-scores" style="display: flex; flex-direction: column; gap: 6px;">
-          <p class="empty">Loading your recent scores...</p>
-        </div>
-      </div>
+      <div class="greeting"><div class="hi" id="time-greeting">Good Evening</div><div class="name">Hey, Joey</div></div>
+      <div class="card"><h3>Today's Schedule</h3><p id="today-date" style="color: var(--text-dim); font-size: 13px; margin-bottom: 6px;"></p><p>Tap <strong>Calendar</strong> to view today's full schedule.</p></div>
+      <div class="card"><h3>Today's Tasks</h3><div id="home-tasks" style="display: flex; flex-direction: column; gap: 6px;"><p class="empty">Loading tasks...</p></div></div>
+      <div class="card"><h3>Today's Reminders</h3><div id="home-reminders" style="display: flex; flex-direction: column; gap: 6px;"><p class="empty">Loading reminders...</p></div></div>
+      <div class="card"><h3>Recent Study Activity</h3><div id="home-recent-scores" style="display: flex; flex-direction: column; gap: 6px;"><p class="empty">Loading your recent scores...</p></div></div>
     </div>
-
-    <div id="calendar" class="tab-view">
-      <div class="greeting" style="margin-top: 10px;">
-        <div class="hi">Your Schedule</div>
-        <div class="name" style="font-size: 28px;">Calendar</div>
-      </div>
-      <div id="custom-calendar" style="margin-top: 14px;"></div>
-    </div>
-
+    <div id="calendar" class="tab-view"><div class="greeting" style="margin-top: 10px;"><div class="hi">Your Schedule</div><div class="name" style="font-size: 28px;">Calendar</div></div><div id="custom-calendar" style="margin-top: 14px;"></div></div>
     <div id="study" class="tab-view">
-      <div class="greeting" style="margin-top: 10px;">
-        <div class="hi">Your Progress</div>
-        <div class="name" style="font-size: 28px;">Study Planner</div>
-      </div>
-      
-      <div class="card" id="gap-analysis-card">
-        <h3>GPhC Evidence Tracker</h3>
-        <div id="gap-analysis-content">
-          <p class="empty">Loading your evidence progress...</p>
-        </div>
-      </div>
-
-      <div class="card">
-        <h3>Overall Coverage</h3>
-        <div style="width: 100%; height: 8px; background: rgba(255,255,255,0.06); border-radius: 10px; margin: 10px 0; overflow: hidden;">
-          <div id="coverage-bar" style="width: 0%; height: 100%; background: linear-gradient(90deg, #6C5CE7, #00D2FF); border-radius: 10px; transition: width 1s ease;"></div>
-        </div>
-        <p id="coverage-text" style="text-align: center; color: var(--text-dim); font-size: 14px;">Loading your topics...</p>
-      </div>
-
-      <div class="card">
-        <h3>Log Test Score</h3>
-        <select id="topic-select" style="width: 100%; padding: 12px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); color: var(--text); font-size: 14px; margin-bottom: 10px;">
-          <option value="">Choose a topic...</option>
-        </select>
-        <input type="number" id="score-input" placeholder="Score (0-100)" min="0" max="100" style="width: 100%; padding: 12px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); color: var(--text); font-size: 14px; margin-bottom: 10px;">
-        <button onclick="logScore()" style="width: 100%; padding: 14px; border-radius: 12px; border: none; background: linear-gradient(135deg, #6C5CE7, #00D2FF); color: white; font-size: 15px; font-weight: 600; cursor: pointer;">Save Score</button>
-      </div>
-
-      <div class="card">
-        <h3>Recent Scores</h3>
-        <div id="recent-scores" style="display: flex; flex-direction: column;">
-          <p class="empty">Loading your scores...</p>
-        </div>
-      </div>
-
+      <div class="greeting" style="margin-top: 10px;"><div class="hi">Your Progress</div><div class="name" style="font-size: 28px;">Study Planner</div></div>
+      <div class="card" id="gap-analysis-card"><h3>GPhC Evidence Tracker</h3><div id="gap-analysis-content"><p class="empty">Loading tracker...</p></div></div>
+      <div class="card"><h3>Overall Coverage</h3><div style="width: 100%; height: 8px; background: rgba(255,255,255,0.06); border-radius: 10px; margin: 10px 0; overflow: hidden;"><div id="coverage-bar" style="width: 0%; height: 100%; background: linear-gradient(90deg, #6C5CE7, #00D2FF); border-radius: 10px; transition: width 1s ease;"></div></div><p id="coverage-text" style="text-align: center; color: var(--text-dim); font-size: 14px;">Loading your topics...</p></div>
+      <div class="card"><h3>Log Test Score</h3><select id="topic-select" style="width: 100%; padding: 12px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); color: var(--text); font-size: 14px; margin-bottom: 10px;"><option value="">Choose a topic...</option></select><input type="number" id="score-input" placeholder="Score (0-100)" min="0" max="100" style="width: 100%; padding: 12px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); color: var(--text); font-size: 14px; margin-bottom: 10px;"><button onclick="logScore()" style="width: 100%; padding: 14px; border-radius: 12px; border: none; background: linear-gradient(135deg, #6C5CE7, #00D2FF); color: white; font-size: 15px; font-weight: 600; cursor: pointer;">Save Score</button></div>
+      <div class="card"><h3>Recent Scores</h3><div id="recent-scores" style="display: flex; flex-direction: column;"><p class="empty">Loading your scores...</p></div></div>
       <div class="card">
         <h3>E-Portfolio Evidence</h3>
         <button onclick="openEvidenceBuilder()" style="width: 100%; padding: 14px; border-radius: 12px; border: none; background: linear-gradient(135deg, #6C5CE7, #00D2FF); color: white; font-size: 15px; font-weight: 600; cursor: pointer; margin-bottom: 12px;">+ New Evidence Entry</button>
-        
-        <h3 style="margin-top: 20px; font-size: 11px; color: var(--text-dim);">Filled Evidence Forms</h3>
-        <div id="evidence-entries-list" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px;">
-          <p class="empty">Loading evidence...</p>
-        </div>
-        
+        <h3 style="margin-top: 20px; font-size: 11px; color: var(--text-dim);">Saved Evidence Entries</h3>
+        <div id="evidence-entries-list" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px;"><p class="empty">Loading evidence...</p></div>
         <h3 style="margin-top: 20px; font-size: 11px; color: var(--text-dim);">Raw Reflections</h3>
-        <div id="reflections-list" style="display: flex; flex-direction: column; gap: 10px;">
-          <p class="empty">Loading your reflections...</p>
-        </div>
+        <div id="reflections-list" style="display: flex; flex-direction: column; gap: 10px;"><p class="empty">Loading your reflections...</p></div>
       </div>
     </div>
   </div>
-
   <button id="chat-fab" onclick="toggleChat()">◆</button>
   <button id="mic-fab" onclick="startVoice()">●</button>
-
   <div id="chat-modal">
-    <div id="chat-header">
-      <span style="font-weight: 600;">Arlo</span>
-      <button onclick="toggleChat()" style="background: none; border: none; color: var(--text-dim); font-size: 20px; cursor: pointer;">×</button>
-    </div>
+    <div id="chat-header"><span style="font-weight: 600;">Arlo</span><button onclick="toggleChat()" style="background: none; border: none; color: var(--text-dim); font-size: 20px; cursor: pointer;">×</button></div>
     <div id="chat-body"></div>
-    <div id="chat-input-row">
-      <input type="text" id="chat-text-input" placeholder="Message Arlo..." onkeypress="if(event.key==='Enter') sendChatMessage()">
-      <button id="chat-send-btn" onclick="sendChatMessage()">→</button>
+    <div id="chat-input-row"><input type="text" id="chat-text-input" placeholder="Message Arlo..." onkeypress="if(event.key==='Enter') sendChatMessage()"><button id="chat-send-btn" onclick="sendChatMessage()">→</button></div>
+  </div>
+
+  <!-- Recommendation Modal -->
+  <div id="recommend-modal" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header"><span style="font-weight: 700; font-size: 16px;">Arlo's Recommendation</span><button onclick="closeRecommendModal()" style="background: none; border: none; color: var(--text-dim); font-size: 20px; cursor: pointer;">×</button></div>
+      <div class="modal-body">
+        <p style="font-size: 14px; margin-bottom: 10px;">Based on your reflection, Arlo recommends:</p>
+        <p id="recommend-type" style="font-size: 18px; font-weight: 800; color: var(--accent-soft); margin-bottom: 8px;"></p>
+        <p id="recommend-reason" style="font-size: 13px; color: var(--text-dim); line-height: 1.5; margin-bottom: 20px;"></p>
+        <p style="font-size: 13px; margin-bottom: 10px;">Choose the final evidence type:</p>
+        <div id="recommend-buttons" style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px;"></div>
+        <button id="recommend-confirm" style="width: 100%; padding: 14px; border-radius: 12px; border: none; background: linear-gradient(135deg, #6C5CE7, #00D2FF); color: white; font-size: 15px; font-weight: 600; cursor: pointer;">Confirm & Create</button>
+      </div>
     </div>
   </div>
 
-  <!-- New Evidence Modal -->
+  <!-- Evidence Builder Modal -->
   <div id="evidence-modal" class="modal-overlay">
     <div class="modal-content">
-      <div class="modal-header">
-        <span style="font-weight: 700; font-size: 16px;">New Evidence Entry</span>
-        <button onclick="closeEvidenceBuilder()" style="background: none; border: none; color: var(--text-dim); font-size: 20px; cursor: pointer;">×</button>
-      </div>
+      <div class="modal-header"><span id="evidence-title" style="font-weight: 700; font-size: 16px;">New Evidence Entry</span><button onclick="closeEvidenceBuilder()" style="background: none; border: none; color: var(--text-dim); font-size: 20px; cursor: pointer;">×</button></div>
       <div class="modal-body">
-        <p style="font-size: 13px; color: var(--text-dim); margin-bottom: 8px;">1. Evidence Type</p>
-        <div id="evidence-type-buttons" style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px;"></div>
-        
-        <div id="situation-container">
-            <p style="font-size: 13px; color: var(--text-dim); margin-bottom: 8px;">2. Situation</p>
-            <textarea id="evidence-situation" placeholder="E.g. I counselled a patient on warfarin..." style="width: 100%; padding: 14px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); color: var(--text); font-size: 14px; min-height: 100px; outline: none; resize: vertical; font-family: inherit; margin-bottom: 16px;"></textarea>
+        <div id="builder-situation" style="display: block;">
+          <p style="font-size: 13px; color: var(--text-dim); margin-bottom: 8px;">Situation</p>
+          <textarea id="evidence-situation" placeholder="E.g. I counselled a patient on warfarin..." style="width: 100%; padding: 14px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); color: var(--text); font-size: 14px; min-height: 100px; outline: none; resize: vertical; font-family: inherit; margin-bottom: 16px;"></textarea>
         </div>
-        
+        <div id="builder-edit" style="display: none;">
+          <p style="font-size: 13px; color: var(--text-dim); margin-bottom: 8px;">Edit Activities (comma separated)</p>
+          <input type="text" id="edit-activities" style="width: 100%; padding: 12px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); color: var(--text); font-size: 14px; margin-bottom: 16px;">
+        </div>
         <button onclick="submitEvidence()" id="evidence-submit" style="width: 100%; padding: 14px; border-radius: 12px; border: none; background: linear-gradient(135deg, #6C5CE7, #00D2FF); color: white; font-size: 15px; font-weight: 600; cursor: pointer;">Submit to Arlo</button>
       </div>
     </div>
   </div>
 
   <div id="toast"></div>
-
   <div class="tab-bar">
     <button class="tab-btn active" onclick="switchTab('home')"><span class="tab-icon">●</span>Home</button>
     <button class="tab-btn" onclick="switchTab('calendar')"><span class="tab-icon">▦</span>Calendar</button>
     <button class="tab-btn" onclick="switchTab('study')"><span class="tab-icon">◈</span>Study</button>
   </div>
 
-<script>
+  <script>
+    // --- HARDCODED GPhC FRAMEWORK ---
     const gphcFramework = {
-      "1": { name: "Learning Agreement", group: "Setup" }, "2": { name: "Learning Needs Analysis", group: "Setup" },
-      "3": { name: "Feedback", group: "Setup" }, "4": { name: "Progress Reviews", group: "Setup" },
-      "5": { name: "Designated Supervisor Final Sign Off and Declaration", group: "Setup" },
-      "6": { name: "Prescribing Learning Agreement", group: "Prescribing" }, "7": { name: "Prescribing Learning Needs Analysis", group: "Prescribing" },
-      "8": { name: "Final Prescribing Development Review", group: "Prescribing" }, "9": { name: "Technical and Legal Prescription Issues", group: "Supplying Medicines" },
-      "10": { name: "Preparing Medicinal Products", group: "Supplying Medicines" }, "11": { name: "Teaching and Mentoring", group: "Education & Research" },
-      "12": { name: "Research, Audit & Quality Improvement", group: "Education & Research" }, "13": { name: "First Aid/Basic Life Support", group: "Mandatory" },
-      "14": { name: "Safeguarding Children & Vulnerable Adults", group: "Mandatory" }, "15": { name: "Health and Safety", group: "Mandatory" },
-      "16": { name: "Digital Systems Used in Employing Organisation", group: "Mandatory" }, "17": { name: "Development and Application of Advanced Therapies", group: "Mandatory" },
-      "18": { name: "Medicines Reconciliation", group: "Clinical" }, "19": { name: "Patient Consultation", group: "Clinical" },
-      "20": { name: "Medicines Optimisation", group: "Clinical" }, "21": { name: "Public Health Intervention", group: "Clinical" },
-      "22": { name: "Medicines Safety", group: "Clinical" }, "23": { name: "Responding to a Medicines Query", group: "Clinical" },
-      "24": { name: "History Taking", group: "Prescribing" }, "25": { name: "Physical and Clinical Examination Skills", group: "Prescribing" },
-      "26": { name: "Prescribing Consultation", group: "Prescribing" }, "27": { name: "Prescription Writing", group: "Prescribing" },
-      "28": { name: "Log of 90 Hours", group: "Prescribing" }
+      "Group B: Supplying Medicines": ["Technical and Legal Prescription Issues", "Preparing Medicinal Product"],
+      "Group C: Education and Research": ["Teaching and Mentoring", "Research, Audit and Quality Improvement"],
+      "Group D: Mandatory and Specific Development": ["First Aid/Basic Life Support", "Safeguarding Children and Vulnerable Adults", "Health and safety", "Digital Systems Used in Employing Organisation", "Development and Application of Advanced Therapies"],
+      "Group E: Clinical and Patient Facing": ["Medicines Reconciliation", "Patient Consultation", "Medicines Optimisation", "Public Health Intervention", "Medicines Safety", "Responding to a Medicines Query"],
+      "Group F: Prescribing": ["History Taking", "Physical and Clinical Examination Skills", "Prescribing Consultation", "Prescription Writing", "Log of 90 Hours"]
     };
 
-    const requiredCounts = {
-      "1": 1, "2": 1, "3": 1, "4": 1, "5": 1, "6": 1, "7": 1, "8": 1,
-      "9": 1, "10": 1, "11": 1, "12": 1, "13": 1, "14": 1, "15": 1, "16": 1, "17": 1,
-      "18": 3, "19": 3, "20": 3, "21": 3, "22": 3, "23": 3,
-      "24": 3, "25": 3, "26": 3, "27": 3, "28": 0
+    // Required counts per activity (B=1, C=1, D=1, E=3, F=3)
+    const reqCounts = {
+      "Technical and Legal Prescription Issues": 1, "Preparing Medicinal Product": 1,
+      "Teaching and Mentoring": 1, "Research, Audit and Quality Improvement": 1,
+      "First Aid/Basic Life Support": 1, "Safeguarding Children and Vulnerable Adults": 1, "Health and safety": 1, "Digital Systems Used in Employing Organisation": 1, "Development and Application of Advanced Therapies": 1,
+      "Medicines Reconciliation": 3, "Patient Consultation": 3, "Medicines Optimisation": 3, "Public Health Intervention": 3, "Medicines Safety": 3, "Responding to a Medicines Query": 3,
+      "History Taking": 3, "Physical and Clinical Examination Skills": 3, "Prescribing Consultation": 3, "Prescription Writing": 3, "Log of 90 Hours": 0
     };
 
     let topics = [];
@@ -271,21 +189,9 @@
     let calendarEvents = [];
     let currentMonth = new Date();
     let evidenceData = []; 
+    let reflectionData = [];
 
-    function createParticles() {
-      const container = document.getElementById('particles');
-      for (let i = 0; i < 25; i++) {
-        const particle = document.createElement('div');
-        particle.className = 'particle';
-        particle.style.left = Math.random() * 100 + '%';
-        particle.style.width = (Math.random() * 4 + 2) + 'px';
-        particle.style.height = particle.style.width;
-        particle.style.animationDuration = (Math.random() * 15 + 10) + 's';
-        particle.style.animationDelay = (Math.random() * 10) + 's';
-        if (Math.random() > 0.5) particle.style.background = 'rgba(0, 210, 255, 0.15)';
-        container.appendChild(particle);
-      }
-    }
+    function createParticles() { const container = document.getElementById('particles'); for (let i = 0; i < 25; i++) { const p = document.createElement('div'); p.className = 'particle'; p.style.left = Math.random() * 100 + '%'; p.style.width = (Math.random() * 4 + 2) + 'px'; p.style.height = p.style.width; p.style.animationDuration = (Math.random() * 15 + 10) + 's'; p.style.animationDelay = (Math.random() * 10) + 's'; if (Math.random() > 0.5) p.style.background = 'rgba(0, 210, 255, 0.15)'; container.appendChild(p); } }
     createParticles();
 
     const SHEET_URL = 'https://docs.google.com/spreadsheets/d/1ElgT3pbdTA8Bd2r9r9nQI1wCayMoH2po8jcVZuoSeSw/export?format=csv&gid=0';
@@ -293,790 +199,332 @@
     const TASKS_URL = 'https://docs.google.com/spreadsheets/d/1ElgT3pbdTA8Bd2r9r9nQI1wCayMoH2po8jcVZuoSeSw/export?format=csv&gid=331487663';
     const REMINDERS_URL = 'https://docs.google.com/spreadsheets/d/1ElgT3pbdTA8Bd2r9r9nQI1wCayMoH2po8jcVZuoSeSw/export?format=csv&gid=1548981654';
     const EVIDENCE_URL = 'https://docs.google.com/spreadsheets/d/1ElgT3pbdTA8Bd2r9r9nQI1wCayMoH2po8jcVZuoSeSw/export?format=csv&gid=2128123491'; 
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxEvMkTafTm_YpGUKFyNchBriCOun8FijcNwf7-SDbuSOzTG1paZ4xYn8kS_IDTcO2sBQ/exec';
-    const CALENDAR_API_URL = 'https://script.google.com/macros/s/AKfycbxEvMkTafTm_YpGUKFyNchBriCOun8FijcNwf7-SDbuSOzTG1paZ4xYn8kS_IDTcO2sBQ/exec?action=get_calendar';
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyQWiXL5r_U9iVQ6KeWadPRsrY_1iSI4oXBeAXwWXpUs1UEuBkuvShqDywpmvuz8Ylgtw/exec';
+    const CALENDAR_API_URL = 'https://script.google.com/macros/s/AKfycbyQWiXL5r_U9iVQ6KeWadPRsrY_1iSI4oXBeAXwWXpUs1UEuBkuvShqDywpmvuz8Ylgtw/exec?action=get_calendar';
     const REFLECTIONS_URL = 'https://docs.google.com/spreadsheets/d/1ElgT3pbdTA8Bd2r9r9nQI1wCayMoH2po8jcVZuoSeSw/export?format=csv&gid=1128922294';
     const CHAT_URL = 'https://familysalesbot.camdvr.org/webhook/f5621c67-f92f-4be2-91ed-5b475df9e6d1/chat';
 
-    function showToast(message) {
-      const toast = document.getElementById('toast');
-      toast.textContent = message;
-      toast.classList.add('show');
-      setTimeout(() => toast.classList.remove('show'), 2500);
-    }
-
-    function addChatMessage(text, type) {
-      const body = document.getElementById('chat-body');
-      const msg = document.createElement('div');
-      msg.className = `msg ${type}`;
-      msg.textContent = text;
-      body.appendChild(msg);
-      body.scrollTop = body.scrollHeight;
-      return msg;
-    }
-
-    function toggleChat() {
-      const modal = document.getElementById('chat-modal');
-      modal.classList.toggle('active');
-      if (modal.classList.contains('active')) document.getElementById('chat-text-input').focus();
-    }
-
-    function switchTab(tabId) {
-      document.querySelectorAll('.tab-view').forEach(view => view.classList.remove('active'));
-      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-      document.getElementById(tabId).classList.add('active');
-      event.currentTarget.classList.add('active');
-      if (tabId === 'home') { loadHomeTasks(); loadReminders(); loadRecentScores().then(() => { renderHomeRecentScores(); }); }
-      if (tabId === 'study') { loadStudyData(); loadRecentScores(); loadEvidenceData(); loadReflections(); }
-      if (tabId === 'calendar') { loadCustomCalendar(); }
-    }
+    function showToast(m) { const t = document.getElementById('toast'); t.textContent = m; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 2500); }
+    function toggleChat() { const m = document.getElementById('chat-modal'); m.classList.toggle('active'); if (m.classList.contains('active')) document.getElementById('chat-text-input').focus(); }
+    function switchTab(id) { document.querySelectorAll('.tab-view').forEach(v => v.classList.remove('active')); document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); document.getElementById(id).classList.add('active'); event.currentTarget.classList.add('active'); if (id === 'home') loadHome(); if (id === 'study') loadStudy(); if (id === 'calendar') loadCalendar(); }
 
     function startVoice() {
       if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-        const recognition = new SpeechRecognition();
-        recognition.lang = 'en-GB';
-        recognition.continuous = false;
-        recognition.interimResults = true;
-        const micBtn = document.getElementById('mic-fab');
-        const modal = document.getElementById('chat-modal');
-        const input = document.getElementById('chat-text-input');
-        modal.classList.add('active');
-        input.placeholder = 'Listening...';
-        input.focus();
-        recognition.onstart = () => { micBtn.classList.add('listening'); micBtn.textContent = '■'; showToast('Listening...'); };
-        recognition.onresult = (event) => { input.value = Array.from(event.results).map(r => r[0].transcript).join(''); };
-        recognition.onend = () => {
-          micBtn.classList.remove('listening'); micBtn.textContent = '●'; input.placeholder = 'Message Arlo...';
-          const transcript = input.value.trim();
-          if (transcript) { input.value = ''; addChatMessage(transcript, 'user'); sendChatMessage(); }
-        };
-        recognition.onerror = () => { micBtn.classList.remove('listening'); micBtn.textContent = '●'; input.placeholder = 'Message Arlo...'; showToast('Voice recognition failed'); };
-        recognition.start();
-      } else { showToast('Voice recognition is not supported'); }
+        const rec = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+        rec.lang = 'en-GB'; rec.continuous = false; rec.interimResults = true;
+        const btn = document.getElementById('mic-fab'); const inp = document.getElementById('chat-text-input');
+        document.getElementById('chat-modal').classList.add('active');
+        inp.placeholder = 'Listening...'; inp.focus();
+        rec.onstart = () => { btn.classList.add('listening'); btn.textContent = '■'; showToast('Listening...'); };
+        rec.onresult = (e) => { inp.value = Array.from(e.results).map(r => r[0].transcript).join(''); };
+        rec.onend = () => { btn.classList.remove('listening'); btn.textContent = '●'; inp.placeholder = 'Message Arlo...'; const t = inp.value.trim(); if (t) { inp.value = ''; addChatMsg(t, 'user'); sendChat(); } };
+        rec.onerror = () => { btn.classList.remove('listening'); btn.textContent = '●'; inp.placeholder = 'Message Arlo...'; showToast('Voice recognition failed'); };
+        rec.start();
+      } else { showToast('Voice not supported'); }
     }
 
-    async function sendChatMessage() {
-      const input = document.getElementById('chat-text-input');
-      const message = input.value.trim();
-      if (!message) return;
-      addChatMessage(message, 'user');
-      input.value = '';
-      const thinking = addChatMessage('Arlo is thinking...', 'arlo');
+    function addChatMsg(text, type) { const body = document.getElementById('chat-body'); const msg = document.createElement('div'); msg.className = `msg ${type}`; msg.textContent = text; body.appendChild(msg); body.scrollTop = body.scrollHeight; return msg; }
+
+    async function sendChat() {
+      const inp = document.getElementById('chat-text-input'); const msg = inp.value.trim(); if (!msg) return;
+      addChatMsg(msg, 'user'); inp.value = ''; const think = addChatMsg('Arlo is thinking...', 'arlo');
       try {
-        const response = await fetch(CHAT_URL, {
-          method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ chatId: "web_" + Math.random().toString(36).substr(2, 9), message: message, route: 'general' })
-        });
-        const data = await response.json();
-        thinking.remove();
-        let reply = data.text || data.output || data.message || 'Sorry, I could not process that.';
-        
-        const actionMarkers = ['[TASK_ADDED]', '[REMINDER_ADDED]', '[MEMORY_ADDED]', '[MEMORY_DELETED]', '[REFLECTION_MAPPED]', '[EVENT_CREATED]', '[EVIDENCE_ADDED]'];
-        let detectedAction = null;
-        actionMarkers.forEach(marker => {
-          if (reply.includes(marker)) { detectedAction = marker; reply = reply.replace(marker, '').trim(); }
-        });
-        
-        addChatMessage(reply, 'arlo');
-        loadReflections();
-        loadEvidenceData();
-        loadHomeTasks();
-        loadReminders();
-        
-        if (detectedAction === '[TASK_ADDED]') showToast('Arlo added a task');
-        else if (detectedAction === '[REMINDER_ADDED]') showToast('Arlo set a reminder');
-        else if (detectedAction === '[MEMORY_ADDED]') showToast('Arlo will remember that');
-        else if (detectedAction === '[MEMORY_DELETED]') showToast('Arlo forgot that');
-        else if (detectedAction === '[REFLECTION_MAPPED]') showToast('Arlo mapped your reflection');
-        else if (detectedAction === '[EVENT_CREATED]') showToast('Arlo added an event');
-        else if (detectedAction === '[EVIDENCE_ADDED]') showToast('Arlo added an evidence entry');
-      } catch (error) {
-        thinking.remove(); addChatMessage('Error connecting to Arlo.', 'arlo');
+        const res = await fetch(CHAT_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ chatId: "web_" + Math.random().toString(36).substr(2, 9), message: msg, route: 'general' }) });
+        const data = await res.json(); think.remove(); let reply = data.text || data.output || data.message || 'Error.';
+        const markers = ['[TASK_ADDED]', '[REMINDER_ADDED]', '[MEMORY_ADDED]', '[MEMORY_DELETED]', '[REFLECTION_MAPPED]', '[EVENT_CREATED]', '[EVIDENCE_ADDED]'];
+        let action = null; markers.forEach(m => { if (reply.includes(m)) { action = m; reply = reply.replace(m, '').trim(); } });
+        addChatMsg(reply, 'arlo'); loadReflections(); loadEvidence(); loadHome();
+        if (action === '[TASK_ADDED]') showToast('Arlo added a task'); else if (action === '[REMINDER_ADDED]') showToast('Arlo set a reminder'); else if (action === '[MEMORY_ADDED]') showToast('Arlo will remember that'); else if (action === '[REFLECTION_MAPPED]') showToast('Arlo mapped your reflection'); else if (action === '[EVENT_CREATED]') showToast('Arlo added an event'); else if (action === '[EVIDENCE_ADDED]') showToast('Arlo added evidence');
+      } catch (e) { think.remove(); addChatMsg('Error connecting to Arlo.', 'arlo'); }
+    }
+
+    // --- RECOMMENDATION LOGIC ---
+    let pendingReflectionText = "";
+    let pendingType = "CBD";
+
+    function recommendType(text) {
+      const l = text.toLowerCase();
+      if (l.includes('inhaler') || l.includes('blood pressure') || l.includes('injection') || l.includes('venepuncture') || l.includes('procedure') || l.includes('technique') || l.includes('examination') || l.includes('observation') || l.includes('counselling')) {
+        return { type: 'DOPS', reason: 'This describes a clinical procedure or observed technique. DOPS is ideal for demonstrating procedural skills.' };
       }
+      if (l.includes('discussed') || l.includes('doctor') || l.includes('gp') || l.includes('team') || l.includes('colleague') || l.includes('prescri')) {
+        return { type: 'CBD', reason: 'This describes a case-based discussion or professional decision-making. CBD is best for exploring clinical reasoning.' };
+      }
+      if (l.includes('patient') || l.includes('consultation') || l.includes('explained') || l.includes('medicine')) {
+        return { type: 'MRCF', reason: 'This describes a medicines-related consultation. MRCF is designed to assess how you structure consultations around medicines.' };
+      }
+      if (l.includes('assessed') || l.includes('clinical skills') || l.includes('observed consultation')) {
+        return { type: 'Mini-CEX', reason: 'This describes an observed clinical encounter. Mini-CEX provides feedback on clinical assessment skills.' };
+      }
+      return { type: 'Full Reflection', reason: 'This is a broader professional experience. A full reflective account captures the learning well.' };
+    }
+
+    function openEvidenceTypePicker(rowIndex, currentType, reflectionText) {
+      pendingReflectionText = reflectionText;
+      const rec = recommendType(reflectionText);
+      pendingType = rec.type;
+
+      document.getElementById('recommend-type').textContent = rec.type;
+      document.getElementById('recommend-reason').textContent = rec.reason;
+
+      const btnContainer = document.getElementById('recommend-buttons');
+      btnContainer.innerHTML = '';
+      const types = ['CBD', 'DOPS', 'MRCF', 'Mini-CEX', 'Full Reflection'];
+      types.forEach(t => {
+        const btn = document.createElement('button');
+        btn.textContent = t;
+        btn.style.cssText = `padding: 10px 14px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1); background: ${t === pendingType ? 'rgba(108,92,231,0.4)' : 'transparent'}; color: ${t === pendingType ? '#fff' : 'var(--text)'}; font-size: 13px; font-weight: 600; cursor: pointer;`;
+        btn.onclick = () => {
+          pendingType = t;
+          document.querySelectorAll('#recommend-buttons button').forEach(b => { b.style.background = 'transparent'; b.style.color = 'var(--text)'; });
+          btn.style.background = 'rgba(108,92,231,0.4)'; btn.style.color = '#fff';
+        };
+        btnContainer.appendChild(btn);
+      });
+
+      document.getElementById('recommend-confirm').onclick = () => {
+        closeRecommendModal();
+        openEvidenceBuilder(pendingType, pendingReflectionText);
+      };
+
+      document.getElementById('recommend-modal').classList.add('active');
+    }
+
+    function closeRecommendModal() {
+      document.getElementById('recommend-modal').classList.remove('active');
     }
 
     // --- EVIDENCE BUILDER ---
-    function openEvidenceBuilder() {
+    function openEvidenceBuilder(type, text) {
       document.getElementById('evidence-modal').classList.add('active');
+      document.getElementById('builder-situation').style.display = text ? 'none' : 'block';
+      document.getElementById('builder-edit').style.display = 'none';
+      document.getElementById('evidence-situation').value = text || '';
+      document.getElementById('evidence-title').textContent = text ? `Confirm ${type} Entry` : 'New Evidence Entry';
+      window.currentEvidenceType = type || null;
+      window.currentEditRow = null;
       
-      const typeContainer = document.getElementById('evidence-type-buttons');
-      typeContainer.innerHTML = '';
-      const types = [
-        { id: 'CBD', color: 'rgba(108, 92, 231, 0.2)', text: '#A29BFE' },
-        { id: 'DOPS', color: 'rgba(0, 210, 255, 0.2)', text: '#81ECEC' },
-        { id: 'MRCF', color: 'rgba(255, 107, 107, 0.2)', text: '#FF8A8A' },
-        { id: 'Mini-CEX', color: 'rgba(251, 191, 36, 0.2)', text: '#FCD34D' },
-        { id: 'Full Reflection', color: 'rgba(74, 222, 128, 0.2)', text: '#86EFAC' }
-      ];
-      types.forEach(t => {
-        const btn = document.createElement('button');
-        btn.textContent = t.id;
-        btn.style.cssText = `padding: 10px 14px; border-radius: 10px; border: 1px solid ${t.color}; background: transparent; color: ${t.text}; font-size: 13px; font-weight: 600; cursor: pointer;`;
-        btn.onclick = () => {
-          document.querySelectorAll('#evidence-type-buttons button').forEach(b => {
-            b.style.background = 'transparent';
-            b.style.color = b.dataset.text;
-            b.style.borderColor = b.dataset.color;
-          });
-          btn.style.background = t.color;
-          btn.style.color = '#fff';
-          window.selectedEvidenceType = t.id;
-        };
-        btn.dataset.color = t.color;
-        btn.dataset.text = t.text;
-        typeContainer.appendChild(btn);
-      });
-      window.selectedEvidenceType = null;
+      document.getElementById('evidence-submit').onclick = submitEvidence;
+    }
+
+    function openEditEvidence(rowIndex, currentActivities) {
+      document.getElementById('evidence-modal').classList.add('active');
+      document.getElementById('builder-situation').style.display = 'none';
+      document.getElementById('builder-edit').style.display = 'block';
+      document.getElementById('edit-activities').value = currentActivities;
+      document.getElementById('evidence-title').textContent = 'Edit Activities';
+      window.currentEditRow = rowIndex;
+      
+      document.getElementById('evidence-submit').onclick = async () => {
+        const newActivities = document.getElementById('edit-activities').value;
+        try {
+          await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ action: 'update_evidence_entry', row: rowIndex, activities: newActivities }) });
+          showToast('Activities updated');
+          closeEvidenceBuilder();
+          loadEvidence();
+        } catch (e) { showToast('Error updating'); }
+      };
     }
 
     function closeEvidenceBuilder() {
       document.getElementById('evidence-modal').classList.remove('active');
-      document.getElementById('situation-container').style.display = 'block'; // Reset
-    }
-
-    function openEvidenceTypePicker(rowIndex, currentType, reflectionText) {
-      window.selectedEvidenceType = currentType || 'CBD';
-      openEvidenceBuilder();
-      
-      document.getElementById('situation-container').style.display = 'none';
-      
-      setTimeout(() => {
-        document.querySelectorAll('#evidence-type-buttons button').forEach(b => {
-          if (b.textContent === window.selectedEvidenceType) {
-            b.style.background = b.dataset.color;
-            b.style.color = '#fff';
-          }
-        });
-      }, 10);
-      
-      const submitBtn = document.getElementById('evidence-submit');
-      submitBtn.onclick = async () => {
-        if (!reflectionText) return showToast('No reflection text found');
-        if (!window.selectedEvidenceType) return showToast('Please select an evidence type');
-        
-        submitBtn.textContent = 'Sending to Arlo...';
-        submitBtn.disabled = true;
-        
-        try {
-          const message = `EVIDENCE ENTRY | Type: ${window.selectedEvidenceType} | Situation: ${reflectionText}`;
-          await fetch(CHAT_URL, {
-            method: 'POST', headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ chatId: "evidence_" + Math.random().toString(36).substr(2, 9), message: message, route: 'general' })
-          });
-          showToast('Evidence created from reflection');
-          closeEvidenceBuilder();
-          loadEvidenceData();
-          loadReflections();
-        } catch (error) {
-          showToast('Unable to submit evidence');
-        } finally {
-          submitBtn.textContent = 'Submit to Arlo';
-          submitBtn.disabled = false;
-          submitBtn.onclick = submitEvidence;
-        }
-      };
     }
 
     async function submitEvidence() {
-      const type = window.selectedEvidenceType;
       const situation = document.getElementById('evidence-situation').value.trim();
-
-      if (!type) return showToast('Please select an evidence type');
       if (!situation) return showToast('Please describe the situation');
-
+      const type = window.currentEvidenceType || 'Full Reflection';
       const btn = document.getElementById('evidence-submit');
-      btn.textContent = 'Sending to Arlo...';
-      btn.disabled = true;
+      btn.textContent = 'Sending to Arlo...'; btn.disabled = true;
 
       try {
-        const message = `EVIDENCE ENTRY | Type: ${type} | Situation: ${situation}`;
-        await fetch(CHAT_URL, {
-          method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ chatId: "evidence_" + Math.random().toString(36).substr(2, 9), message: message, route: 'general' })
-        });
+        const msg = `EVIDENCE ENTRY | Type: ${type} | Situation: ${situation}`;
+        await fetch(CHAT_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ chatId: "evidence_" + Math.random().toString(36).substr(2, 9), message: msg, route: 'general' }) });
         showToast('Evidence submitted to Arlo');
         closeEvidenceBuilder();
-        loadEvidenceData();
+        loadEvidence();
         loadReflections();
-      } catch (error) {
-        showToast('Unable to submit evidence');
-      } finally {
-        btn.textContent = 'Submit to Arlo';
-        btn.disabled = false;
-      }
+      } catch (e) { showToast('Unable to submit evidence'); }
+      finally { btn.textContent = 'Submit to Arlo'; btn.disabled = false; }
     }
 
-    // --- DATA LOADERS ---
-    async function loadEvidenceData() {
+    // --- LOADERS ---
+    async function loadEvidence() {
       try {
-        const response = await fetch(EVIDENCE_URL);
-        const csv = await response.text();
-        const list = document.getElementById('evidence-entries-list');
-        if (!list) return;
-        list.innerHTML = '';
+        const res = await fetch(EVIDENCE_URL); const csv = await res.text();
+        const list = document.getElementById('evidence-entries-list'); list.innerHTML = '';
         
-        const parseCSV = (text) => {
-          const rows = []; let row = []; let cell = ''; let inQuotes = false;
-          for (let i = 0; i < text.length; i++) {
-            const char = text[i];
-            if (inQuotes) {
-              if (char === '"') { if (i + 1 < text.length && text[i + 1] === '"') { cell += '"'; i++; } else { inQuotes = false; } } else { cell += char; }
-            } else {
-              if (char === '"') { inQuotes = true; }
-              else if (char === ',') { row.push(cell.trim()); cell = ''; }
-              else if (char === '\n' || char === '\r') {
-                if (cell.trim() !== '' || row.length > 0) { row.push(cell.trim()); rows.push(row); row = []; cell = ''; }
-                if (char === '\r' && i + 1 < text.length && text[i + 1] === '\n') { i++; }
-              } else { cell += char; }
-            }
-          }
-          if (cell.trim() !== '' || row.length > 0) { row.push(cell.trim()); rows.push(row); }
-          return rows;
-        };
+        const parseCSV = (text) => { const rows=[]; let row=[],cell='',inQ=false; for(let i=0;i<text.length;i++){const c=text[i]; if(inQ){ if(c==='"'){ if(i+1<text.length&&text[i+1]==='"'){cell+='"';i++;}else{inQ=false;} }else{cell+=c;} }else{ if(c==='"'){inQ=true;} else if(c===','){row.push(cell.trim());cell='';} else if(c==='\n'||c==='\r'){ if(cell.trim()!==''||row.length>0){row.push(cell.trim());rows.push(row);row=[];cell='';} if(c==='\r'&&i+1<text.length&&text[i+1]==='\n'){i++;} }else{cell+=c;} } } if(cell.trim()!==''||row.length>0){row.push(cell.trim());rows.push(row);} return rows; };
+        const rows = parseCSV(csv); if (rows.length > 0) rows.shift();
         
-        const rows = parseCSV(csv);
-        if (rows.length > 0) rows.shift();
-        
-        evidenceData = rows.map((row, index) => {
-          return { 
-            date: row[0] || '', type: row[1] || '', activityNum: row[2] || '', activityName: row[3] || '', 
-            setting: row[4] || '', patientType: row[5] || '', focus: row[6] || '', 
-            whatWentWell: row[9] || '', suggestions: row[10] || '', agreedAction: row[11] || '', 
-            reflection: row[12] || '', mappedLOs: row[13] || '', rating: row[14] || '', rowIndex: index 
-          };
-        }).filter(item => item.reflection !== '');
+        evidenceData = rows.map((row, index) => ({
+          date: row[0] || '', type: row[1] || '', activities: row[2] || '', setting: row[3] || '', patientType: row[4] || '', focus: row[5] || '', newOrFollowUp: row[6] || '', complexity: row[7] || '', whatWentWell: row[8] || '', suggestions: row[9] || '', agreedAction: row[10] || '', reflection: row[11] || '', mappedLOs: row[12] || '', rating: row[13] || '', rowIndex: index
+        })).filter(i => i.reflection !== '');
 
-        if (evidenceData.length === 0) { list.innerHTML = '<p class="empty">No evidence entries yet.</p>'; return; }
-        
+        if (evidenceData.length === 0) { list.innerHTML = '<p class="empty">No evidence yet.</p>'; return; }
+
         evidenceData.slice(-5).reverse().forEach(item => {
-          const card = document.createElement('div');
-          card.className = 'reflection-card';
-          card.style.cursor = 'pointer';
-          
+          const card = document.createElement('div'); card.className = 'reflection-card'; card.style.cursor = 'pointer';
           card.innerHTML = `
             <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;">
-              <div>
-                <span style="font-size: 10px; background: rgba(108,92,231,0.2); color: #A29BFE; padding: 2px 6px; border-radius: 4px; font-weight: bold; margin-right: 6px;">${item.type}</span>
-                <span style="font-size: 12px; font-weight: bold; color: #81ECEC;">Act ${item.activityNum}</span>
-              </div>
+              <div><span style="font-size: 10px; background: rgba(108,92,231,0.2); color: #A29BFE; padding: 2px 6px; border-radius: 4px; font-weight: bold; margin-right: 6px;">${item.type}</span></div>
               <span class="reflection-date">${item.date}</span>
             </div>
-            <p class="reflection-text" style="margin-top: 6px;">${item.reflection.length > 80 ? item.reflection.slice(0, 80) + '…' : item.reflection}</p>
+            <p class="reflection-text" style="margin-top: 6px;">${item.activities || 'No activities assigned'}</p>
           `;
-          
-          const expanded = document.createElement('div');
-          expanded.style.cssText = 'display: none; margin-top: 10px; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 10px; font-size: 13px; line-height: 1.6;';
-          
-          expanded.innerHTML = `
-            <p><strong style="color:var(--accent-soft)">Activity:</strong> ${item.activityName}</p>
-            <p><strong style="color:var(--accent-soft)">Setting:</strong> ${item.setting} | <strong style="color:var(--accent-soft)">Patient:</strong> ${item.patientType}</p>
-            <p style="margin-top: 6px;"><strong style="color:var(--accent-soft)">Reflection:</strong> ${item.reflection}</p>
+          const exp = document.createElement('div'); exp.style.cssText = 'display: none; margin-top: 10px; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 10px; font-size: 13px; line-height: 1.6;';
+          exp.innerHTML = `
+            <p><strong style="color:var(--accent-soft)">Situation:</strong> ${item.reflection}</p>
             <p style="margin-top: 6px;"><strong style="color:#86EFAC">What went well:</strong> ${item.whatWentWell}</p>
             <p style="margin-top: 6px;"><strong style="color:#FCD34D">Suggestions:</strong> ${item.suggestions}</p>
-            <p style="margin-top: 6px;"><strong style="color:#FF8A8A">Agreed Action:</strong> ${item.agreedAction}</p>
-            <div style="margin-top: 8px; display: flex; flex-wrap: wrap; gap: 4px;">
-               ${item.mappedLOs.split(',').map(lo => `<span class="lo-chip lo-1">${lo.trim()}</span>`).join('')}
-            </div>
-            <p style="margin-top: 8px; font-size: 12px; color: #FF6B6B; font-weight: 600;">Arlo's Rating: ${item.rating}/10</p>
+            <p style="margin-top: 6px;"><strong style="color:#FF8A8A">Action:</strong> ${item.agreedAction}</p>
+            <div style="margin-top: 8px; display: flex; flex-wrap: wrap; gap: 4px;">${item.mappedLOs.split(',').map(lo => `<span class="lo-chip lo-1">${lo.trim()}</span>`).join('')}</div>
+            <p style="margin-top: 8px; font-size: 12px; color: #FF6B6B; font-weight: 600;">Rating: ${item.rating}/10</p>
           `;
-
-          const btnRow = document.createElement('div');
-          btnRow.style.cssText = 'display: flex; gap: 8px; margin-top: 10px;';
-          
-          const deleteBtn = document.createElement('button');
-          deleteBtn.textContent = 'Delete Evidence';
-          deleteBtn.style.cssText = 'padding: 8px 12px; background: rgba(255, 107, 107, 0.08); border: 1px solid rgba(255, 107, 107, 0.2); color: #FF6B6B; border-radius: 8px; font-size: 12px; cursor: pointer;';
-          deleteBtn.onclick = (e) => { 
-            e.stopPropagation(); 
-            if (confirm('Delete this evidence entry?')) deleteEvidenceEntry(item.rowIndex); 
-          };
-          
-          btnRow.appendChild(deleteBtn);
-          expanded.appendChild(btnRow);
-          card.appendChild(expanded);
-
-          card.addEventListener('click', () => {
-            if (expanded.style.display === 'none') { expanded.style.display = 'block'; }
-            else { expanded.style.display = 'none'; }
-          });
+          const btnRow = document.createElement('div'); btnRow.style.cssText = 'display: flex; gap: 8px; margin-top: 10px;';
+          const editBtn = document.createElement('button'); editBtn.textContent = 'Edit Activities'; editBtn.style.cssText = 'padding: 8px 12px; background: rgba(0, 210, 255, 0.1); border: 1px solid rgba(0, 210, 255, 0.3); color: #00D2FF; border-radius: 8px; font-size: 12px; cursor: pointer;';
+          editBtn.onclick = (e) => { e.stopPropagation(); openEditEvidence(item.rowIndex, item.activities); };
+          const delBtn = document.createElement('button'); delBtn.textContent = 'Delete'; delBtn.style.cssText = 'padding: 8px 12px; background: rgba(255, 107, 107, 0.08); border: 1px solid rgba(255, 107, 107, 0.2); color: #FF6B6B; border-radius: 8px; font-size: 12px; cursor: pointer;';
+          delBtn.onclick = (e) => { e.stopPropagation(); if (confirm('Delete?')) deleteEvidence(item.rowIndex); };
+          btnRow.appendChild(editBtn); btnRow.appendChild(delBtn); exp.appendChild(btnRow);
+          card.appendChild(exp);
+          card.addEventListener('click', () => { exp.style.display = exp.style.display === 'none' ? 'block' : 'none'; });
           list.appendChild(card);
         });
-        
-        renderGapAnalysis();
-      } catch (error) {
-        console.error("Could not load evidence data", error);
-      }
+        renderTracker();
+      } catch (e) { console.error(e); }
     }
 
-    async function deleteEvidenceEntry(rowIndex) {
-      try {
-        await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ action: 'delete_evidence_entry', row: rowIndex }) });
-        showToast('Evidence deleted');
-        loadEvidenceData();
-      } catch (error) { showToast('Unable to delete evidence'); }
+    async function deleteEvidence(row) {
+      try { await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ action: 'delete_evidence_entry', row: row }) }); showToast('Deleted'); loadEvidence(); } catch (e) { showToast('Error'); }
     }
 
-    function renderGapAnalysis() {
-      const container = document.getElementById('gap-analysis-content');
-      container.innerHTML = '';
-
-      let completedCounts = {};
+    function renderTracker() {
+      const container = document.getElementById('gap-analysis-content'); container.innerHTML = '';
+      let counts = {};
       evidenceData.forEach(e => {
-        if (e.activityNum) {
-           const num = e.activityNum.replace(/[^0-9]/g, '');
-           if (num) completedCounts[num] = (completedCounts[num] || 0) + 1;
+        if (e.activities) {
+          e.activities.split(',').forEach(a => { const name = a.trim(); if (name) counts[name] = (counts[name] || 0) + 1; });
         }
       });
 
-      let totalRequired = 0;
-      let totalDone = 0;
-
-      const groups = { "Setup": [], "Supplying Medicines": [], "Education & Research": [], "Mandatory": [], "Clinical": [], "Prescribing": [] };
-      Object.keys(gphcFramework).forEach(num => {
-        const act = gphcFramework[num];
-        if (!groups[act.group]) groups[act.group] = [];
-        groups[act.group].push({ num, ...act });
+      let totalReq = 0, totalDone = 0;
+      Object.keys(gphcFramework).forEach(group => {
+        const gDiv = document.createElement('div'); gDiv.style.marginBottom = '12px';
+        gDiv.innerHTML = `<p style="font-size: 11px; font-weight: 700; color: var(--accent-soft); text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.5px;">${group}</p>`;
+        gphcFramework[group].forEach(act => {
+          const req = reqCounts[act] || 0; if (req === 0) return;
+          const done = counts[act] || 0;
+          totalReq += req; totalDone += Math.min(done, req);
+          const color = done >= req ? '#86EFAC' : (done > 0 ? '#FCD34D' : '#FF8A8A');
+          const row = document.createElement('div'); row.style.cssText = 'display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px; color: var(--text-dim);';
+          row.innerHTML = `<span>${act}</span><span style="color: ${color}; font-weight: 600;">${done}/${req}</span>`;
+          gDiv.appendChild(row);
+        });
+        container.appendChild(gDiv);
       });
-
-      const groupColors = { "Setup": "#A29BFE", "Supplying Medicines": "#81ECEC", "Education & Research": "#86EFAC", "Mandatory": "#C4B5FD", "Clinical": "#FCD34D", "Prescribing": "#FF8A8A" };
-
-      Object.keys(groups).forEach(groupName => {
-        if (groups[groupName].length === 0) return;
-        
-        const groupDiv = document.createElement('div');
-        groupDiv.style.marginBottom = '12px';
-        groupDiv.innerHTML = `<p style="font-size: 11px; font-weight: 700; color: ${groupColors[groupName]}; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.5px;">${groupName}</p>`;
-        
-        groups[groupName].forEach(act => {
-          const req = requiredCounts[act.num] || 0;
-          if (req === 0) return;
-          const done = completedCounts[act.num] || 0;
-          totalRequired += req;
-          totalDone += Math.min(done, req);
-
-          const isComplete = done >= req;
-          const color = isComplete ? '#86EFAC' : (done > 0 ? '#FCD34D' : '#FF8A8A');
-          
-          const row = document.createElement('div');
-          row.style.cssText = 'display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px; color: var(--text-dim);';
-          row.innerHTML = `<span>${act.num}. ${act.name}</span><span style="color: ${color}; font-weight: 600;">${done}/${req}</span>`;
-          groupDiv.appendChild(row);
-        });
-        container.appendChild(groupDiv);
-      });
-
-      if (totalRequired > 0) {
-        const pct = Math.round((totalDone / totalRequired) * 100);
-        const summary = document.createElement('div');
-        summary.style.cssText = 'margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.1); font-size: 14px; font-weight: 700; text-align: center;';
-        summary.innerHTML = `Overall Evidence: <span style="color: ${pct >= 100 ? '#86EFAC' : '#FCD34D'}">${totalDone}/${totalRequired} (${pct}%)</span>`;
-        container.appendChild(summary);
-      }
-    }
-
-    async function loadStudyData() {
-      try {
-        const response = await fetch(SHEET_URL);
-        const csv = await response.text();
-        const parseCSV = (text) => {
-          const rows = []; let row = []; let cell = ''; let inQuotes = false;
-          for (let i = 0; i < text.length; i++) {
-            const char = text[i];
-            if (inQuotes) {
-              if (char === '"') { if (i + 1 < text.length && text[i + 1] === '"') { cell += '"'; i++; } else { inQuotes = false; } } else { cell += char; }
-            } else {
-              if (char === '"') { inQuotes = true; }
-              else if (char === ',') { row.push(cell.trim()); cell = ''; }
-              else if (char === '\n' || char === '\r') {
-                if (cell.trim() !== '' || row.length > 0) { row.push(cell.trim()); rows.push(row); row = []; cell = ''; }
-                if (char === '\r' && i + 1 < text.length && text[i + 1] === '\n') { i++; }
-              } else { cell += char; }
-            }
-          }
-          if (cell.trim() !== '' || row.length > 0) { row.push(cell.trim()); rows.push(row); }
-          return rows;
-        };
-        const rows = parseCSV(csv);
-        if (rows.length > 0) rows.shift();
-        topics = [];
-        rows.forEach(row => {
-          if (row.length >= 5 && row[0].trim() !== '') {
-            topics.push({ id: row[0].trim(), subject: row[1].trim(), topic: row[2].trim(), highYield: row[3].trim(), priority: row[4].trim() });
-          }
-        });
-        renderStudyData();
-      } catch (error) {
-        document.getElementById('coverage-text').textContent = 'Unable to load topics.';
-      }
-    }
-
-    function renderStudyData() {
-      const select = document.getElementById('topic-select');
-      select.innerHTML = '<option value="">Choose a topic...</option>';
-      topics.forEach(t => {
-        const option = document.createElement('option');
-        option.value = t.id;
-        option.textContent = `${t.id} - ${t.topic}`;
-        select.appendChild(option);
-      });
-      const total = topics.length;
-      const studiedTopicIds = new Set(recentScores.map(score => score.topicId));
-      const covered = studiedTopicIds.size;
-      const pct = total > 0 ? Math.round((covered / total) * 100) : 0;
-      document.getElementById('coverage-bar').style.width = pct + '%';
-      document.getElementById('coverage-text').textContent = `${covered} of ${total} topics studied (${pct}%)`;
-    }
-
-    async function loadRecentScores() {
-      try {
-        const response = await fetch(STUDYLOG_URL);
-        const csv = await response.text();
-        const rows = csv.split('\n').slice(1);
-        recentScores = [];
-        rows.forEach((row, index) => {
-          const cols = row.split(',');
-          if (cols.length >= 3 && cols[0].trim() !== '') {
-            recentScores.push({ date: cols[0].trim(), topicId: cols[1].trim(), score: cols[2].trim(), rowIndex: index });
-          }
-        });
-        renderRecentScores();
-      } catch (error) {
-        document.getElementById('recent-scores').innerHTML = '<p class="empty">Unable to load scores.</p>';
-      }
-    }
-
-    function renderRecentScores() {
-      const list = document.getElementById('recent-scores');
-      list.innerHTML = '';
-      if (recentScores.length === 0) { list.innerHTML = '<p class="empty">No scores logged yet.</p>'; return; }
-      const reversed = recentScores.slice(-10).reverse();
-      reversed.forEach(item => {
-        const row = document.createElement('div');
-        row.className = 'score-row';
-        row.innerHTML = `<span>${item.topicId} — ${item.score}%</span>`;
-        const btn = document.createElement('button');
-        btn.className = 'delete-btn'; btn.textContent = '×';
-        btn.onclick = () => deleteScore(item.rowIndex);
-        row.appendChild(btn);
-        list.appendChild(row);
-      });
-    }
-
-    async function loadHomeTasks() {
-      try {
-        const response = await fetch(TASKS_URL);
-        const csv = await response.text();
-        const rows = csv.split('\n').slice(1);
-        const list = document.getElementById('home-tasks');
-        list.innerHTML = '';
-        const pendingTasks = rows.map((row, index) => {
-          const cols = row.split(',');
-          return { task: cols[0] ? cols[0].trim() : '', dueDate: cols[1] ? cols[1].trim() : '', priority: cols[2] ? cols[2].trim() : '', status: cols[3] ? cols[3].trim() : '', rowIndex: index };
-        }).filter(item => item.status !== 'Done' && item.task !== '');
-        if (pendingTasks.length === 0) { list.innerHTML = '<p class="empty">No pending tasks. You\'re all clear!</p>'; return; }
-        pendingTasks.slice(0, 5).forEach(item => {
-          const div = document.createElement('div');
-          div.style.cssText = 'display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; background: rgba(255,255,255,0.03); border-radius: 10px; margin-bottom: 6px; font-size: 14px;';
-          div.innerHTML = `<span>${item.task}${item.dueDate !== '' ? ` — Due: ${item.dueDate}` : ''}</span>`;
-          const btn = document.createElement('button');
-          btn.textContent = '✓'; btn.style.cssText = 'background: var(--accent); border: none; color: white; font-size: 16px; width: 28px; height: 28px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center;';
-          btn.onclick = () => completeTask(item.rowIndex);
-          div.appendChild(btn);
-          list.appendChild(div);
-        });
-      } catch (error) { document.getElementById('home-tasks').innerHTML = '<p class="empty">Unable to load tasks.</p>'; }
-    }
-
-    async function loadReminders() {
-      try {
-        const response = await fetch(REMINDERS_URL);
-        const csv = await response.text();
-        const rows = csv.split('\n').slice(1);
-        const list = document.getElementById('home-reminders');
-        list.innerHTML = '';
-        const pending = rows.map((row, index) => {
-          const cols = row.split(',');
-          return { reminder: cols[0] ? cols[0].trim() : '', dueDate: cols[1] ? cols[1].trim() : '', time: cols[2] ? cols[2].trim() : '', status: cols[3] ? cols[3].trim() : '', rowIndex: index };
-        }).filter(item => item.status !== 'Done' && item.reminder !== '');
-        if (pending.length === 0) { list.innerHTML = '<p class="empty">No reminders set.</p>'; return; }
-        pending.slice(0, 5).forEach(item => {
-          const div = document.createElement('div');
-          div.style.cssText = 'display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; background: rgba(0, 210, 255, 0.08); border: 1px solid rgba(0, 210, 255, 0.2); border-radius: 10px; margin-bottom: 6px; font-size: 14px;';
-          div.innerHTML = `<span>${item.reminder}${item.time !== '' ? ` — ${item.time}` : ''}</span>`;
-          const btn = document.createElement('button');
-          btn.textContent = '✓'; btn.style.cssText = 'background: rgba(0, 210, 255, 0.2); border: none; color: #00D2FF; font-size: 16px; width: 28px; height: 28px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center;';
-          btn.onclick = () => completeReminder(item.rowIndex);
-          div.appendChild(btn);
-          list.appendChild(div);
-        });
-      } catch (error) { document.getElementById('home-reminders').innerHTML = '<p class="empty">Unable to load reminders.</p>'; }
+      const pct = totalReq > 0 ? Math.round((totalDone / totalReq) * 100) : 0;
+      const sum = document.createElement('div'); sum.style.cssText = 'margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.1); font-size: 14px; font-weight: 700; text-align: center;';
+      sum.innerHTML = `Total: <span style="color: ${pct >= 100 ? '#86EFAC' : '#FCD34D'}">${totalDone}/${totalReq} (${pct}%)</span>`;
+      container.appendChild(sum);
     }
 
     async function loadReflections() {
       try {
-        const response = await fetch(REFLECTIONS_URL);
-        const csv = await response.text();
-        const list = document.getElementById('reflections-list');
-        list.innerHTML = '';
-        const parseCSV = (text) => {
-          const rows = []; let row = []; let cell = ''; let inQuotes = false;
-          for (let i = 0; i < text.length; i++) {
-            const char = text[i];
-            if (inQuotes) {
-              if (char === '"') { if (i + 1 < text.length && text[i + 1] === '"') { cell += '"'; i++; } else { inQuotes = false; } } else { cell += char; }
-            } else {
-              if (char === '"') { inQuotes = true; }
-              else if (char === ',') { row.push(cell.trim()); cell = ''; }
-              else if (char === '\n' || char === '\r') {
-                if (cell.trim() !== '' || row.length > 0) { row.push(cell.trim()); rows.push(row); row = []; cell = ''; }
-                if (char === '\r' && i + 1 < text.length && text[i + 1] === '\n') { i++; }
-              } else { cell += char; }
-            }
-          }
-          if (cell.trim() !== '' || row.length > 0) { row.push(cell.trim()); rows.push(row); }
-          return rows;
-        };
-        const rows = parseCSV(csv);
-        if (rows.length > 0) rows.shift();
-        const reflections = rows.map((row, index) => {
-          return { date: row[0] || '', raw: row[1] || '', refined: row[2] || '', mappedLOs: row[3] || '', status: row[4] || '', rating: row[5] || '', evidenceType: row[6] || '', rowIndex: index };
-        }).filter(item => item.refined !== '');
+        const res = await fetch(REFLECTIONS_URL); const csv = await res.text();
+        const list = document.getElementById('reflections-list'); list.innerHTML = '';
+        const parseCSV = (text) => { const rows=[]; let row=[],cell='',inQ=false; for(let i=0;i<text.length;i++){const c=text[i]; if(inQ){ if(c==='"'){ if(i+1<text.length&&text[i+1]==='"'){cell+='"';i++;}else{inQ=false;} }else{cell+=c;} }else{ if(c==='"'){inQ=true;} else if(c===','){row.push(cell.trim());cell='';} else if(c==='\n'||c==='\r'){ if(cell.trim()!==''||row.length>0){row.push(cell.trim());rows.push(row);row=[];cell='';} if(c==='\r'&&i+1<text.length&&text[i+1]==='\n'){i++;} }else{cell+=c;} } } if(cell.trim()!==''||row.length>0){row.push(cell.trim());rows.push(row);} return rows; };
+        const rows = parseCSV(csv); if (rows.length > 0) rows.shift();
+        const reflections = rows.map((row, index) => ({ date: row[0] || '', raw: row[1] || '', refined: row[2] || '', mappedLOs: row[3] || '', status: row[4] || '', rating: row[5] || '', evidenceType: row[6] || '', rowIndex: index })).filter(i => i.refined !== '');
+        
         if (reflections.length === 0) { list.innerHTML = '<p class="empty">No reflections yet.</p>'; return; }
         reflections.slice(-5).reverse().forEach(item => {
-          const card = document.createElement('div');
-          card.className = 'reflection-card';
-          card.style.cursor = 'pointer';
-          card.innerHTML = `
-            <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;">
-              <p class="reflection-text">${item.refined.length > 80 ? item.refined.slice(0, 80) + '…' : item.refined}</p>
-              <span class="reflection-date">${item.date}</span>
-            </div>
-          `;
-          const expanded = document.createElement('div');
-          expanded.style.cssText = 'display: none; margin-top: 10px; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 10px;';
-          expanded.innerHTML = `<p class="reflection-text">${item.refined}</p>`;
+          const card = document.createElement('div'); card.className = 'reflection-card'; card.style.cursor = 'pointer';
+          card.innerHTML = `<div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;"><p class="reflection-text">${item.refined.length > 80 ? item.refined.slice(0, 80) + '…' : item.refined}</p><span class="reflection-date">${item.date}</span></div>`;
+          const exp = document.createElement('div'); exp.style.cssText = 'display: none; margin-top: 10px; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 10px;';
+          exp.innerHTML = `<p class="reflection-text">${item.refined}</p>`;
           
-          const loEl = document.createElement('div');
-          loEl.className = 'lo-chips';
-          loEl.style.marginTop = '8px';
-          if (item.mappedLOs && item.mappedLOs !== '') {
-            item.mappedLOs.split(',').map(lo => lo.trim()).filter(lo => lo !== '').forEach(lo => {
-              const chip = document.createElement('span');
-              chip.className = 'lo-chip';
-              chip.textContent = lo;
-              const firstPart = lo.split('.')[0].replace(/[^0-9]/g, '');
-              if (firstPart === '1') chip.classList.add('lo-1');
-              else if (firstPart === '2') chip.classList.add('lo-2');
-              else if (firstPart === '3') chip.classList.add('lo-3');
-              else if (firstPart === '4') chip.classList.add('lo-4');
-              else chip.classList.add('lo-1');
-              loEl.appendChild(chip);
-            });
-          } else {
-            loEl.innerHTML = '<span style="font-size: 11px; color: var(--text-faint); font-style: italic;">No LOs mapped</span>';
-          }
-          expanded.appendChild(loEl);
-
-          if (item.rating && item.rating !== '') {
-            const ratingEl = document.createElement('p');
-            ratingEl.style.cssText = 'margin-top: 10px; font-size: 12px; color: #FF6B6B; font-weight: 600;';
-            ratingEl.textContent = `Arlo's Rating: ${item.rating}`;
-            expanded.appendChild(ratingEl);
-          }
-          if (item.evidenceType && item.evidenceType !== '') {
-            const evidenceEl = document.createElement('p');
-            evidenceEl.style.cssText = 'margin-top: 10px; font-size: 12px; color: #00D2FF; font-weight: 600;';
-            evidenceEl.textContent = `Evidence: ${item.evidenceType}`;
-            expanded.appendChild(evidenceEl);
-          }
-
-          const btnRow = document.createElement('div');
-          btnRow.style.cssText = 'display: flex; gap: 8px; margin-top: 10px;';
+          const loEl = document.createElement('div'); loEl.className = 'lo-chips'; loEl.style.marginTop = '8px';
+          if (item.mappedLOs) item.mappedLOs.split(',').map(l => l.trim()).filter(l => l).forEach(lo => { const c = document.createElement('span'); c.className = 'lo-chip'; c.textContent = lo; c.classList.add('lo-1'); loEl.appendChild(c); });
+          exp.appendChild(loEl);
           
-          const evidenceBtn = document.createElement('button');
-          evidenceBtn.textContent = 'Make Evidence';
-          evidenceBtn.style.cssText = 'padding: 8px 12px; background: rgba(108, 92, 231, 0.15); border: 1px solid rgba(108, 92, 231, 0.4); color: #A29BFE; border-radius: 8px; font-size: 12px; cursor: pointer;';
-          evidenceBtn.onclick = (e) => { e.stopPropagation(); openEvidenceTypePicker(item.rowIndex, item.evidenceType, item.refined); };
+          if (item.rating) exp.innerHTML += `<p style="margin-top: 10px; font-size: 12px; color: #FF6B6B; font-weight: 600;">Arlo's Rating: ${item.rating}</p>`;
           
-          const deleteBtn = document.createElement('button');
-          deleteBtn.textContent = 'Delete';
-          deleteBtn.style.cssText = 'padding: 8px 12px; background: rgba(255, 107, 107, 0.08); border: 1px solid rgba(255, 107, 107, 0.2); color: #FF6B6B; border-radius: 8px; font-size: 12px; cursor: pointer;';
-          deleteBtn.onclick = (e) => { e.stopPropagation(); if (confirm('Delete this reflection?')) deleteReflection(item.rowIndex); };
-          
-          btnRow.appendChild(evidenceBtn);
-          btnRow.appendChild(deleteBtn);
-          expanded.appendChild(btnRow);
-          card.appendChild(expanded);
-
-          card.addEventListener('click', () => {
-            if (expanded.style.display === 'none') { expanded.style.display = 'block'; }
-            else { expanded.style.display = 'none'; }
-          });
+          const btnRow = document.createElement('div'); btnRow.style.cssText = 'display: flex; gap: 8px; margin-top: 10px;';
+          const evBtn = document.createElement('button'); evBtn.textContent = 'Make Evidence'; evBtn.style.cssText = 'padding: 8px 12px; background: rgba(108, 92, 231, 0.15); border: 1px solid rgba(108, 92, 231, 0.4); color: #A29BFE; border-radius: 8px; font-size: 12px; cursor: pointer;';
+          evBtn.onclick = (e) => { e.stopPropagation(); openEvidenceTypePicker(item.rowIndex, item.evidenceType, item.refined); };
+          const delBtn = document.createElement('button'); delBtn.textContent = 'Delete'; delBtn.style.cssText = 'padding: 8px 12px; background: rgba(255, 107, 107, 0.08); border: 1px solid rgba(255, 107, 107, 0.2); color: #FF6B6B; border-radius: 8px; font-size: 12px; cursor: pointer;';
+          delBtn.onclick = (e) => { e.stopPropagation(); if (confirm('Delete?')) deleteReflection(item.rowIndex); };
+          btnRow.appendChild(evBtn); btnRow.appendChild(delBtn); exp.appendChild(btnRow);
+          card.appendChild(exp);
+          card.addEventListener('click', () => { exp.style.display = exp.style.display === 'none' ? 'block' : 'none'; });
           list.appendChild(card);
         });
-      } catch (error) {
-        document.getElementById('reflections-list').innerHTML = '<p class="empty">Unable to load reflections.</p>';
-      }
+      } catch (e) { document.getElementById('reflections-list').innerHTML = '<p class="empty">Error loading reflections.</p>'; }
     }
 
-    async function deleteReflection(rowIndex) {
+    async function deleteReflection(row) {
+      try { await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ action: 'delete_reflection', row: row }) }); showToast('Deleted'); loadReflections(); } catch (e) { showToast('Error'); }
+    }
+
+    // Standard Loaders (Task, Calendar, etc.)
+    async function loadHome() { loadHomeTasks(); loadReminders(); loadRecentScores().then(() => renderHomeRecentScores()); }
+    async function loadStudy() { loadStudyData(); loadRecentScores(); loadEvidence(); loadReflections(); }
+    
+    async function loadStudyData() {
       try {
-        await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ action: 'delete_reflection', row: rowIndex }) });
-        showToast('Reflection deleted');
-        loadReflections();
-      } catch (error) { showToast('Unable to delete reflection'); }
+        const res = await fetch(SHEET_URL); const csv = await res.text();
+        const parseCSV = (text) => { const rows=[]; let row=[],cell='',inQ=false; for(let i=0;i<text.length;i++){const c=text[i]; if(inQ){ if(c==='"'){ if(i+1<text.length&&text[i+1]==='"'){cell+='"';i++;}else{inQ=false;} }else{cell+=c;} }else{ if(c==='"'){inQ=true;} else if(c===','){row.push(cell.trim());cell='';} else if(c==='\n'||c==='\r'){ if(cell.trim()!==''||row.length>0){row.push(cell.trim());rows.push(row);row=[];cell='';} if(c==='\r'&&i+1<text.length&&text[i+1]==='\n'){i++;} }else{cell+=c;} } } if(cell.trim()!==''||row.length>0){row.push(cell.trim());rows.push(row);} return rows; };
+        const rows = parseCSV(csv); if (rows.length > 0) rows.shift();
+        topics = []; rows.forEach(row => { if (row.length >= 5 && row[0].trim() !== '') topics.push({ id: row[0].trim(), subject: row[1].trim(), topic: row[2].trim(), highYield: row[3].trim(), priority: row[4].trim() }); });
+        renderStudyData();
+      } catch (e) {}
     }
 
-    async function completeTask(rowIndex) {
-      try {
-        await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ action: 'complete_task', row: rowIndex }) });
-        showToast('Task marked as done'); loadHomeTasks();
-      } catch (error) { showToast('Unable to mark task as done'); }
-    }
-    async function completeReminder(rowIndex) {
-      try {
-        await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ action: 'complete_reminder', row: rowIndex }) });
-        showToast('Reminder marked as done'); loadReminders();
-      } catch (error) { showToast('Unable to mark reminder as done'); }
-    }
-    async function deleteScore(rowIndex) {
-      try {
-        await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ action: 'delete_score', row: rowIndex }) });
-        showToast('Score deleted'); loadRecentScores().then(() => { renderHomeRecentScores(); });
-      } catch (error) { showToast('Unable to delete score'); }
-    }
-    async function logScore() {
-      const topicId = document.getElementById('topic-select').value;
-      const score = document.getElementById('score-input').value;
-      if (!topicId || !score) { showToast('Please select a topic and enter a score'); return; }
-      try {
-        await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ topicId, score }) });
-        showToast(`Score logged for ${topicId}: ${score}%`);
-        document.getElementById('score-input').value = '';
-        loadRecentScores().then(() => { renderHomeRecentScores(); renderStudyData(); });
-      } catch (error) { showToast('Unable to log score'); }
+    function renderStudyData() {
+      const select = document.getElementById('topic-select'); select.innerHTML = '<option value="">Choose a topic...</option>';
+      topics.forEach(t => { const o = document.createElement('option'); o.value = t.id; o.textContent = `${t.id} - ${t.topic}`; select.appendChild(o); });
+      const total = topics.length; const covered = new Set(recentScores.map(s => s.topicId)).size; const pct = total > 0 ? Math.round((covered / total) * 100) : 0;
+      document.getElementById('coverage-bar').style.width = pct + '%'; document.getElementById('coverage-text').textContent = `${covered} of ${total} topics studied (${pct}%)`;
     }
 
-    // --- CALENDAR ---
-    async function loadCustomCalendar() {
-      try {
-        const response = await fetch(CALENDAR_API_URL);
-        const data = await response.json();
-        if (data.status !== 'success') { document.getElementById('custom-calendar').innerHTML = '<div class="card"><p class="empty">Unable to load calendar.</p></div>'; return; }
-        calendarEvents = data.events || [];
-        renderCalendar();
-      } catch (error) { document.getElementById('custom-calendar').innerHTML = '<div class="card"><p class="empty">Unable to load calendar.</p></div>'; }
-    }
-    function getEventColours(title) {
-      if (title.includes('🟡')) return { bg: 'rgba(108, 92, 231, 0.2)', text: '#A29BFE' };
-      if (title.includes('🔵')) return { bg: 'rgba(0, 210, 255, 0.15)', text: '#81ECEC' };
-      if (title.includes('🔴')) return { bg: 'rgba(255, 107, 107, 0.15)', text: '#FF8A8A' };
-      if (title.includes('🟣')) return { bg: 'rgba(162, 155, 254, 0.15)', text: '#C4B5FD' };
-      if (title.includes('🟢')) return { bg: 'rgba(0, 210, 255, 0.1)', text: '#00D2FF' };
-      return { bg: 'rgba(108, 92, 231, 0.15)', text: '#A29BFE' };
+    async function loadRecentScores() {
+      try { const res = await fetch(STUDYLOG_URL); const csv = await res.text(); const rows = csv.split('\n').slice(1); recentScores = [];
+        rows.forEach((row, index) => { const c = row.split(','); if (c.length >= 3 && c[0].trim() !== '') recentScores.push({ date: c[0].trim(), topicId: c[1].trim(), score: c[2].trim(), rowIndex: index }); });
+        renderRecentScores();
+      } catch (e) {}
     }
 
-    function renderCalendar() {
-      const container = document.getElementById('custom-calendar');
-      container.innerHTML = '';
-      const year = currentMonth.getFullYear();
-      const month = currentMonth.getMonth();
-      const header = document.createElement('div'); header.className = 'cal-month-header';
-      const prevBtn = document.createElement('button'); prevBtn.className = 'cal-nav-btn'; prevBtn.textContent = '‹'; prevBtn.onclick = () => { currentMonth.setMonth(currentMonth.getMonth() - 1); renderCalendar(); };
-      const nextBtn = document.createElement('button'); nextBtn.className = 'cal-nav-btn'; nextBtn.textContent = '›'; nextBtn.onclick = () => { currentMonth.setMonth(currentMonth.getMonth() + 1); renderCalendar(); };
-      const title = document.createElement('div'); title.className = 'cal-month-title'; title.textContent = currentMonth.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
-      header.appendChild(prevBtn); header.appendChild(title); header.appendChild(nextBtn); container.appendChild(header);
-
-      const weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-      const weekdayRow = document.createElement('div'); weekdayRow.className = 'cal-grid';
-      weekdays.forEach(day => { const label = document.createElement('div'); label.className = 'cal-weekday'; label.textContent = day; weekdayRow.appendChild(label); });
-      container.appendChild(weekdayRow);
-
-      const firstDay = new Date(year, month, 1); const lastDay = new Date(year, month + 1, 0);
-      const daysInMonth = lastDay.getDate(); const startWeekday = (firstDay.getDay() + 6) % 7;
-      const grid = document.createElement('div'); grid.className = 'cal-grid';
-
-      for (let i = 0; i < startWeekday; i++) { const empty = document.createElement('div'); empty.className = 'cal-day-cell'; empty.style.opacity = '0.3'; grid.appendChild(empty); }
-
-      for (let day = 1; day <= daysInMonth; day++) {
-        const cell = document.createElement('div'); cell.className = 'cal-day-cell';
-        const today = new Date();
-        if (day === today.getDate() && month === today.getMonth() && year === today.getFullYear()) cell.classList.add('today');
-        const dayNumber = document.createElement('div'); dayNumber.className = 'cal-day-number'; dayNumber.textContent = day; cell.appendChild(dayNumber);
-
-        const dayEvents = calendarEvents.filter(event => {
-          const eventDate = new Date(event.start);
-          return eventDate.getDate() === day && eventDate.getMonth() === month && eventDate.getFullYear() === year;
-        });
-
-        dayEvents.slice(0, 3).forEach(event => {
-          const chip = document.createElement('div'); chip.className = 'cal-day-event';
-          const colours = getEventColours(event.title); chip.style.background = colours.bg; chip.style.color = colours.text;
-          chip.textContent = event.title; cell.appendChild(chip);
-        });
-        if (dayEvents.length > 3) { const more = document.createElement('div'); more.style.cssText = 'font-size: 9px; color: var(--text-dim); margin-top: 2px;'; more.textContent = `+${dayEvents.length - 3} more`; cell.appendChild(more); }
-        cell.onclick = () => showDayDetails(day, month, year);
-        grid.appendChild(cell);
-      }
-      container.appendChild(grid);
+    function renderRecentScores() {
+      const list = document.getElementById('recent-scores'); list.innerHTML = '';
+      if (recentScores.length === 0) { list.innerHTML = '<p class="empty">No scores logged.</p>'; return; }
+      recentScores.slice(-10).reverse().forEach(item => { const row = document.createElement('div'); row.className = 'score-row'; row.innerHTML = `<span>${item.topicId} — ${item.score}%</span><button class="delete-btn" onclick="deleteScore(${item.rowIndex})">×</button>`; list.appendChild(row); });
     }
+    
+    async function logScore() { const topicId = document.getElementById('topic-select').value; const score = document.getElementById('score-input').value; if (!topicId || !score) return showToast('Select topic/score'); try { await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ topicId, score }) }); showToast('Score logged'); document.getElementById('score-input').value = ''; loadRecentScores().then(() => renderHomeRecentScores()); } catch (e) {} }
+    async function deleteScore(row) { try { await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ action: 'delete_score', row }) }); loadRecentScores(); } catch (e) {} }
+    
+    async function loadHomeTasks() { try { const res = await fetch(TASKS_URL); const csv = await res.text(); const rows = csv.split('\n').slice(1); const list = document.getElementById('home-tasks'); list.innerHTML = ''; const p = rows.map((r,i) => { const c = r.split(','); return { task: c[0]||'', due: c[1]||'', status: c[3]||'', i }; }).filter(x => x.status !== 'Done' && x.task); if (p.length === 0) { list.innerHTML = '<p class="empty">All clear!</p>'; return; } p.slice(0,5).forEach(x => { const d = document.createElement('div'); d.style.cssText = 'display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; background: rgba(255,255,255,0.03); border-radius: 10px; margin-bottom: 6px; font-size: 14px;'; d.innerHTML = `<span>${x.task}</span><button class="delete-btn" onclick="completeTask(${x.i})">✓</button>`; list.appendChild(d); }); } catch (e) {} }
+    async function completeTask(row) { try { await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ action: 'complete_task', row }) }); loadHomeTasks(); } catch (e) {} }
+    
+    async function loadReminders() { try { const res = await fetch(REMINDERS_URL); const csv = await res.text(); const rows = csv.split('\n').slice(1); const list = document.getElementById('home-reminders'); list.innerHTML = ''; const p = rows.map((r,i) => { const c = r.split(','); return { rem: c[0]||'', status: c[3]||'', i }; }).filter(x => x.status !== 'Done' && x.rem); if (p.length === 0) { list.innerHTML = '<p class="empty">No reminders.</p>'; return; } p.slice(0,5).forEach(x => { const d = document.createElement('div'); d.style.cssText = 'display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; background: rgba(0, 210, 255, 0.08); border-radius: 10px; margin-bottom: 6px; font-size: 14px;'; d.innerHTML = `<span>${x.rem}</span><button class="delete-btn" onclick="completeReminder(${x.i})">✓</button>`; list.appendChild(d); }); } catch (e) {} }
+    async function completeReminder(row) { try { await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ action: 'complete_reminder', row }) }); loadReminders(); } catch (e) {} }
+    
+    function renderHomeRecentScores() { const list = document.getElementById('home-recent-scores'); list.innerHTML = ''; if (recentScores.length === 0) { list.innerHTML = '<p class="empty">No scores yet.</p>'; return; } recentScores.slice(-3).reverse().forEach(i => { const d = document.createElement('div'); d.style.cssText = 'padding: 8px 12px; background: rgba(255,255,255,0.03); border-radius: 10px; font-size: 14px;'; d.textContent = `${i.topicId} — ${i.score}%`; list.appendChild(d); }); }
 
-    function showDayDetails(day, month, year) {
-      const existing = document.querySelector('.cal-selected-day'); if (existing) existing.remove();
-      const container = document.getElementById('custom-calendar');
-      const detailDiv = document.createElement('div'); detailDiv.className = 'cal-selected-day';
-      const title = document.createElement('div'); title.className = 'cal-selected-title';
-      const date = new Date(year, month, day);
-      title.textContent = date.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' });
-      detailDiv.appendChild(title);
+    async function loadCalendar() {
+      try { const res = await fetch(CALENDAR_API_URL); const data = await res.json(); if (data.status !== 'success') { document.getElementById('custom-calendar').innerHTML = '<div class="card"><p class="empty">Unable to load.</p></div>'; return; } calendarEvents = data.events || []; renderCalendar(); } catch (e) {}
+    }
+    function getEventColours(title) { if (title.includes('🟡')) return { bg: 'rgba(108, 92, 231, 0.2)', text: '#A29BFE' }; if (title.includes('🔵')) return { bg: 'rgba(0, 210, 255, 0.15)', text: '#81ECEC' }; if (title.includes('🔴')) return { bg: 'rgba(255, 107, 107, 0.15)', text: '#FF8A8A' }; if (title.includes('🟣')) return { bg: 'rgba(162, 155, 254, 0.15)', text: '#C4B5FD' }; if (title.includes('🟢')) return { bg: 'rgba(0, 210, 255, 0.1)', text: '#00D2FF' }; return { bg: 'rgba(108, 92, 231, 0.15)', text: '#A29BFE' }; }
+    function renderCalendar() { const container = document.getElementById('custom-calendar'); container.innerHTML = ''; const year = currentMonth.getFullYear(); const month = currentMonth.getMonth(); const header = document.createElement('div'); header.className = 'cal-month-header'; const prev = document.createElement('button'); prev.className = 'cal-nav-btn'; prev.textContent = '‹'; prev.onclick = () => { currentMonth.setMonth(currentMonth.getMonth() - 1); renderCalendar(); }; const next = document.createElement('button'); next.className = 'cal-nav-btn'; next.textContent = '›'; next.onclick = () => { currentMonth.setMonth(currentMonth.getMonth() + 1); renderCalendar(); }; const title = document.createElement('div'); title.className = 'cal-month-title'; title.textContent = currentMonth.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' }); header.appendChild(prev); header.appendChild(title); header.appendChild(next); container.appendChild(header); const weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']; const weekdayRow = document.createElement('div'); weekdayRow.className = 'cal-grid'; weekdays.forEach(day => { const label = document.createElement('div'); label.className = 'cal-weekday'; label.textContent = day; weekdayRow.appendChild(label); }); container.appendChild(weekdayRow); const firstDay = new Date(year, month, 1); const lastDay = new Date(year, month + 1, 0); const daysInMonth = lastDay.getDate(); const startWeekday = (firstDay.getDay() + 6) % 7; const grid = document.createElement('div'); grid.className = 'cal-grid'; for (let i = 0; i < startWeekday; i++) { const empty = document.createElement('div'); empty.className = 'cal-day-cell'; empty.style.opacity = '0.3'; grid.appendChild(empty); } for (let day = 1; day <= daysInMonth; day++) { const cell = document.createElement('div'); cell.className = 'cal-day-cell'; const today = new Date(); if (day === today.getDate() && month === today.getMonth() && year === today.getFullYear()) cell.classList.add('today'); const dayNumber = document.createElement('div'); dayNumber.className = 'cal-day-number'; dayNumber.textContent = day; cell.appendChild(dayNumber); const dayEvents = calendarEvents.filter(event => { const d = new Date(event.start); return d.getDate() === day && d.getMonth() === month && d.getFullYear() === year; }); dayEvents.slice(0, 3).forEach(event => { const chip = document.createElement('div'); chip.className = 'cal-day-event'; const colours = getEventColours(event.title); chip.style.background = colours.bg; chip.style.color = colours.text; chip.textContent = event.title; cell.appendChild(chip); }); if (dayEvents.length > 3) { const more = document.createElement('div'); more.style.cssText = 'font-size: 9px; color: var(--text-dim); margin-top: 2px;'; more.textContent = `+${dayEvents.length - 3} more`; cell.appendChild(more); } cell.onclick = () => showDayDetails(day, month, year); grid.appendChild(cell); } container.appendChild(grid); }
+    function showDayDetails(day, month, year) { const existing = document.querySelector('.cal-selected-day'); if (existing) existing.remove(); const container = document.getElementById('custom-calendar'); const detailDiv = document.createElement('div'); detailDiv.className = 'cal-selected-day'; const title = document.createElement('div'); title.className = 'cal-selected-title'; const date = new Date(year, month, day); title.textContent = date.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' }); detailDiv.appendChild(title); const dayEvents = calendarEvents.filter(event => { const d = new Date(event.start); return d.getDate() === day && d.getMonth() === month && d.getFullYear() === year; }); if (dayEvents.length === 0) { const empty = document.createElement('p'); empty.className = 'empty'; empty.textContent = 'No events for this day.'; detailDiv.appendChild(empty); } else { dayEvents.forEach(event => { const eventDiv = document.createElement('div'); eventDiv.style.cssText = 'padding: 8px 12px; border-radius: 10px; margin-bottom: 6px; font-size: 13px; display: flex; justify-content: space-between; align-items: center; gap: 8px;'; const colours = getEventColours(event.title); eventDiv.style.background = colours.bg; eventDiv.style.color = colours.text; const titleSpan = document.createElement('span'); titleSpan.textContent = event.title; const timeSpan = document.createElement('span'); timeSpan.style.cssText = 'font-size: 11px; color: var(--text-dim); white-space: nowrap;'; const startTime = new Date(event.start); timeSpan.textContent = startTime.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }); const deleteBtn = document.createElement('button'); deleteBtn.textContent = '×'; deleteBtn.style.cssText = 'background: none; border: none; color: var(--coral); font-size: 18px; cursor: pointer; padding: 0 4px;'; deleteBtn.onclick = (e) => { e.stopPropagation(); if (confirm('Delete this event?')) deleteCalendarEvent(event.title, event.start); }; eventDiv.appendChild(titleSpan); eventDiv.appendChild(timeSpan); eventDiv.appendChild(deleteBtn); detailDiv.appendChild(eventDiv); }); } container.appendChild(detailDiv); }
+    async function deleteCalendarEvent(title, date) { try { await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ action: 'delete_calendar_event', title, date }) }); loadCalendar(); } catch (e) {} }
 
-      const dayEvents = calendarEvents.filter(event => {
-        const eventDate = new Date(event.start);
-        return eventDate.getDate() === day && eventDate.getMonth() === month && eventDate.getFullYear() === year;
-      });
-
-      if (dayEvents.length === 0) { const empty = document.createElement('p'); empty.className = 'empty'; empty.textContent = 'No events for this day.'; detailDiv.appendChild(empty); } else {
-        dayEvents.forEach(event => {
-          const eventDiv = document.createElement('div');
-          eventDiv.style.cssText = 'padding: 8px 12px; border-radius: 10px; margin-bottom: 6px; font-size: 13px; display: flex; justify-content: space-between; align-items: center; gap: 8px;';
-          const colours = getEventColours(event.title); eventDiv.style.background = colours.bg; eventDiv.style.color = colours.text;
-          const titleSpan = document.createElement('span'); titleSpan.textContent = event.title;
-          const timeSpan = document.createElement('span'); timeSpan.style.cssText = 'font-size: 11px; color: var(--text-dim); white-space: nowrap;';
-          const startTime = new Date(event.start); timeSpan.textContent = startTime.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
-          const deleteBtn = document.createElement('button'); deleteBtn.textContent = '×'; deleteBtn.style.cssText = 'background: none; border: none; color: var(--coral); font-size: 18px; cursor: pointer; padding: 0 4px;';
-          deleteBtn.onclick = (e) => { e.stopPropagation(); if (confirm('Delete this event?')) deleteCalendarEvent(event.title, event.start); };
-          eventDiv.appendChild(titleSpan); eventDiv.appendChild(timeSpan); eventDiv.appendChild(deleteBtn); detailDiv.appendChild(eventDiv);
-        });
-      }
-      container.appendChild(detailDiv);
-    }
-
-    async function deleteCalendarEvent(title, date) {
-      try {
-        await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ action: 'delete_calendar_event', title: title, date: date }) });
-        showToast('Event deleted'); loadCustomCalendar();
-      } catch (error) { showToast('Unable to delete event'); }
-    }
-
-    function setGreeting() {
-      const hour = new Date().getHours(); const greetingEl = document.getElementById('time-greeting');
-      if (hour < 12) greetingEl.textContent = 'Good Morning'; else if (hour < 18) greetingEl.textContent = 'Good Afternoon'; else greetingEl.textContent = 'Good Evening';
-    }
-    function setTodayDate() {
-      const today = new Date(); const options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
-      document.getElementById('today-date').textContent = today.toLocaleDateString('en-GB', options);
-    }
-    function renderHomeRecentScores() {
-      const list = document.getElementById('home-recent-scores'); list.innerHTML = '';
-      if (recentScores.length === 0) { list.innerHTML = '<p class="empty">No scores logged yet. Go to Study to add your first score.</p>'; return; }
-      const reversed = recentScores.slice(-3).reverse();
-      reversed.forEach(item => { const div = document.createElement('div'); div.style.cssText = 'padding: 8px 12px; background: rgba(255,255,255,0.03); border-radius: 10px; font-size: 14px;'; div.textContent = `${item.topicId} — ${item.score}%`; list.appendChild(div); });
-    }
+    function setGreeting() { const h = new Date().getHours(); const el = document.getElementById('time-greeting'); if (h < 12) el.textContent = 'Good Morning'; else if (h < 18) el.textContent = 'Good Afternoon'; else el.textContent = 'Good Evening'; }
+    function setTodayDate() { const t = new Date(); document.getElementById('today-date').textContent = t.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }); }
 
     setGreeting(); setTodayDate(); setTimeout(() => { document.getElementById('splash').classList.add('hide'); }, 2000);
-    loadStudyData(); loadRecentScores().then(() => { renderStudyData(); renderHomeRecentScores(); });
-    loadHomeTasks(); loadReminders(); loadReflections(); loadEvidenceData(); loadCustomCalendar();
+    loadHome(); loadStudy(); loadCalendar();
     if ('Notification' in window) { Notification.requestPermission(); }
   </script>
 </body>
