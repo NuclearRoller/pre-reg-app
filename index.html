@@ -165,7 +165,7 @@
     <button class="tab-btn" onclick="switchTab('study')"><span class="tab-icon">◈</span>Study</button>
   </div>
 
-  <script>
+<script>
     const gphcFramework = {
       "Group B: Supplying Medicines": ["Technical and Legal Prescription Issues", "Preparing Medicinal Product"],
       "Group C: Education and Research": ["Teaching and Mentoring", "Research, Audit and Quality Improvement"],
@@ -196,8 +196,8 @@
     const TASKS_URL = 'https://docs.google.com/spreadsheets/d/1ElgT3pbdTA8Bd2r9r9nQI1wCayMoH2po8jcVZuoSeSw/export?format=csv&gid=331487663';
     const REMINDERS_URL = 'https://docs.google.com/spreadsheets/d/1ElgT3pbdTA8Bd2r9r9nQI1wCayMoH2po8jcVZuoSeSw/export?format=csv&gid=1548981654';
     const EVIDENCE_URL = 'https://docs.google.com/spreadsheets/d/1ElgT3pbdTA8Bd2r9r9nQI1wCayMoH2po8jcVZuoSeSw/export?format=csv&gid=2128123491'; 
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby4YrVXUR1-sbvRMyDpbmfmhYzFCAi14cgAIxNM0qMYK9C1YBFx6ZSN8fzYgi-ssee-vw/exec';
-    const CALENDAR_API_URL = 'https://script.google.com/macros/s/AKfycby4YrVXUR1-sbvRMyDpbmfmhYzFCAi14cgAIxNM0qMYK9C1YBFx6ZSN8fzYgi-ssee-vw/exec?action=get_calendar';
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzm6esuJhpo-UDfEBI7jvuq0oeMXuj9TXMeaISJPmzB7DwDAcpXAFrZaUYJNoD0WYAV/exec';
+    const CALENDAR_API_URL = 'https://script.google.com/macros/s/AKfycbzm6esuJhpo-UDfEBI7jvuq0oeMXuj9TXMeaISJPmzB7DwDAcpXAFrZaUYJNoD0WYAV/exec?action=get_calendar';
     const REFLECTIONS_URL = 'https://docs.google.com/spreadsheets/d/1ElgT3pbdTA8Bd2r9r9nQI1wCayMoH2po8jcVZuoSeSw/export?format=csv&gid=1128922294';
     const CHAT_URL = 'https://familysalesbot.camdvr.org/webhook/f5621c67-f92f-4be2-91ed-5b475df9e6d1/chat';
 
@@ -328,34 +328,39 @@
         const parseCSV = (text) => { const rows=[]; let row=[],cell='',inQ=false; for(let i=0;i<text.length;i++){const c=text[i]; if(inQ){ if(c==='"'){ if(i+1<text.length&&text[i+1]==='"'){cell+='"';i++;}else{inQ=false;} }else{cell+=c;} }else{ if(c==='"'){inQ=true;} else if(c===','){row.push(cell.trim());cell='';} else if(c==='\n'||c==='\r'){ if(cell.trim()!==''||row.length>0){row.push(cell.trim());rows.push(row);row=[];cell='';} if(c==='\r'&&i+1<text.length&&text[i+1]==='\n'){i++;} }else{cell+=c;} } } if(cell.trim()!==''||row.length>0){row.push(cell.trim());rows.push(row);} return rows; };
         const rows = parseCSV(csv); if (rows.length > 0) rows.shift();
         
-        evidenceData = rows.map((row, index) => ({
-          date: row[0] || '', type: row[1] || '', activities: row[2] || '', setting: row[3] || '', patientType: row[4] || '', focus: row[5] || '', newOrFollowUp: row[6] || '', complexity: row[7] || '', whatWentWell: row[8] || '', suggestions: row[9] || '', agreedAction: row[10] || '', reflection: row[11] || '', mappedLOs: row[12] || '', rating: row[13] || '', rowIndex: index
-        })).filter(i => i.reflection !== '');
+        evidenceData = rows.map((row, index) => {
+          // Since we are now saving the whole thing as a JSON string in Column A:
+          try {
+            const obj = JSON.parse(row[0]);
+            return { ...obj, rowIndex: index };
+          } catch(e) {
+             // Fallback for old data
+             return { date: row[0] || '', type: row[1] || '', activities: row[2] || '', reflection: row[11] || '', whatWentWell: row[8] || '', suggestions: row[9] || '', agreedAction: row[10] || '', mappedLOs: row[12] || '', rating: row[13] || '', rowIndex: index };
+          }
+        }).filter(i => i.reflection);
 
         if (evidenceData.length === 0) { list.innerHTML = '<p class="empty">No evidence yet.</p>'; return; }
 
         evidenceData.slice(-5).reverse().forEach(item => {
           const card = document.createElement('div'); card.className = 'reflection-card'; card.style.cursor = 'pointer';
           
-          // Title now shows activities
           card.innerHTML = `
             <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 6px;">
-              <span style="font-size: 10px; background: rgba(108,92,231,0.2); color: #A29BFE; padding: 2px 6px; border-radius: 4px; font-weight: bold;">${item.type}</span>
-              <span class="reflection-date">${item.date}</span>
+              <span style="font-size: 10px; background: rgba(108,92,231,0.2); color: #A29BFE; padding: 2px 6px; border-radius: 4px; font-weight: bold;">${item.type || 'Evidence'}</span>
             </div>
             <p style="font-size: 13px; font-weight: 700; color: #00D2FF; margin-bottom: 8px;">${item.activities || 'No activities assigned'}</p>
-            <p class="reflection-text">${item.reflection.length > 80 ? item.reflection.slice(0, 80) + '…' : item.reflection}</p>
+            <p class="reflection-text">${item.reflection ? (item.reflection.length > 80 ? item.reflection.slice(0, 80) + '…' : item.reflection) : 'No reflection'}</p>
           `;
           
           const exp = document.createElement('div'); exp.style.cssText = 'display: none; margin-top: 10px; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 10px; font-size: 13px; line-height: 1.6;';
           
           exp.innerHTML = `
-            <p><strong style="color:var(--accent-soft)">Original Situation:</strong> ${item.reflection}</p>
-            <p style="margin-top: 6px;"><strong style="color:#86EFAC">What went well:</strong> ${item.whatWentWell}</p>
-            <p style="margin-top: 6px;"><strong style="color:#FCD34D">Suggestions:</strong> ${item.suggestions}</p>
-            <p style="margin-top: 6px;"><strong style="color:#FF8A8A">Action:</strong> ${item.agreedAction}</p>
-            <div style="margin-top: 8px; display: flex; flex-wrap: wrap; gap: 4px;">${item.mappedLOs.split(',').map(lo => `<span class="lo-chip lo-1">${lo.trim()}</span>`).join('')}</div>
-            <p style="margin-top: 8px; font-size: 12px; color: #FF6B6B; font-weight: 600;">Rating: ${item.rating}/10</p>
+            <p><strong style="color:var(--accent-soft)">Original Situation:</strong> ${item.reflection || ''}</p>
+            <p style="margin-top: 6px;"><strong style="color:#86EFAC">What went well:</strong> ${item.whatWentWell || ''}</p>
+            <p style="margin-top: 6px;"><strong style="color:#FCD34D">Suggestions:</strong> ${item.suggestions || ''}</p>
+            <p style="margin-top: 6px;"><strong style="color:#FF8A8A">Action:</strong> ${item.agreedAction || ''}</p>
+            <div style="margin-top: 8px; display: flex; flex-wrap: wrap; gap: 4px;">${(item.mappedLOs || '').split(',').map(lo => `<span class="lo-chip lo-1">${lo.trim()}</span>`).join('')}</div>
+            <p style="margin-top: 8px; font-size: 12px; color: #FF6B6B; font-weight: 600;">Rating: ${item.rating || 'N/A'}/10</p>
           `;
           const btnRow = document.createElement('div'); btnRow.style.cssText = 'display: flex; gap: 8px; margin-top: 10px;';
           const editBtn = document.createElement('button'); editBtn.textContent = 'Edit Activities'; editBtn.style.cssText = 'padding: 8px 12px; background: rgba(0, 210, 255, 0.1); border: 1px solid rgba(0, 210, 255, 0.3); color: #00D2FF; border-radius: 8px; font-size: 12px; cursor: pointer;';
@@ -481,5 +486,7 @@
     loadHome(); loadStudy(); loadCalendar();
     if ('Notification' in window) { Notification.requestPermission(); }
   </script>
+</body>
+</html>
 </body>
 </html>
