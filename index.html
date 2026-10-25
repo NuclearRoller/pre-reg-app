@@ -107,7 +107,7 @@
       <div class="card">
         <h3>E-Portfolio Evidence</h3>
         <button onclick="openEvidenceBuilder()" style="width: 100%; padding: 14px; border-radius: 12px; border: none; background: linear-gradient(135deg, #6C5CE7, #00D2FF); color: white; font-size: 15px; font-weight: 600; cursor: pointer; margin-bottom: 12px;">+ New Evidence Entry</button>
-                <button onclick="openManualEvidence()" style="width: 100%; padding: 12px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); background: transparent; color: var(--text); font-size: 13px; font-weight: 600; cursor: pointer; margin-bottom: 12px;">+ Add Old Portfolio Evidence</button>
+        <button onclick="openManualEvidence()" style="width: 100%; padding: 12px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); background: transparent; color: var(--text); font-size: 13px; font-weight: 600; cursor: pointer; margin-bottom: 12px;">+ Add Old Portfolio Evidence</button>
         <h3 style="margin-top: 20px; font-size: 11px; color: var(--text-dim);">Saved Evidence Entries</h3>
         <div id="evidence-entries-list" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px;"><p class="empty">Loading evidence...</p></div>
         <h3 style="margin-top: 20px; font-size: 11px; color: var(--text-dim);">Raw Reflections</h3>
@@ -329,7 +329,6 @@
       document.getElementById('evidence-title').textContent = 'Add Old Evidence';
       window.currentEvidenceType = 'Manual Entry';
       
-      // Override the submit button to save a dummy entry
       document.getElementById('evidence-submit').onclick = async () => {
         const act = prompt("Enter the exact activity (e.g. Group E: Patient Consultation):");
         if (!act) return;
@@ -414,12 +413,32 @@
     }
 
     function renderTracker() {
-      const container = document.getElementById('gap-analysis-content'); container.innerHTML = '';
-      let counts = {};
+      const container = document.getElementById('gap-analysis-content'); 
+      // SKELETON LOADER: Draw immediately with 0s
+      container.innerHTML = '';
+      let totalReq = 0;
       
+      Object.keys(gphcFramework).forEach(group => {
+        const gDiv = document.createElement('div'); gDiv.style.marginBottom = '12px';
+        gDiv.innerHTML = `<p style="font-size: 11px; font-weight: 700; color: var(--accent-soft); text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.5px;">${group}</p>`;
+        gphcFramework[group].forEach(act => {
+          const req = reqCounts[act] || 0; if (req === 0) return;
+          totalReq += req;
+          const row = document.createElement('div'); row.id = `tracker-${act.replace(/\s/g, '')}`; row.style.cssText = 'display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px; color: var(--text-dim);';
+          row.innerHTML = `<span>${act}</span><span style="color: #FF8A8A; font-weight: 600;">0/${req}</span>`;
+          gDiv.appendChild(row);
+        });
+        container.appendChild(gDiv);
+      });
+      
+      const sum = document.createElement('div'); sum.id = 'tracker-total'; sum.style.cssText = 'margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.1); font-size: 14px; font-weight: 700; text-align: center;';
+      sum.innerHTML = `Total: <span style="color: #FF8A8A">0/${totalReq} (0%)</span>`;
+      container.appendChild(sum);
+
+      // Now calculate actuals and update the UI
+      let counts = {};
       evidenceData.forEach(e => {
         if (e.activities) {
-          // Fix: Normalize the pipe separator to ensure counting works
           e.activities.split('|').forEach(a => { 
             const name = a.trim(); 
             if (name) counts[name] = (counts[name] || 0) + 1; 
@@ -427,27 +446,25 @@
         }
       });
 
-      let totalReq = 0, totalDone = 0;
+      let totalDone = 0;
       Object.keys(gphcFramework).forEach(group => {
-        const gDiv = document.createElement('div'); gDiv.style.marginBottom = '12px';
-        gDiv.innerHTML = `<p style="font-size: 11px; font-weight: 700; color: var(--accent-soft); text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.5px;">${group}</p>`;
         gphcFramework[group].forEach(act => {
           const req = reqCounts[act] || 0; if (req === 0) return;
-          
           const done = (counts[`${group}: ${act}`] || 0) + (counts[act] || 0);
-          
-          totalReq += req; totalDone += Math.min(done, req);
+          totalDone += Math.min(done, req);
           const color = done >= req ? '#86EFAC' : (done > 0 ? '#FCD34D' : '#FF8A8A');
-          const row = document.createElement('div'); row.style.cssText = 'display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px; color: var(--text-dim);';
-          row.innerHTML = `<span>${act}</span><span style="color: ${color}; font-weight: 600;">${done}/${req}</span>`;
-          gDiv.appendChild(row);
+          const row = document.getElementById(`tracker-${act.replace(/\s/g, '')}`);
+          if (row) {
+            row.innerHTML = `<span>${act}</span><span style="color: ${color}; font-weight: 600;">${done}/${req}</span>`;
+          }
         });
-        container.appendChild(gDiv);
       });
+      
       const pct = totalReq > 0 ? Math.round((totalDone / totalReq) * 100) : 0;
-      const sum = document.createElement('div'); sum.style.cssText = 'margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.1); font-size: 14px; font-weight: 700; text-align: center;';
-      sum.innerHTML = `Total: <span style="color: ${pct >= 100 ? '#86EFAC' : '#FCD34D'}">${totalDone}/${totalReq} (${pct}%)</span>`;
-      container.appendChild(sum);
+      const sumEl = document.getElementById('tracker-total');
+      if (sumEl) {
+        sumEl.innerHTML = `Total: <span style="color: ${pct >= 100 ? '#86EFAC' : '#FCD34D'}">${totalDone}/${totalReq} (${pct}%)</span>`;
+      }
     }
 
     async function loadReflections() {
@@ -489,7 +506,7 @@
     }
 
     async function loadHome() { loadHomeTasks(); loadReminders(); loadRecentScores().then(() => renderHomeRecentScores()); }
-    async function loadStudy() { loadStudyData(); loadRecentScores(); loadEvidence(); loadReflections(); }
+    async function loadStudy() { renderTracker(); loadStudyData(); loadRecentScores(); loadEvidence(); loadReflections(); }
     
     async function loadStudyData() { try { const res = await fetch(SHEET_URL); const csv = await res.text(); const parseCSV = (text) => { const rows=[]; let row=[],cell='',inQ=false; for(let i=0;i<text.length;i++){const c=text[i]; if(inQ){ if(c==='"'){ if(i+1<text.length&&text[i+1]==='"'){cell+='"';i++;}else{inQ=false;} }else{cell+=c;} }else{ if(c==='"'){inQ=true;} else if(c===','){row.push(cell.trim());cell='';} else if(c==='\n'||c==='\r'){ if(cell.trim()!==''||row.length>0){row.push(cell.trim());rows.push(row);row=[];cell='';} if(c==='\r'&&i+1<text.length&&text[i+1]==='\n'){i++;} }else{cell+=c;} } } if(cell.trim()!==''||row.length>0){row.push(cell.trim());rows.push(row);} return rows; }; const rows = parseCSV(csv); if (rows.length > 0) rows.shift(); topics = []; rows.forEach(row => { if (row.length >= 5 && row[0].trim() !== '') topics.push({ id: row[0].trim(), subject: row[1].trim(), topic: row[2].trim(), highYield: row[3].trim(), priority: row[4].trim() }); }); renderStudyData(); } catch (e) {} }
 
@@ -523,7 +540,5 @@
     loadHome(); loadStudy(); loadCalendar();
     if ('Notification' in window) { Notification.requestPermission(); }
   </script>
-</body>
-</html>
 </body>
 </html>
