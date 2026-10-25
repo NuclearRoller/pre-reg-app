@@ -107,6 +107,7 @@
       <div class="card">
         <h3>E-Portfolio Evidence</h3>
         <button onclick="openEvidenceBuilder()" style="width: 100%; padding: 14px; border-radius: 12px; border: none; background: linear-gradient(135deg, #6C5CE7, #00D2FF); color: white; font-size: 15px; font-weight: 600; cursor: pointer; margin-bottom: 12px;">+ New Evidence Entry</button>
+                <button onclick="openManualEvidence()" style="width: 100%; padding: 12px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); background: transparent; color: var(--text); font-size: 13px; font-weight: 600; cursor: pointer; margin-bottom: 12px;">+ Add Old Portfolio Evidence</button>
         <h3 style="margin-top: 20px; font-size: 11px; color: var(--text-dim);">Saved Evidence Entries</h3>
         <div id="evidence-entries-list" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px;"><p class="empty">Loading evidence...</p></div>
         <h3 style="margin-top: 20px; font-size: 11px; color: var(--text-dim);">Raw Reflections</h3>
@@ -195,9 +196,9 @@
     const STUDYLOG_URL = 'https://docs.google.com/spreadsheets/d/1ElgT3pbdTA8Bd2r9r9nQI1wCayMoH2po8jcVZuoSeSw/export?format=csv&gid=688195198';
     const TASKS_URL = 'https://docs.google.com/spreadsheets/d/1ElgT3pbdTA8Bd2r9r9nQI1wCayMoH2po8jcVZuoSeSw/export?format=csv&gid=331487663';
     const REMINDERS_URL = 'https://docs.google.com/spreadsheets/d/1ElgT3pbdTA8Bd2r9r9nQI1wCayMoH2po8jcVZuoSeSw/export?format=csv&gid=1548981654';
-    const EVIDENCE_URL = 'https://docs.google.com/spreadsheets/d/1ElgT3pbdTA8Bd2r9r9nQI1wCayMoH2po8jcVZuoSeSw/export?format=csv&gid=513545959'; 
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz-UcAkAwWjfOMT3xF6lslMHYFTpdxq53Giy1uSXYQFTYXMrVbJdpeDkQBGMRLGCOCQ3Q/exec';
-    const CALENDAR_API_URL = 'https://script.google.com/macros/s/AKfycbz-UcAkAwWjfOMT3xF6lslMHYFTpdxq53Giy1uSXYQFTYXMrVbJdpeDkQBGMRLGCOCQ3Q/exec?action=get_calendar';
+    const EVIDENCE_URL = 'https://docs.google.com/spreadsheets/d/1ElgT3pbdTA8Bd2r9r9nQI1wCayMoH2po8jcVZuoSeSw/export?format=csv&gid=YOUR_EVIDENCE_GID'; 
+    const SCRIPT_URL = 'YOUR_NEW_EXEC_URL';
+    const CALENDAR_API_URL = 'YOUR_NEW_EXEC_URL?action=get_calendar';
     const REFLECTIONS_URL = 'https://docs.google.com/spreadsheets/d/1ElgT3pbdTA8Bd2r9r9nQI1wCayMoH2po8jcVZuoSeSw/export?format=csv&gid=1128922294';
     const CHAT_URL = 'https://familysalesbot.camdvr.org/webhook/f5621c67-f92f-4be2-91ed-5b475df9e6d1/chat';
 
@@ -319,6 +320,45 @@
       finally { btn.textContent = 'Submit to Arlo'; btn.disabled = false; }
     }
 
+    // --- MANUAL PORTFOLIO ADDER ---
+    function openManualEvidence() {
+      document.getElementById('evidence-modal').classList.add('active');
+      document.getElementById('builder-situation').style.display = 'block';
+      document.getElementById('builder-edit-checkboxes').style.display = 'none';
+      document.getElementById('evidence-situation').value = "Manual entry for old portfolio";
+      document.getElementById('evidence-title').textContent = 'Add Old Evidence';
+      window.currentEvidenceType = 'Manual Entry';
+      
+      // Override the submit button to save a dummy entry
+      document.getElementById('evidence-submit').onclick = async () => {
+        const act = prompt("Enter the exact activity (e.g. Group E: Patient Consultation):");
+        if (!act) return;
+        
+        const payload = {
+          type: 'Manual',
+          activities: act,
+          setting: 'Old Portfolio',
+          patientType: 'N/A',
+          focus: 'N/A',
+          newOrFollowUp: 'N/A',
+          complexity: 'N/A',
+          whatWentWell: 'N/A',
+          suggestions: 'N/A',
+          agreedAction: 'N/A',
+          reflection: 'Added manually to track progress.',
+          mappedLOs: '',
+          rating: ''
+        };
+        
+        try {
+          await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ action: 'add_evidence_entry', payload: JSON.stringify(payload) }) });
+          showToast('Old evidence added');
+          closeEvidenceBuilder();
+          loadEvidence();
+        } catch (e) { showToast('Error'); }
+      };
+    }
+
     // --- LOADERS ---
     async function loadEvidence() {
       try {
@@ -343,7 +383,6 @@
               <span class="reflection-date">${item.date}</span>
             </div>
             <p style="font-size: 13px; font-weight: 700; color: #00D2FF; margin-bottom: 8px;">${item.activities || 'No activities assigned'}</p>
-            <p class="reflection-text">${item.reflection.length > 80 ? item.reflection.slice(0, 80) + '…' : item.reflection}</p>
           `;
           
           const exp = document.createElement('div'); exp.style.cssText = 'display: none; margin-top: 10px; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 10px; font-size: 13px; line-height: 1.6;';
@@ -380,7 +419,11 @@
       
       evidenceData.forEach(e => {
         if (e.activities) {
-          e.activities.split('|').forEach(a => { const name = a.trim(); if (name) counts[name] = (counts[name] || 0) + 1; });
+          // Fix: Normalize the pipe separator to ensure counting works
+          e.activities.split('|').forEach(a => { 
+            const name = a.trim(); 
+            if (name) counts[name] = (counts[name] || 0) + 1; 
+          });
         }
       });
 
