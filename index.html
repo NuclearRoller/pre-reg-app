@@ -194,7 +194,6 @@
     let calendarEvents = [];
     let currentMonth = new Date();
     let evidenceData = []; 
-    let reflectionData = [];
 
     function createParticles() { const container = document.getElementById('particles'); for (let i = 0; i < 25; i++) { const p = document.createElement('div'); p.className = 'particle'; p.style.left = Math.random() * 100 + '%'; p.style.width = (Math.random() * 4 + 2) + 'px'; p.style.height = p.style.width; p.style.animationDuration = (Math.random() * 15 + 10) + 's'; p.style.animationDelay = (Math.random() * 10) + 's'; if (Math.random() > 0.5) p.style.background = 'rgba(0, 210, 255, 0.15)'; container.appendChild(p); } }
     createParticles();
@@ -204,10 +203,21 @@
     const TASKS_URL = 'https://docs.google.com/spreadsheets/d/1ElgT3pbdTA8Bd2r9r9nQI1wCayMoH2po8jcVZuoSeSw/export?format=csv&gid=331487663';
     const REMINDERS_URL = 'https://docs.google.com/spreadsheets/d/1ElgT3pbdTA8Bd2r9r9nQI1wCayMoH2po8jcVZuoSeSw/export?format=csv&gid=1548981654';
     const EVIDENCE_URL = 'https://docs.google.com/spreadsheets/d/1ElgT3pbdTA8Bd2r9r9nQI1wCayMoH2po8jcVZuoSeSw/export?format=csv&gid=2128123491'; 
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby4YrVXUR1-sbvRMyDpbmfmhYzFCAi14cgAIxNM0qMYK9C1YBFx6ZSN8fzYgi-ssee-vw/exec';
-    const CALENDAR_API_URL = 'https://script.google.com/macros/s/AKfycby4YrVXUR1-sbvRMyDpbmfmhYzFCAi14cgAIxNM0qMYK9C1YBFx6ZSN8fzYgi-ssee-vw/exec?action=get_calendar';
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzdljuN67vIwVHVAIyTXL4408cCHod1z3FmxO0g3PLTAog94uvOb66XqeDt4ZInfcFk0g/exec';
+    const CALENDAR_API_URL = 'https://script.google.com/macros/s/AKfycbzdljuN67vIwVHVAIyTXL4408cCHod1z3FmxO0g3PLTAog94uvOb66XqeDt4ZInfcFk0g/exec?action=get_calendar';
     const REFLECTIONS_URL = 'https://docs.google.com/spreadsheets/d/1ElgT3pbdTA8Bd2r9r9nQI1wCayMoH2po8jcVZuoSeSw/export?format=csv&gid=1128922294';
     const CHAT_URL = 'https://familysalesbot.camdvr.org/webhook/f5621c67-f92f-4be2-91ed-5b475df9e6d1/chat';
+
+    // Helper to safely decode Base64 strings
+    function decodeBase64(str) {
+      try {
+        // If it doesn't look like base64, just return it
+        if (!str || str.length < 4 || str.includes(' ')) return str;
+        return decodeURIComponent(escape(atob(str)));
+      } catch (e) {
+        return str; // Return original if it fails (e.g. it wasn't base64)
+      }
+    }
 
     function showToast(m) { const t = document.getElementById('toast'); t.textContent = m; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 2500); }
     function toggleChat() { const m = document.getElementById('chat-modal'); m.classList.toggle('active'); if (m.classList.contains('active')) document.getElementById('chat-text-input').focus(); }
@@ -255,7 +265,6 @@
     function openEvidenceBuilder(type, text) {
       document.getElementById('evidence-modal').classList.add('active');
       document.getElementById('builder-situation').style.display = text ? 'none' : 'block';
-      document.getElementById('builder-edit').style.display = 'none';
       document.getElementById('builder-edit-checkboxes').style.display = 'none';
       
       document.getElementById('evidence-situation').value = text || '';
@@ -269,12 +278,10 @@
     function openEditEvidence(rowIndex, currentActivities) {
       document.getElementById('evidence-modal').classList.add('active');
       document.getElementById('builder-situation').style.display = 'none';
-      document.getElementById('builder-edit').style.display = 'none';
       document.getElementById('builder-edit-checkboxes').style.display = 'block';
       document.getElementById('evidence-title').textContent = 'Edit Activities';
       window.currentEditRow = rowIndex;
 
-      // Build Checkboxes
       const container = document.getElementById('edit-checkbox-container');
       container.innerHTML = '';
       const activeActs = currentActivities ? currentActivities.split('|').map(s => s.trim()) : [];
@@ -339,9 +346,25 @@
         const parseCSV = (text) => { const rows=[]; let row=[],cell='',inQ=false; for(let i=0;i<text.length;i++){const c=text[i]; if(inQ){ if(c==='"'){ if(i+1<text.length&&text[i+1]==='"'){cell+='"';i++;}else{inQ=false;} }else{cell+=c;} }else{ if(c==='"'){inQ=true;} else if(c===','){row.push(cell.trim());cell='';} else if(c==='\n'||c==='\r'){ if(cell.trim()!==''||row.length>0){row.push(cell.trim());rows.push(row);row=[];cell='';} if(c==='\r'&&i+1<text.length&&text[i+1]==='\n'){i++;} }else{cell+=c;} } } if(cell.trim()!==''||row.length>0){row.push(cell.trim());rows.push(row);} return rows; };
         const rows = parseCSV(csv); if (rows.length > 0) rows.shift();
         
-        evidenceData = rows.map((row, index) => ({
-          date: row[0] || '', type: row[1] || '', activities: row[2] || '', setting: row[3] || '', patientType: row[4] || '', focus: row[5] || '', newOrFollowUp: row[6] || '', complexity: row[7] || '', whatWentWell: row[8] || '', suggestions: row[9] || '', agreedAction: row[10] || '', reflection: row[11] || '', mappedLOs: row[12] || '', rating: row[13] || '', rowIndex: index
-        })).filter(i => i.reflection !== '');
+        evidenceData = rows.map((row, index) => {
+          return {
+            date: row[0] || '', 
+            type: row[1] || '', 
+            activities: row[2] || '', 
+            setting: row[3] || '', 
+            patientType: row[4] || '', 
+            focus: row[5] || '', 
+            newOrFollowUp: row[6] || '', 
+            complexity: row[7] || '', 
+            whatWentWell: decodeBase64(row[8] || ''), 
+            suggestions: decodeBase64(row[9] || ''), 
+            agreedAction: decodeBase64(row[10] || ''), 
+            reflection: decodeBase64(row[11] || ''), 
+            mappedLOs: row[12] || '', 
+            rating: row[13] || '', 
+            rowIndex: index
+          };
+        }).filter(i => i.reflection !== '');
 
         if (evidenceData.length === 0) { list.innerHTML = '<p class="empty">No evidence yet.</p>'; return; }
 
@@ -387,7 +410,6 @@
       
       evidenceData.forEach(e => {
         if (e.activities) {
-          // SPLIT BY PIPE NOW
           e.activities.split('|').forEach(a => { const name = a.trim(); if (name) counts[name] = (counts[name] || 0) + 1; });
         }
       });
@@ -399,7 +421,6 @@
         gphcFramework[group].forEach(act => {
           const req = reqCounts[act] || 0; if (req === 0) return;
           
-          // Check with and without group prefix
           const done = (counts[`${group}: ${act}`] || 0) + (counts[act] || 0);
           
           totalReq += req; totalDone += Math.min(done, req);
@@ -454,7 +475,6 @@
       try { await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ action: 'delete_reflection', row: row }) }); showToast('Deleted'); loadReflections(); } catch (e) { showToast('Error'); }
     }
 
-    // Standard Loaders
     async function loadHome() { loadHomeTasks(); loadReminders(); loadRecentScores().then(() => renderHomeRecentScores()); }
     async function loadStudy() { loadStudyData(); loadRecentScores(); loadEvidence(); loadReflections(); }
     
